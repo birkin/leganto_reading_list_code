@@ -154,27 +154,22 @@ def map_books( book_results: list, course_id: str ) -> list:
 def map_book( initial_book_data: dict, course_id: str ) -> dict:
     log.debug( f'initial_book_data, ``{initial_book_data}``' )
     mapped_book_data = LEGANTO_HEADINGS.copy()
-    coursecode: str = f'{course_id[0:8]}'
-    log.debug( f'coursecode, ``{coursecode}``' )
-    mapped_book_data['coursecode'] = coursecode
-    section_id: str = ''
-    if len(course_id) > 8:
-        section_id = course_id[8:]
-    log.debug( f'section_id, ``{section_id}``' )
-    mapped_book_data['section_id'] = section_id
+    mapped_book_data['citation_author'] = initial_book_data['bk_author']
+    mapped_book_data['citation_isbn'] = initial_book_data['isbn']
+    mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
+    mapped_book_data['citation_secondary_type'] = 'BK'
+    mapped_book_data['citation_source1'] = initial_book_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
+    mapped_book_data['citation_title'] = initial_book_data['bk_title']
+    mapped_book_data['coursecode'] = f'{course_id[0:8]}'
+    mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
+    # section_id: str = ''
+    # if len(course_id) > 8:
+    #     section_id = course_id[8:]
+    # log.debug( f'section_id, ``{section_id}``' )
+    # mapped_book_data['section_id'] = section_id
+    mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
     return mapped_book_data
-
-    # 'coursecode': '',
-    # 'section_id': '',
-    # 'citation_secondary_type': '',
-    # 'citation_title': '',
-    # 'citation_author': '',
-    # 'citation_publication_date': '',
-    # 'citation_isbn': '',
-    # 'citation_source1': '',
-    # 'external_system_id': ''
-
 
 
 ## -- misc helpers --------------------------------------------------

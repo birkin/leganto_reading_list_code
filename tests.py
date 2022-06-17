@@ -69,8 +69,30 @@ class MapperTest( unittest.TestCase ):
         
         course_id = 'EDUC2510A'
         mapped_book_data: dict = etl_class_data.map_book( initial_book_data, course_id )
-        self.assertEqual( [ 'key_a', 'key_b' ], sorted(list(mapped_book_data.keys())) )
-        self.assertEqual( 'foo', mapped_book_data )
+        expected_sorted_keys = [
+            'citation_author',
+            'citation_isbn',
+            'citation_publication_date',
+            'citation_secondary_type',
+            'citation_source1',
+            'citation_title',
+            'coursecode',
+            'external_system_id',
+            'section_id'
+            ]
+        self.assertEqual( expected_sorted_keys, sorted(list(mapped_book_data.keys())) )
+        expected_data = {
+            'citation_author': 'Appleman, Deborah',
+            'citation_isbn': '',
+            'citation_publication_date': '',
+            'citation_secondary_type': 'BK',
+            'citation_source1': 'CDL linked',
+            'citation_title': 'Critical Encounters in Secondary English: Teaching Literary Theory to Adolescents ',
+            'coursecode': 'EDUC2510',
+            'external_system_id': '20200505172403authID',
+            'section_id': 'A'
+            }
+        self.assertEqual( expected_data, mapped_book_data )
 
 
 if __name__ == '__main__':
