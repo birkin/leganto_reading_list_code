@@ -55,7 +55,7 @@ def manage_build_reading_list( course_id: str, class_id: str ):
     excerpt_results = get_excerpt_readings( class_id )
 
     ## map book data to leganto -------------------------------------
-    leg_books: list = map_books( book_results )
+    leg_books: list = map_books( book_results, course_id )
 
     ## post to google-sheet -----------------------------------------
 
@@ -143,13 +143,38 @@ def get_excerpt_readings( class_id: str ) -> list:
     return result_set
 
 
-def map_books( book_results: list ) -> list:
+def map_books( book_results: list, course_id: str ) -> list:
     mapped_books = []
+    for book_result in book_results:
+        mapped_book: dict = map_book( book_result, course_id )
+        mapped_books.append( mapped_book )
     return mapped_books
 
 
-def map_book( initial_book_data: dict ) -> dict:
-    return {}
+def map_book( initial_book_data: dict, course_id: str ) -> dict:
+    log.debug( f'initial_book_data, ``{initial_book_data}``' )
+    mapped_book_data = LEGANTO_HEADINGS.copy()
+    coursecode: str = f'{course_id[0:8]}'
+    log.debug( f'coursecode, ``{coursecode}``' )
+    mapped_book_data['coursecode'] = coursecode
+    section_id: str = ''
+    if len(course_id) > 8:
+        section_id = course_id[8:]
+    log.debug( f'section_id, ``{section_id}``' )
+    mapped_book_data['section_id'] = section_id
+    log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
+    return mapped_book_data
+
+    # 'coursecode': '',
+    # 'section_id': '',
+    # 'citation_secondary_type': '',
+    # 'citation_title': '',
+    # 'citation_author': '',
+    # 'citation_publication_date': '',
+    # 'citation_isbn': '',
+    # 'citation_source1': '',
+    # 'external_system_id': ''
+
 
 
 ## -- misc helpers --------------------------------------------------

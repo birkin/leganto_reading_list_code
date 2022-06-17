@@ -66,9 +66,11 @@ class MapperTest( unittest.TestCase ):
             'staffnotes': '',
             'status': 'requested as ebook'
             }
-        mapped_book_data: dict = etl_class_data.map_book( initial_book_data )
+        
+        course_id = 'EDUC2510A'
+        mapped_book_data: dict = etl_class_data.map_book( initial_book_data, course_id )
+        self.assertEqual( [ 'key_a', 'key_b' ], sorted(list(mapped_book_data.keys())) )
         self.assertEqual( 'foo', mapped_book_data )
-        self.assertEqual( [ 'key_a', 'key_b' ], list(mapped_book_data.keys()) )
 
 
 if __name__ == '__main__':

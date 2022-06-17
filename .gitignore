@@ -1,2 +1,6 @@
 settings.json
 .vscode
+*pycache*
+__pycache__
+*.pyc
+__pycache__/etl_class_data.cpython-39.pyc
