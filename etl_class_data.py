@@ -27,8 +27,13 @@ LEGANTO_HEADINGS: dict = {
     'citation_title': '',
     'citation_author': '',
     'citation_publication_date': '',
+    'citation_doi': '',
     'citation_isbn': '',
+    'citation_issn': '',
+    'citation_start_page': '',
+    'citation_end_page': '',
     'citation_source1': '',
+    'citation_source2': '',
     'external_system_id': ''
 }
 
@@ -56,6 +61,9 @@ def manage_build_reading_list( course_id: str, class_id: str ):
 
     ## map book data to leganto -------------------------------------
     leg_books: list = map_books( book_results, course_id )
+
+    ## map article data to leganto ----------------------------------
+    leg_articles: list = map_articles( article_results, course_id )
 
     ## post to google-sheet -----------------------------------------
 
@@ -143,6 +151,9 @@ def get_excerpt_readings( class_id: str ) -> list:
     return result_set
 
 
+## mappers ----------------------------------------------------------
+
+
 def map_books( book_results: list, course_id: str ) -> list:
     mapped_books = []
     for book_result in book_results:
@@ -170,6 +181,35 @@ def map_book( initial_book_data: dict, course_id: str ) -> dict:
     mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
     return mapped_book_data
+
+
+def map_articles( article_results: list, course_id: str ) -> list:
+    mapped_articles = []
+    for article_result in article_results:
+        mapped_article: dict = map_article( article_result, course_id )
+        mapped_articles.append( mapped_article )
+    return mapped_articles
+
+
+def map_article( initial_article_data: dict, course_id: str ) -> dict:
+    log.debug( f'initial_article_data, ``{initial_article_data}``' )
+    mapped_article_data = LEGANTO_HEADINGS.copy()
+
+    mapped_article_data['citation_author'] = f'{initial_article_data["aulast"]}, {initial_article_data["aufirst"]}'
+    mapped_article_data['citation_doi'] = initial_article_data['doi']
+    mapped_article_data['citation_end_page'] = str(initial_article_data['epage']) if initial_article_data['epage'] else ''
+    mapped_article_data['citation_issn'] = initial_article_data['issn']
+    # mapped_article_data['citation_publication_date'] = ''  # odd; articles don't show publication-date
+    mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
+    mapped_article_data['citation_source1'] = initial_article_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
+    mapped_article_data['citation_source2'] = initial_article_data['art_url']  
+    mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else ''
+    mapped_article_data['citation_title'] = initial_article_data['title']
+    mapped_article_data['coursecode'] = f'{course_id[0:8]}'
+    mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
+    mapped_article_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
+    return mapped_article_data
 
 
 ## -- misc helpers --------------------------------------------------
@@ -207,31 +247,6 @@ if __name__ == '__main__':
     course_id: str = args['course_id']
     class_id: str = args['class_id']
     manage_build_reading_list( course_id, class_id )
-
-
-
-
-# try:
-#     with pymysql.connect(  ## the with auto-closes the connection on any problem
-#         host=HOST,
-#         user=USERNAME,
-#         password=PASSWORD,
-#         database=DB,
-#         charset='utf8mb4',
-#         cursorclass=pymysql.cursors.DictCursor ) as db_connection:  # DictCursor means results will be dictionaries (yay!)
-#         print( f'made db_connection with PyMySQL.connect(), ``{db_connection}``' )
-#         db_cursor = db_connection.cursor()
-
-#         # db_cursor.execute( TEST_SELECT_QUERY )
-#         db_cursor.execute( "SELECT * FROM `banner_courses` WHERE `subject` LIKE 'EDUC' AND `course` LIKE '2510A' ORDER BY `banner_courses`.`term` DESC" )
-#         result_set = db_cursor.fetchall()
-#         for x in result_set:
-#             assert type( x ) == dict
-#             print( f'entry, ``{x}``' )
-
-# except Exception as e:
-#     # log.exception( 'problem somewhere; traceback follows' )
-#     print( f'could not make db_connection with PyMySQL.connect(); error, ``{e}``' )
 
 
 ## EOF
