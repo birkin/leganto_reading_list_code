@@ -71,7 +71,7 @@ def manage_build_reading_list( course_id: str, class_id: str ):
     leg_articles: list = map_articles( article_results, course_id )
 
     ## post to google-sheet -----------------------------------------
-    update_gsheet( leg_books )
+    update_gsheet( leg_books, leg_articles )
 
     ## end manage_build_reading_list()
 
@@ -179,11 +179,6 @@ def map_book( initial_book_data: dict, course_id: str ) -> dict:
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
-    # section_id: str = ''
-    # if len(course_id) > 8:
-    #     section_id = course_id[8:]
-    # log.debug( f'section_id, ``{section_id}``' )
-    # mapped_book_data['section_id'] = section_id
     mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
     return mapped_book_data
@@ -221,12 +216,14 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
 ## gsheet code ------------------------------------------------------
 
 
-def update_gsheet( book_results: list ) -> None:
+def update_gsheet( leg_books: list, leg_articles: list ) -> None:
     """ Writes data to gsheet, then...
         - sorts the worksheets so the most recent check appears first in the worksheet list.
         - deletes checks older than the curent and previous checks.
         Called by check_bibs() """
-    log.debug( f'gsheet starting data, ``{book_results}``' )
+    log.debug( f'gsheet starting leg_books, ``{leg_books}``' )
+    log.debug( f'gsheet starting leg_articles, ``{leg_articles}``' )
+    all_results = leg_books + leg_articles
     ## access spreadsheet -------------------------------------------
     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
@@ -254,11 +251,11 @@ def update_gsheet( book_results: list ) -> None:
         ]
     end_range_column = 'N'
     header_end_range = 'N1'
-    num_entries = len( book_results )
+    num_entries = len( all_results )
     data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
     ## prepare data -------------------------------------------------
     data_values = []
-    for entry in book_results:
+    for entry in all_results:
         row = [
             entry['coursecode'],
             entry['section_id'],
