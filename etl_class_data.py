@@ -15,12 +15,22 @@ log = logging.getLogger(__name__)
 log.info( 'logging ready' )
 
 
-TEST_SELECT_QUERY = 'SELECT * FROM `books` LIMIT 10'
-
 HOST = os.environ['LGNT__DB_HOST']
 USERNAME = os.environ['LGNT__DB_USERNAME']
 PASSWORD = os.environ['LGNT__DB_PASSWORD']
 DB = os.environ['LGNT__DB_DATABASE_NAME']
+
+LEGANTO_HEADINGS: dict = {
+    'coursecode': '',
+    'section_id': '',
+    'citation_secondary_type': '',
+    'citation_title': '',
+    'citation_author': '',
+    'citation_publication_date': '',
+    'citation_isbn': '',
+    'citation_source1': '',
+    'external_system_id': ''
+}
 
 
 def manage_build_reading_list( course_id: str, class_id: str ):
@@ -36,13 +46,16 @@ def manage_build_reading_list( course_id: str, class_id: str ):
         class_id = found_class_id
 
     ## get books ----------------------------------------------------
-    book_results = get_book_readings( class_id )
+    book_results: list = get_book_readings( class_id )
 
     ## get articles -------------------------------------------------
-    article_results = get_article_readings( class_id )
+    article_results: list = get_article_readings( class_id )
 
     ## get excerpts -------------------------------------------------
     excerpt_results = get_excerpt_readings( class_id )
+
+    ## map book data to leganto -------------------------------------
+    leg_books: list = map_books( book_results )
 
     ## post to google-sheet -----------------------------------------
 
@@ -79,7 +92,7 @@ def get_class_id( course_id: str ) -> str:
     return class_id
 
 
-def get_book_readings( class_id: str ):
+def get_book_readings( class_id: str ) -> list:
     db_connection = get_db_connection()
     sql = f"SELECT * FROM reserves.books, reserves.requests WHERE books.requestid = requests.requestid AND classid = {int(class_id)} ORDER BY `books`.`bk_title` ASC"
     log.debug( f'sql, ``{sql}``' )
@@ -96,7 +109,7 @@ def get_book_readings( class_id: str ):
     return result_set
 
 
-def get_article_readings( class_id: str ):
+def get_article_readings( class_id: str ) -> list:
     db_connection = get_db_connection()
     sql = f"SELECT * FROM reserves.articles, reserves.requests WHERE articles.requestid = requests.requestid AND classid = {int(class_id)} AND format = 'article' AND articles.requestid = requests.requestid AND articles.status != 'volume on reserve' AND articles.status != 'purchase requested' ORDER BY `articles`.`atitle` ASC"
     log.debug( f'sql, ``{sql}``' )
@@ -113,7 +126,7 @@ def get_article_readings( class_id: str ):
     return result_set
 
 
-def get_excerpt_readings( class_id: str ):
+def get_excerpt_readings( class_id: str ) -> list:
     db_connection = get_db_connection()
     sql = f"SELECT * FROM reserves.articles, reserves.requests WHERE requests.classid = {int(class_id)} AND format = 'excerpt' AND articles.requestid = requests.requestid AND articles.status != 'volume on reserve' AND articles.status != 'purchase requested' ORDER BY `articles`.`atitle` ASC;"
     log.debug( f'sql, ``{sql}``' )
@@ -128,6 +141,16 @@ def get_excerpt_readings( class_id: str ):
         log.debug( f'\n\nexcerpt, ``{entry}``')
     log.debug( '\n\n----------' )
     return result_set
+
+
+def map_books( book_results: list ) -> list:
+    mapped_books = []
+    return mapped_books
+
+
+def map_book( initial_book_data: dict ) -> dict:
+    return {}
+
 
 ## -- misc helpers --------------------------------------------------
 
