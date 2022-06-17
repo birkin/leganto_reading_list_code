@@ -1,5 +1,6 @@
-import argparse, logging, os, pprint, sys
+import argparse, datetime, json, logging, os, pprint, sys
 
+import gspread
 import pymysql
 import pymysql.cursors
 
@@ -37,6 +38,9 @@ LEGANTO_HEADINGS: dict = {
     'external_system_id': ''
 }
 
+CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
+SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
+
 
 def manage_build_reading_list( course_id: str, class_id: str ):
     """ Manages db-querying, assembling, and posting to gsheet. 
@@ -52,6 +56,7 @@ def manage_build_reading_list( course_id: str, class_id: str ):
 
     ## get books ----------------------------------------------------
     book_results: list = get_book_readings( class_id )
+    log.debug( f'book_results, ``{book_results}``' )
 
     ## get articles -------------------------------------------------
     article_results: list = get_article_readings( class_id )
@@ -66,6 +71,7 @@ def manage_build_reading_list( course_id: str, class_id: str ):
     leg_articles: list = map_articles( article_results, course_id )
 
     ## post to google-sheet -----------------------------------------
+    update_gsheet( leg_books )
 
     ## end manage_build_reading_list()
 
@@ -210,6 +216,115 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
     mapped_article_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
+
+
+## gsheet code ------------------------------------------------------
+
+
+def update_gsheet( book_results: list ) -> None:
+    """ Writes data to gsheet, then...
+        - sorts the worksheets so the most recent check appears first in the worksheet list.
+        - deletes checks older than the curent and previous checks.
+        Called by check_bibs() """
+    log.debug( f'gsheet starting data, ``{book_results}``' )
+    ## access spreadsheet -------------------------------------------
+    credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+    sheet = credentialed_connection.open( SPREADSHEET_NAME )
+    ## create new worksheet ----------------------------------------
+    title: str = f'check_results_{datetime.datetime.now()}'
+    worksheet = sheet.add_worksheet(
+        title=title, rows=100, cols=20
+        )
+    ## prepare range ------------------------------------------------
+    headers = [
+        'coursecode',
+        'section_id',
+        'citation_secondary_type',
+        'citation_title',
+        'citation_author',
+        'citation_publication_date',
+        'citation_doi',
+        'citation_isbn',
+        'citation_issn',
+        'citation_start_page',
+        'citation_end_page',
+        'citation_source1',
+        'citation_source2',
+        'external_system_id'
+        ]
+    end_range_column = 'N'
+    header_end_range = 'N1'
+    num_entries = len( book_results )
+    data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
+    ## prepare data -------------------------------------------------
+    data_values = []
+    for entry in book_results:
+        row = [
+            entry['coursecode'],
+            entry['section_id'],
+            entry['citation_secondary_type'],
+            entry['citation_title'],
+            entry['citation_author'],
+            entry['citation_publication_date'],
+            entry['citation_doi'],
+            entry['citation_isbn'],
+            entry['citation_issn'],
+            entry['citation_start_page'],
+            entry['citation_end_page'],
+            entry['citation_source1'],
+            entry['citation_source2'],
+            entry['external_system_id']
+            ]
+        data_values.append( row )
+    log.debug( f'data_values, ``{data_values}``' )
+    log.debug( f'data_end_range, ``{data_end_range}``' )
+    new_data = [
+        { 
+            'range': f'A1:{header_end_range}',
+            'values': [ headers ]
+        },
+        {
+            'range': f'A2:{data_end_range}',
+            'values': data_values
+        }
+
+    ]
+    
+    ## update values ------------------------------------------------
+    worksheet.batch_update( new_data, value_input_option='raw' )
+
+
+
+
+    # log.debug( f'data_end_range, ``{data_end_range}``' )
+    # ## prepare data -------------------------------------------------
+    # data_values: list = prep_data_values( headers, final_data['results'], header_end_range, data_end_range )
+    # ## update values ------------------------------------------------
+    # worksheet.batch_update( data_values, value_input_option='raw' )
+    # ## update formatting --------------------------------------------
+    # worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
+    # worksheet.freeze( rows=1, cols=None )
+    # ## re-order worksheets so most recent is 2nd --------------------
+    # wrkshts: list = sheet.worksheets()
+    # log.debug( f'wrkshts, ``{wrkshts}``' )
+    # reordered_wrkshts: list = [ wrkshts[0], wrkshts[-1] ]
+    # log.debug( f'reordered_wrkshts, ``{reordered_wrkshts}``' )
+    # sheet.reorder_worksheets( reordered_wrkshts )
+    # ## delete old checks (keeps current and previous) ---------------
+    # num_wrkshts: int = len( wrkshts )
+    # log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
+    # if num_wrkshts > 3:  # keep requested_checks, and two recent checks
+    #     wrkshts: list = sheet.worksheets()
+    #     wrkshts_to_delete = wrkshts[3:]
+    #     for wrksht in wrkshts_to_delete:
+    #         sheet.del_worksheet( wrksht )
+    # ## wind down -----------------------------------------------------
+    # end_time = timer()
+    # elapsed_write_data: str = str( end_time - start_time )
+    # log.debug( f'elapsed_write_data, ``{elapsed_write_data}``' )
+    return
+
+    ## end def update_gsheet()
 
 
 ## -- misc helpers --------------------------------------------------
