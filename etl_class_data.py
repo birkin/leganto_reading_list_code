@@ -289,36 +289,23 @@ def update_gsheet( leg_books: list, leg_articles: list ) -> None:
     
     ## update values ------------------------------------------------
     worksheet.batch_update( new_data, value_input_option='raw' )
-
-
-
-
-    # log.debug( f'data_end_range, ``{data_end_range}``' )
-    # ## prepare data -------------------------------------------------
-    # data_values: list = prep_data_values( headers, final_data['results'], header_end_range, data_end_range )
-    # ## update values ------------------------------------------------
-    # worksheet.batch_update( data_values, value_input_option='raw' )
-    # ## update formatting --------------------------------------------
-    # worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
-    # worksheet.freeze( rows=1, cols=None )
-    # ## re-order worksheets so most recent is 2nd --------------------
-    # wrkshts: list = sheet.worksheets()
-    # log.debug( f'wrkshts, ``{wrkshts}``' )
-    # reordered_wrkshts: list = [ wrkshts[0], wrkshts[-1] ]
-    # log.debug( f'reordered_wrkshts, ``{reordered_wrkshts}``' )
-    # sheet.reorder_worksheets( reordered_wrkshts )
-    # ## delete old checks (keeps current and previous) ---------------
-    # num_wrkshts: int = len( wrkshts )
-    # log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
-    # if num_wrkshts > 3:  # keep requested_checks, and two recent checks
-    #     wrkshts: list = sheet.worksheets()
-    #     wrkshts_to_delete = wrkshts[3:]
-    #     for wrksht in wrkshts_to_delete:
-    #         sheet.del_worksheet( wrksht )
-    # ## wind down -----------------------------------------------------
-    # end_time = timer()
-    # elapsed_write_data: str = str( end_time - start_time )
-    # log.debug( f'elapsed_write_data, ``{elapsed_write_data}``' )
+    ## update formatting --------------------------------------------
+    worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
+    worksheet.freeze( rows=1, cols=None )
+    ## re-order worksheets so most recent is 2nd --------------------
+    wrkshts: list = sheet.worksheets()
+    log.debug( f'wrkshts, ``{wrkshts}``' )
+    reordered_wrkshts: list = [ wrkshts[0], wrkshts[-1] ]
+    log.debug( f'reordered_wrkshts, ``{reordered_wrkshts}``' )
+    sheet.reorder_worksheets( reordered_wrkshts )
+    ## delete old checks (keeps current and previous) ---------------
+    num_wrkshts: int = len( wrkshts )
+    log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
+    if num_wrkshts > 3:  # keep requested_checks, and two recent checks
+        wrkshts: list = sheet.worksheets()
+        wrkshts_to_delete = wrkshts[3:]
+        for wrksht in wrkshts_to_delete:
+            sheet.del_worksheet( wrksht )
     return
 
     ## end def update_gsheet()
