@@ -227,6 +227,7 @@ def update_gsheet( leg_books: list, leg_articles: list ) -> None:
     ## access spreadsheet -------------------------------------------
     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
+    log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
     ## create new worksheet ----------------------------------------
     title: str = f'check_results_{datetime.datetime.now()}'
     worksheet = sheet.add_worksheet(
@@ -343,8 +344,10 @@ def parse_args() -> dict:
 if __name__ == '__main__':
     args: dict = parse_args()
     log.info( f'starting args, ```{args}```' )
-    course_id: str = args['course_id']
-    class_id: str = args['class_id']
+    course_id  = args['course_id']
+    log.debug( f'course_id, ``{course_id}``' )
+    class_id  = args['class_id']
+    log.debug( f'class_id, ``{class_id}``' )
     manage_build_reading_list( course_id, class_id )
 
 
