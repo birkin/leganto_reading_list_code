@@ -5,10 +5,10 @@ import pymysql
 import pymysql.cursors
 
 
-# LOG_PATH: str = os.environ['LGNT__LOG_PATH']
+LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 
 logging.basicConfig(
-    # filename=LOG_PATH,
+    filename=LOG_PATH,
     level=logging.DEBUG,
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
