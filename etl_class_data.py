@@ -42,37 +42,28 @@ CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
 SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 
-# def manage_build_reading_list( course_id: str, class_id: str ):
+# def manage_build_reading_list( course_id: str ):
 #     """ Manages db-querying, assembling, and posting to gsheet. 
 #         Called by if...main: """
-#     log.debug( f'course_id, ``{course_id}``')
-#     log.debug( f'class_id, ``{class_id}``')
-
-#     ## if course_id, get class_id -----------------------------------
-#     if course_id and not class_id:
-#         found_class_id: str = get_class_id( course_id )
-#         log.debug( f'found_class_id, ``{found_class_id}``' )
-#         class_id = found_class_id
-
-#     ## get books ----------------------------------------------------
-#     book_results: list = get_book_readings( class_id )
-#     log.debug( f'book_results, ``{book_results}``' )
-
-#     ## get articles -------------------------------------------------
-#     article_results: list = get_article_readings( class_id )
-
-#     ## get excerpts -------------------------------------------------
-#     excerpt_results = get_excerpt_readings( class_id )
-
-#     ## map book data to leganto -------------------------------------
-#     leg_books: list = map_books( book_results, course_id )
-
-#     ## map article data to leganto ----------------------------------
-#     leg_articles: list = map_articles( article_results, course_id )
-
+#     log.debug( f'raw course_id, ``{course_id}``')
+#     ## setup --------------------------------------------------------
+#     all_results: list = []
+#     class_id_list: list = []
+#     ## make course-id list ------------------------------------------
+#     course_id_list: list = course_id.split( ',' )
+#     for course_id_entry in course_id_list:
+#         class_id: str = get_class_id( course_id_entry )
+#         class_id_list.append( class_id )
+#     ## process class-id-list ----------------------------------------
+#     for class_id_entry in class_id_list:
+#         book_results: list = get_book_readings( class_id_entry )
+#         article_results: list = get_article_readings( class_id_entry )
+#         leg_books: list = map_books( book_results, course_id )
+#         leg_articles: list = map_articles( article_results, course_id )
+#         all_course_results = leg_books + leg_articles
+#         all_results = all_results + all_course_results
 #     ## post to google-sheet -----------------------------------------
-#     update_gsheet( leg_books, leg_articles )
-
+#     update_gsheet( all_results )
 #     ## end manage_build_reading_list()
 
 
@@ -82,23 +73,27 @@ def manage_build_reading_list( course_id: str ):
     log.debug( f'raw course_id, ``{course_id}``')
     ## setup --------------------------------------------------------
     all_results: list = []
-    class_id_list: list = []
+    courses_and_classes: list = []
     ## make course-id list ------------------------------------------
     course_id_list: list = course_id.split( ',' )
     for course_id_entry in course_id_list:
-        class_id: str = get_class_id( course_id )
-        class_id_list.append( class_id )
+        class_id: str = get_class_id( course_id_entry )
+        class_id_dict: dict = { 'course_id': course_id_entry, 'class_id': class_id }
+        courses_and_classes.append( class_id_dict )
     ## process class-id-list ----------------------------------------
-    for class_id_entry in class_id_list:
-        book_results: list = get_book_readings( class_id_entry )
-        article_results: list = get_article_readings( class_id_entry )
-        leg_books: list = map_books( book_results, course_id )
-        leg_articles: list = map_articles( article_results, course_id )
+    for class_id_entry in courses_and_classes:
+        assert type(class_id_entry) == dict
+        log.debug( f'class_id_entry, ``{class_id_entry}``' )
+        book_results: list = get_book_readings( class_id_entry['class_id'] )
+        article_results: list = get_article_readings( class_id_entry['class_id'] )
+        leg_books: list = map_books( book_results, class_id_entry['course_id'] )
+        leg_articles: list = map_articles( article_results, class_id_entry['course_id'] )
         all_course_results = leg_books + leg_articles
         all_results = all_results + all_course_results
     ## post to google-sheet -----------------------------------------
     update_gsheet( all_results )
     ## end manage_build_reading_list()
+
 
 
 def get_class_id( course_id: str ) -> str:
