@@ -95,7 +95,7 @@ def manage_build_reading_list( course_id: str ):
         leg_books: list = map_books( book_results, course_id )
         leg_articles: list = map_articles( article_results, course_id )
         all_course_results = leg_books + leg_articles
-        all_results.append( all_course_results )
+        all_results = all_results + all_course_results
     ## post to google-sheet -----------------------------------------
     update_gsheet( all_results )
     ## end manage_build_reading_list()
@@ -247,6 +247,7 @@ def update_gsheet( all_results: list ) -> None:
         - deletes checks older than the curent and previous checks.
         Called by check_bibs() """
     ## access spreadsheet -------------------------------------------
+    log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
