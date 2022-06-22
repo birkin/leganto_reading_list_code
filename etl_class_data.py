@@ -42,31 +42,6 @@ CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
 SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 
-# def manage_build_reading_list( course_id: str ):
-#     """ Manages db-querying, assembling, and posting to gsheet. 
-#         Called by if...main: """
-#     log.debug( f'raw course_id, ``{course_id}``')
-#     ## setup --------------------------------------------------------
-#     all_results: list = []
-#     class_id_list: list = []
-#     ## make course-id list ------------------------------------------
-#     course_id_list: list = course_id.split( ',' )
-#     for course_id_entry in course_id_list:
-#         class_id: str = get_class_id( course_id_entry )
-#         class_id_list.append( class_id )
-#     ## process class-id-list ----------------------------------------
-#     for class_id_entry in class_id_list:
-#         book_results: list = get_book_readings( class_id_entry )
-#         article_results: list = get_article_readings( class_id_entry )
-#         leg_books: list = map_books( book_results, course_id )
-#         leg_articles: list = map_articles( article_results, course_id )
-#         all_course_results = leg_books + leg_articles
-#         all_results = all_results + all_course_results
-#     ## post to google-sheet -----------------------------------------
-#     update_gsheet( all_results )
-#     ## end manage_build_reading_list()
-
-
 def manage_build_reading_list( course_id: str ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
@@ -84,21 +59,26 @@ def manage_build_reading_list( course_id: str ):
     for class_id_entry in courses_and_classes:
         assert type(class_id_entry) == dict
         log.debug( f'class_id_entry, ``{class_id_entry}``' )
-        book_results: list = get_book_readings( class_id_entry['class_id'] )
-        article_results: list = get_article_readings( class_id_entry['class_id'] )
-        leg_books: list = map_books( book_results, class_id_entry['course_id'] )
-        leg_articles: list = map_articles( article_results, class_id_entry['course_id'] )
-        all_course_results = leg_books + leg_articles
+        class_id: str = class_id_entry['class_id']
+        course_id: str = class_id_entry['course_id']
+        if class_id:
+            book_results: list = get_book_readings( class_id )
+            article_results: list = get_article_readings( class_id )
+            leg_books: list = map_books( book_results, course_id )
+            leg_articles: list = map_articles( article_results, course_id )
+            all_course_results: list = leg_books + leg_articles
+        else:
+            all_course_results: list = [ map_empty(course_id) ]
         all_results = all_results + all_course_results
     ## post to google-sheet -----------------------------------------
     update_gsheet( all_results )
     ## end manage_build_reading_list()
 
 
-
 def get_class_id( course_id: str ) -> str:
     """ Finds class_id from given course_id.
         Called by manage_build_reading_list() """
+    class_id: str = 'init'
     ## split the id -------------------------------------------------
     db_connection = get_db_connection()
     split_position: int = 0
@@ -120,8 +100,11 @@ def get_class_id( course_id: str ) -> str:
             result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
             assert type(result_set) == list
     log.debug( f'result_set, ``{result_set}``' )
-    recent_row = result_set[0]
-    class_id: str = str( recent_row['classid'] )
+    if result_set:
+        recent_row = result_set[0]
+        class_id = str( recent_row['classid'] )
+    else:
+        class_id = ''
     log.debug( f'class_id, ``{class_id}``' )
     return class_id
 
@@ -201,6 +184,13 @@ def map_book( initial_book_data: dict, course_id: str ) -> dict:
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
     mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
+    return mapped_book_data
+
+
+def map_empty( course_id: str ) -> dict:
+    mapped_book_data = LEGANTO_HEADINGS.copy()
+    mapped_book_data['coursecode'] = f'{course_id[0:8]}'
+    mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     return mapped_book_data
 
 
