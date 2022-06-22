@@ -42,37 +42,62 @@ CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
 SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 
-def manage_build_reading_list( course_id: str, class_id: str ):
+# def manage_build_reading_list( course_id: str, class_id: str ):
+#     """ Manages db-querying, assembling, and posting to gsheet. 
+#         Called by if...main: """
+#     log.debug( f'course_id, ``{course_id}``')
+#     log.debug( f'class_id, ``{class_id}``')
+
+#     ## if course_id, get class_id -----------------------------------
+#     if course_id and not class_id:
+#         found_class_id: str = get_class_id( course_id )
+#         log.debug( f'found_class_id, ``{found_class_id}``' )
+#         class_id = found_class_id
+
+#     ## get books ----------------------------------------------------
+#     book_results: list = get_book_readings( class_id )
+#     log.debug( f'book_results, ``{book_results}``' )
+
+#     ## get articles -------------------------------------------------
+#     article_results: list = get_article_readings( class_id )
+
+#     ## get excerpts -------------------------------------------------
+#     excerpt_results = get_excerpt_readings( class_id )
+
+#     ## map book data to leganto -------------------------------------
+#     leg_books: list = map_books( book_results, course_id )
+
+#     ## map article data to leganto ----------------------------------
+#     leg_articles: list = map_articles( article_results, course_id )
+
+#     ## post to google-sheet -----------------------------------------
+#     update_gsheet( leg_books, leg_articles )
+
+#     ## end manage_build_reading_list()
+
+
+def manage_build_reading_list( course_id: str ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
-    log.debug( f'course_id, ``{course_id}``')
-    log.debug( f'class_id, ``{class_id}``')
-
-    ## if course_id, get class_id -----------------------------------
-    if course_id and not class_id:
-        found_class_id: str = get_class_id( course_id )
-        log.debug( f'found_class_id, ``{found_class_id}``' )
-        class_id = found_class_id
-
-    ## get books ----------------------------------------------------
-    book_results: list = get_book_readings( class_id )
-    log.debug( f'book_results, ``{book_results}``' )
-
-    ## get articles -------------------------------------------------
-    article_results: list = get_article_readings( class_id )
-
-    ## get excerpts -------------------------------------------------
-    excerpt_results = get_excerpt_readings( class_id )
-
-    ## map book data to leganto -------------------------------------
-    leg_books: list = map_books( book_results, course_id )
-
-    ## map article data to leganto ----------------------------------
-    leg_articles: list = map_articles( article_results, course_id )
-
+    log.debug( f'raw course_id, ``{course_id}``')
+    ## setup --------------------------------------------------------
+    all_results: list = []
+    class_id_list: list = []
+    ## make course-id list ------------------------------------------
+    course_id_list: list = course_id.split( ',' )
+    for course_id_entry in course_id_list:
+        class_id: str = get_class_id( course_id )
+        class_id_list.append( class_id )
+    ## process class-id-list ----------------------------------------
+    for class_id_entry in class_id_list:
+        book_results: list = get_book_readings( class_id_entry )
+        article_results: list = get_article_readings( class_id_entry )
+        leg_books: list = map_books( book_results, course_id )
+        leg_articles: list = map_articles( article_results, course_id )
+        all_course_results = leg_books + leg_articles
+        all_results.append( all_course_results )
     ## post to google-sheet -----------------------------------------
-    update_gsheet( leg_books, leg_articles )
-
+    update_gsheet( all_results )
     ## end manage_build_reading_list()
 
 
@@ -216,14 +241,11 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
 ## gsheet code ------------------------------------------------------
 
 
-def update_gsheet( leg_books: list, leg_articles: list ) -> None:
+def update_gsheet( all_results: list ) -> None:
     """ Writes data to gsheet, then...
         - sorts the worksheets so the most recent check appears first in the worksheet list.
         - deletes checks older than the curent and previous checks.
         Called by check_bibs() """
-    log.debug( f'gsheet starting leg_books, ``{leg_books}``' )
-    log.debug( f'gsheet starting leg_articles, ``{leg_articles}``' )
-    all_results = leg_books + leg_articles
     ## access spreadsheet -------------------------------------------
     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
@@ -312,6 +334,102 @@ def update_gsheet( leg_books: list, leg_articles: list ) -> None:
     ## end def update_gsheet()
 
 
+# def update_gsheet( leg_books: list, leg_articles: list ) -> None:
+#     """ Writes data to gsheet, then...
+#         - sorts the worksheets so the most recent check appears first in the worksheet list.
+#         - deletes checks older than the curent and previous checks.
+#         Called by check_bibs() """
+#     log.debug( f'gsheet starting leg_books, ``{leg_books}``' )
+#     log.debug( f'gsheet starting leg_articles, ``{leg_articles}``' )
+#     all_results = leg_books + leg_articles
+#     ## access spreadsheet -------------------------------------------
+#     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+#     sheet = credentialed_connection.open( SPREADSHEET_NAME )
+#     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
+#     ## create new worksheet ----------------------------------------
+#     title: str = f'check_results_{datetime.datetime.now()}'
+#     worksheet = sheet.add_worksheet(
+#         title=title, rows=100, cols=20
+#         )
+#     ## prepare range ------------------------------------------------
+#     headers = [
+#         'coursecode',
+#         'section_id',
+#         'citation_secondary_type',
+#         'citation_title',
+#         'citation_author',
+#         'citation_publication_date',
+#         'citation_doi',
+#         'citation_isbn',
+#         'citation_issn',
+#         'citation_start_page',
+#         'citation_end_page',
+#         'citation_source1',
+#         'citation_source2',
+#         'external_system_id'
+#         ]
+#     end_range_column = 'N'
+#     header_end_range = 'N1'
+#     num_entries = len( all_results )
+#     data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
+#     ## prepare data -------------------------------------------------
+#     data_values = []
+#     for entry in all_results:
+#         row = [
+#             entry['coursecode'],
+#             entry['section_id'],
+#             entry['citation_secondary_type'],
+#             entry['citation_title'],
+#             entry['citation_author'],
+#             entry['citation_publication_date'],
+#             entry['citation_doi'],
+#             entry['citation_isbn'],
+#             entry['citation_issn'],
+#             entry['citation_start_page'],
+#             entry['citation_end_page'],
+#             entry['citation_source1'],
+#             entry['citation_source2'],
+#             entry['external_system_id']
+#             ]
+#         data_values.append( row )
+#     log.debug( f'data_values, ``{data_values}``' )
+#     log.debug( f'data_end_range, ``{data_end_range}``' )
+#     new_data = [
+#         { 
+#             'range': f'A1:{header_end_range}',
+#             'values': [ headers ]
+#         },
+#         {
+#             'range': f'A2:{data_end_range}',
+#             'values': data_values
+#         }
+
+#     ]
+    
+#     ## update values ------------------------------------------------
+#     worksheet.batch_update( new_data, value_input_option='raw' )
+#     ## update formatting --------------------------------------------
+#     worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
+#     worksheet.freeze( rows=1, cols=None )
+#     ## re-order worksheets so most recent is 2nd --------------------
+#     wrkshts: list = sheet.worksheets()
+#     log.debug( f'wrkshts, ``{wrkshts}``' )
+#     reordered_wrkshts: list = [ wrkshts[0], wrkshts[-1] ]
+#     log.debug( f'reordered_wrkshts, ``{reordered_wrkshts}``' )
+#     sheet.reorder_worksheets( reordered_wrkshts )
+#     ## delete old checks (keeps current and previous) ---------------
+#     num_wrkshts: int = len( wrkshts )
+#     log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
+#     if num_wrkshts > 3:  # keep requested_checks, and two recent checks
+#         wrkshts: list = sheet.worksheets()
+#         wrkshts_to_delete = wrkshts[3:]
+#         for wrksht in wrkshts_to_delete:
+#             sheet.del_worksheet( wrksht )
+#     return
+
+#     ## end def update_gsheet()
+
+
 ## -- misc helpers --------------------------------------------------
 
 
@@ -332,9 +450,8 @@ def get_db_connection():
 
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
-    parser = argparse.ArgumentParser( description='Required: either a `course_id` like EDUC1234, or a `class_id`' )
-    parser.add_argument( '--course_id', help='typically like: EDUC1234', required=False )
-    parser.add_argument( '--class_id', help='', required=False )
+    parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`)' )
+    parser.add_argument( '--course_id', help='typically like: EDUC1234', required=True )
     args: dict = vars( parser.parse_args() )
     if args == {'course_id': None, 'class_id': None}:
         parser.print_help()
@@ -346,9 +463,7 @@ if __name__ == '__main__':
     log.info( f'starting args, ```{args}```' )
     course_id  = args['course_id']
     log.debug( f'course_id, ``{course_id}``' )
-    class_id  = args['class_id']
-    log.debug( f'class_id, ``{class_id}``' )
-    manage_build_reading_list( course_id, class_id )
+    manage_build_reading_list( course_id )
 
 
 ## EOF
