@@ -84,7 +84,31 @@ def manage_build_reading_list( raw_course_id: str ):
 def get_list_from_spreadsheet() -> list:
     """ Builds course-id-list from spreadsheet.
         Called by manage_build_reading_list() """
+    credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+    sheet = credentialed_connection.open( SPREADSHEET_NAME )
+    wrksheet = sheet.worksheet( 'course_ids_to_check' )
+    list_of_dicts: list = wrksheet.get_all_records()
+    log.debug( f'list_of_dicts, ``{pprint.pformat(list_of_dicts)}``' )
     return ['coming']
+
+
+
+
+
+# def get_requested_checks() -> tuple:
+#     """ Grabs mms_ids to check from google-sheet.
+#         Called by check_bibs() """
+#     start_time = timer()
+#     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+#     sheet = credentialed_connection.open( SPREADSHEET_NAME )
+#     wrksheet = sheet.worksheet( 'requested_checks' )
+#     list_of_dicts = wrksheet.get_all_records()
+#     end_time = timer()
+#     elapsed: str = str( end_time - start_time )
+#     return ( list_of_dicts[0:2] , elapsed )
+
+
+
 
 
 def get_class_id( course_id: str ) -> str:
