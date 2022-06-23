@@ -42,15 +42,15 @@ CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
 SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 
-def manage_build_reading_list( course_id: str ):
+def manage_build_reading_list( raw_course_id: str ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
-    log.debug( f'raw course_id, ``{course_id}``')
+    log.debug( f'raw course_id, ``{raw_course_id}``')
     ## setup --------------------------------------------------------
     all_results: list = []
     courses_and_classes: list = []
     ## make course-id list ------------------------------------------
-    course_id_list: list = course_id.split( ',' )
+    course_id_list: list = raw_course_id.split( ',' )
     for course_id_entry in course_id_list:
         class_id: str = get_class_id( course_id_entry )
         class_id_dict: dict = { 'course_id': course_id_entry, 'class_id': class_id }
