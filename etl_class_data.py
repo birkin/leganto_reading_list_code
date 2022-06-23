@@ -50,7 +50,10 @@ def manage_build_reading_list( raw_course_id: str ):
     all_results: list = []
     courses_and_classes: list = []
     ## make course-id list ------------------------------------------
-    course_id_list: list = raw_course_id.split( ',' )
+    if raw_course_id == 'SPREADSHEET':
+        course_id_list: list = get_list_from_spreadsheet()
+    else:
+        course_id_list: list = raw_course_id.split( ',' )
     for course_id_entry in course_id_list:
         class_id: str = get_class_id( course_id_entry )
         class_id_dict: dict = { 'course_id': course_id_entry, 'class_id': class_id }
@@ -73,6 +76,15 @@ def manage_build_reading_list( raw_course_id: str ):
     ## post to google-sheet -----------------------------------------
     update_gsheet( all_results )
     ## end manage_build_reading_list()
+
+
+## helpers ----------------------------------------------------------
+
+
+def get_list_from_spreadsheet() -> list:
+    """ Builds course-id-list from spreadsheet.
+        Called by manage_build_reading_list() """
+    return ['coming']
 
 
 def get_class_id( course_id: str ) -> str:
