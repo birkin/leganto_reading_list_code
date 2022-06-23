@@ -89,10 +89,11 @@ def get_list_from_spreadsheet() -> list:
     wrksheet = sheet.worksheet( 'course_ids_to_check' )
     list_of_dicts: list = wrksheet.get_all_records()
     log.debug( f'list_of_dicts, ``{pprint.pformat(list_of_dicts)}``' )
-    return ['coming']
-
-
-
+    course_id_list: list = []
+    for dct in list_of_dicts:
+        course_id: str = dct['course_id']
+        course_id_list.append( course_id )
+    return course_id_list
 
 
 # def get_requested_checks() -> tuple:
