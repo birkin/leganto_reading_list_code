@@ -42,10 +42,16 @@ CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
 SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 
-def manage_build_reading_list( raw_course_id: str ):
+def manage_build_reading_list( raw_course_id: str, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
-    log.debug( f'raw course_id, ``{raw_course_id}``')
+    log.debug( f'raw course_id, ``{raw_course_id}``; force, ``{force}``')
+    ## check for recent updates -------------------------------------
+    if force == False:
+        recent_updates: bool = check_for_recent_updates()
+        if recent_updates == False:
+            log.debug( 'no recent updates' )
+            return
     ## setup --------------------------------------------------------
     all_results: list = []
     courses_and_classes: list = []
@@ -79,6 +85,35 @@ def manage_build_reading_list( raw_course_id: str ):
 
 
 ## helpers ----------------------------------------------------------
+
+
+def check_for_recent_updates() -> bool:
+    """ Checks if there have been recent updates.
+        Called by manage_build_reading_list() """
+    recently_updated = False
+    ## access spreadsheet -------------------------------------------
+    credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+    sheet = credentialed_connection.open( SPREADSHEET_NAME )
+    last_updated_str: str = sheet.lastUpdateTime
+    log.debug( f'last-updated, ``{last_updated_str}``' )
+    ## calculate ----------------------------------------------------
+    last_updated_obj = datetime.datetime.strptime( last_updated_str, '%Y-%m-%dT%H:%M:%S.%f%z' )
+    log.debug( f'last_updated_obj-str, ``{last_updated_obj}``' )
+    utc_now_obj = datetime.datetime.utcnow()
+    log.debug( f'initial utc_now_obj, ``{utc_now_obj}``' )
+    utc_now_obj = datetime.datetime.now( datetime.timezone.utc )
+    log.debug( f'better utc_now_obj, ``{utc_now_obj}``' )
+    interval_obj = datetime.timedelta( minutes=30 )
+    log.debug( f'interval, ``{interval_obj}``' )
+    window_limit = last_updated_obj + interval_obj
+    log.debug( f'window_limit, ``{window_limit}``' )
+    if utc_now_obj > window_limit:
+        log.debug( f'was _not_ recently updated')
+    else:
+        log.debug( f'_was_ recently updated')
+        recently_updated = True
+    log.debug( f'recently_updated, ``{recently_updated}``' )
+    return recently_updated
 
 
 def get_list_from_spreadsheet() -> list:
@@ -405,9 +440,10 @@ def parse_args() -> dict:
 if __name__ == '__main__':
     args: dict = parse_args()
     log.info( f'starting args, ```{args}```' )
-    course_id  = args['course_id']
+    course_id: str  = args['course_id']
     log.debug( f'course_id, ``{course_id}``' )
-    manage_build_reading_list( course_id )
+    force: bool = args.get( 'force', False )
+    manage_build_reading_list( course_id, force )
 
 
 ## EOF
