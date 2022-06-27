@@ -120,51 +120,6 @@ def check_for_updates( course_id_list ) -> bool:
     return new_updates
 
 
-    ## calculate ----------------------------------------------------
-    last_updated_obj = datetime.datetime.strptime( last_updated_str, '%Y-%m-%dT%H:%M:%S.%f%z' )
-    log.debug( f'last_updated_obj-str, ``{last_updated_obj}``' )
-    utc_now_obj = datetime.datetime.now( datetime.timezone.utc )
-    log.debug( f'utc_now_obj, ``{utc_now_obj}``' )
-    interval_obj = datetime.timedelta( minutes=30 )
-    log.debug( f'interval, ``{interval_obj}``' )
-    window_limit = last_updated_obj + interval_obj
-    log.debug( f'window_limit, ``{window_limit}``' )
-    if utc_now_obj > window_limit:
-        log.debug( f'was _not_ recently updated')
-    else:
-        log.debug( f'_was_ recently updated')
-        recently_updated = True
-    log.debug( f'recently_updated, ``{recently_updated}``' )
-    return recently_updated
-
-
-# def check_for_recent_updates() -> bool:
-#     """ Checks if there have been recent updates.
-#         Called by manage_build_reading_list() """
-#     recently_updated = False
-#     ## access spreadsheet -------------------------------------------
-#     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
-#     sheet = credentialed_connection.open( SPREADSHEET_NAME )
-#     last_updated_str: str = sheet.lastUpdateTime
-#     log.debug( f'last-updated, ``{last_updated_str}``' )
-#     ## calculate ----------------------------------------------------
-#     last_updated_obj = datetime.datetime.strptime( last_updated_str, '%Y-%m-%dT%H:%M:%S.%f%z' )
-#     log.debug( f'last_updated_obj-str, ``{last_updated_obj}``' )
-#     utc_now_obj = datetime.datetime.now( datetime.timezone.utc )
-#     log.debug( f'utc_now_obj, ``{utc_now_obj}``' )
-#     interval_obj = datetime.timedelta( minutes=30 )
-#     log.debug( f'interval, ``{interval_obj}``' )
-#     window_limit = last_updated_obj + interval_obj
-#     log.debug( f'window_limit, ``{window_limit}``' )
-#     if utc_now_obj > window_limit:
-#         log.debug( f'was _not_ recently updated')
-#     else:
-#         log.debug( f'_was_ recently updated')
-#         recently_updated = True
-#     log.debug( f'recently_updated, ``{recently_updated}``' )
-#     return recently_updated
-
-
 def get_list_from_spreadsheet() -> list:
     """ Builds course-id-list from spreadsheet.
         Called by manage_build_reading_list() """
