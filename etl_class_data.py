@@ -41,6 +41,8 @@ LEGANTO_HEADINGS: dict = {
 CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
 SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
+LAST_CHECKED_PATH: str = os.environ['LGNT__LAST_CHECKED_JSON_PATH']
+
 
 def manage_build_reading_list( raw_course_id: str, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
@@ -49,19 +51,20 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
     ## setup --------------------------------------------------------
     all_results: list = []
     courses_and_classes: list = []
+    course_id_list = []
     ## make course-id list ------------------------------------------
     if raw_course_id == 'SPREADSHEET':
-        ## check for recent updates ---------------------------------
+        course_id_list: list = get_list_from_spreadsheet()
         if force:
             log.debug( 'skipping recent-updates check' )
         else:
-            recent_updates: bool = check_for_recent_updates()
+            ## check for recent updates ---------------------------------
+            recent_updates: bool = check_for_updates( course_id_list )
             if recent_updates == False:
                 log.debug( 'no recent updates; quitting' )
                 return        
             else:
                 log.debug( 'recent updates found' )
-        course_id_list: list = get_list_from_spreadsheet()
     else:
         course_id_list: list = raw_course_id.split( ',' )
     for course_id_entry in course_id_list:
@@ -91,15 +94,32 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
 ## helpers ----------------------------------------------------------
 
 
-def check_for_recent_updates() -> bool:
-    """ Checks if there have been recent updates.
+def check_for_updates( course_id_list ) -> bool:
+    """ Checks if there have been new updates.
+        Can't calculate this by checking `sheet.lastUpdateTime`, because any run _will_ create a recent spreadsheet update.
+        So, plan is to look at the root-page columns and compare it agains a saved json file.
         Called by manage_build_reading_list() """
-    recently_updated = False
-    ## access spreadsheet -------------------------------------------
-    credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
-    sheet = credentialed_connection.open( SPREADSHEET_NAME )
-    last_updated_str: str = sheet.lastUpdateTime
-    log.debug( f'last-updated, ``{last_updated_str}``' )
+    log.debug( 'course_id_list, ``{pprint.pformat(course_id_list)}``' )
+    last_saved_list = []
+    new_updates = False
+    ## load last-saved file -----------------------------------------
+    last_saved_list = []
+    with open( LAST_CHECKED_PATH, 'r' ) as f_reader:
+        jsn_list = f_reader.read()
+        last_saved_list = json.loads( jsn_list )
+        log.debug( f'last_saved_list from disk, ``{pprint.pformat(last_saved_list)}``' )
+    if last_saved_list == course_id_list:
+        log.debug( f'was _not_ recently updated')
+    else:
+        new_updates = True
+        jsn = json.dumps( course_id_list, indent=2 )
+        with open( LAST_CHECKED_PATH, 'w' ) as f_writer:
+            f_writer.write( jsn )
+        log.debug( 'new updates found and saved' )
+    log.debug( f'new_updates, ``{new_updates}``' )
+    return new_updates
+
+
     ## calculate ----------------------------------------------------
     last_updated_obj = datetime.datetime.strptime( last_updated_str, '%Y-%m-%dT%H:%M:%S.%f%z' )
     log.debug( f'last_updated_obj-str, ``{last_updated_obj}``' )
@@ -116,6 +136,33 @@ def check_for_recent_updates() -> bool:
         recently_updated = True
     log.debug( f'recently_updated, ``{recently_updated}``' )
     return recently_updated
+
+
+# def check_for_recent_updates() -> bool:
+#     """ Checks if there have been recent updates.
+#         Called by manage_build_reading_list() """
+#     recently_updated = False
+#     ## access spreadsheet -------------------------------------------
+#     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+#     sheet = credentialed_connection.open( SPREADSHEET_NAME )
+#     last_updated_str: str = sheet.lastUpdateTime
+#     log.debug( f'last-updated, ``{last_updated_str}``' )
+#     ## calculate ----------------------------------------------------
+#     last_updated_obj = datetime.datetime.strptime( last_updated_str, '%Y-%m-%dT%H:%M:%S.%f%z' )
+#     log.debug( f'last_updated_obj-str, ``{last_updated_obj}``' )
+#     utc_now_obj = datetime.datetime.now( datetime.timezone.utc )
+#     log.debug( f'utc_now_obj, ``{utc_now_obj}``' )
+#     interval_obj = datetime.timedelta( minutes=30 )
+#     log.debug( f'interval, ``{interval_obj}``' )
+#     window_limit = last_updated_obj + interval_obj
+#     log.debug( f'window_limit, ``{window_limit}``' )
+#     if utc_now_obj > window_limit:
+#         log.debug( f'was _not_ recently updated')
+#     else:
+#         log.debug( f'_was_ recently updated')
+#         recently_updated = True
+#     log.debug( f'recently_updated, ``{recently_updated}``' )
+#     return recently_updated
 
 
 def get_list_from_spreadsheet() -> list:
