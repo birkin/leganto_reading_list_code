@@ -29,6 +29,7 @@ log.debug( 'test-logging ready' )
 class MapperTest( unittest.TestCase ):
 
     def setUp( self ):
+        self.maxDiff = None
         pass
 
     def test_map_book_data(self):

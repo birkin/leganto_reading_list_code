@@ -46,17 +46,21 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
     log.debug( f'raw course_id, ``{raw_course_id}``; force, ``{force}``')
-    ## check for recent updates -------------------------------------
-    if force == False:
-        recent_updates: bool = check_for_recent_updates()
-        if recent_updates == False:
-            log.debug( 'no recent updates' )
-            return
     ## setup --------------------------------------------------------
     all_results: list = []
     courses_and_classes: list = []
     ## make course-id list ------------------------------------------
     if raw_course_id == 'SPREADSHEET':
+        ## check for recent updates ---------------------------------
+        if force:
+            log.debug( 'skipping recent-updates check' )
+        else:
+            recent_updates: bool = check_for_recent_updates()
+            if recent_updates == False:
+                log.debug( 'no recent updates; quitting' )
+                return        
+            else:
+                log.debug( 'recent updates found' )
         course_id_list: list = get_list_from_spreadsheet()
     else:
         course_id_list: list = raw_course_id.split( ',' )
@@ -99,10 +103,8 @@ def check_for_recent_updates() -> bool:
     ## calculate ----------------------------------------------------
     last_updated_obj = datetime.datetime.strptime( last_updated_str, '%Y-%m-%dT%H:%M:%S.%f%z' )
     log.debug( f'last_updated_obj-str, ``{last_updated_obj}``' )
-    utc_now_obj = datetime.datetime.utcnow()
-    log.debug( f'initial utc_now_obj, ``{utc_now_obj}``' )
     utc_now_obj = datetime.datetime.now( datetime.timezone.utc )
-    log.debug( f'better utc_now_obj, ``{utc_now_obj}``' )
+    log.debug( f'utc_now_obj, ``{utc_now_obj}``' )
     interval_obj = datetime.timedelta( minutes=30 )
     log.debug( f'interval, ``{interval_obj}``' )
     window_limit = last_updated_obj + interval_obj
@@ -299,6 +301,8 @@ def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
     spage = ''
     try:
         spage = initial_article_data['spage']
+        if spage == None:
+            spage = ''
     except:
         pass
     log.debug( f'spage after db-field check, ``{spage}``' )
@@ -430,7 +434,8 @@ def get_db_connection():
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`)' )
-    parser.add_argument( '--course_id', help='typically like: EDUC1234', required=True )
+    parser.add_argument( '--course_id', help='typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
+    parser.add_argument( '--force', help='takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
     args: dict = vars( parser.parse_args() )
     if args == {'course_id': None, 'class_id': None}:
         parser.print_help()
