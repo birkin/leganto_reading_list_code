@@ -26,11 +26,35 @@ log = logging.getLogger(__name__)
 log.debug( 'test-logging ready' )
 
 
-class MapperTest( unittest.TestCase ):
+class OpenUrlParserTest( unittest.TestCase ):
+
+    """ Checks parsing of openurl data. """
 
     def setUp( self ):
         self.maxDiff = None
-        pass
+        self.ourls: list = [
+            '//library.brown.edu/easyarticle/?genre=article&atitle="If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines&title=Theatre Journal&date=2011&volume=63&issue=4&spage=607&epage=621&issn=&doi=&aulast=J. Lorenzo&aufirst=Perillo&auinit=&__char_set=utf8',
+            'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8'
+            ]
+
+    def test_parse_end_page(self):
+        parsed_end_pages: list = []
+        for ourl in self.ourls:
+            epage = etl_class_data.parse_end_page( ourl )
+            parsed_end_pages.append( epage )
+        expected = [ 'foo', 'bar' ]
+        self.assertEquals( expected, parsed_end_pages )
+
+    ## end class OpenUrlParserTest()
+
+
+
+class MapperTest( unittest.TestCase ):
+
+    """ Checks mapping of db-resultset data to leganto fields. """
+
+    def setUp( self ):
+        self.maxDiff = None
 
     def test_map_book_data(self):
         initial_book_data: dict = {
@@ -198,6 +222,8 @@ class MapperTest( unittest.TestCase ):
             }
         self.assertEqual( expected_data, mapped_article_data )
         ## end def test_map_article_data()
+
+    ## end class MapperTest()
 
 
 if __name__ == '__main__':

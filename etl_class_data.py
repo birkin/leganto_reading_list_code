@@ -316,6 +316,8 @@ def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
     log.debug( f'spage after both checks, ``{spage}``' )
     return spage
 
+def parse_end_page( )
+
 
 
 ## gsheet code ------------------------------------------------------
