@@ -204,6 +204,9 @@ def get_article_readings( class_id: str ) -> list:
     log.debug( '\n\n----------\narticles\n----------' )
     for entry in result_set:
         log.debug( f'\n\narticle, ``{entry}``')
+        if entry['doi'][0:1] == ' ':
+            log.debug( 'cleaning doi' )
+            entry['doi'] = entry['doi'].strip()
     log.debug( '\n\n----------' )
     return result_set
 
@@ -305,25 +308,25 @@ def parse_openurl( raw_ourl: str ) -> dict:
     return ourl_dct
 
 
-def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
-    """ Grabs start-page from db field if available, otherwise looks for it from openurl.
-        Called by map_article() """
-    log.debug( f'ourl_parts for spage, ``{pprint.pformat(ourl_parts)}``' )
-    spage = ''
-    try:
-        spage = initial_article_data['spage']
-        if spage == None:
-            spage = ''
-    except:
-        pass
-    log.debug( f'spage after db-field check, ``{spage}``' )
-    if spage == '' or spage == None:
-        try:
-            spage = ourl_parts['spage'][0]
-        except:
-            pass
-    log.debug( f'spage after both checks, ``{spage}``' )
-    return spage
+# def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
+#     """ Grabs start-page from db field if available, otherwise looks for it from openurl.
+#         Called by map_article() """
+#     log.debug( f'ourl_parts for spage, ``{pprint.pformat(ourl_parts)}``' )
+#     spage = ''
+#     try:
+#         spage = initial_article_data['spage']
+#         if spage == None:
+#             spage = ''
+#     except:
+#         pass
+#     log.debug( f'spage after db-field check, ``{spage}``' )
+#     if spage == '' or spage == None:
+#         try:
+#             spage = ourl_parts['spage'][0]
+#         except:
+#             pass
+#     log.debug( f'spage after both checks, ``{spage}``' )
+#     return spage
 
 
 def parse_start_page_from_ourl( parts: dict ):
