@@ -34,16 +34,27 @@ class OpenUrlParserTest( unittest.TestCase ):
         self.maxDiff = None
         self.ourls: list = [
             '//library.brown.edu/easyarticle/?genre=article&atitle="If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines&title=Theatre Journal&date=2011&volume=63&issue=4&spage=607&epage=621&issn=&doi=&aulast=J. Lorenzo&aufirst=Perillo&auinit=&__char_set=utf8',
-            'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8'
+            'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8',
             ]
 
-    def test_parse_end_page(self):
-        parsed_end_pages: list = []
-        for ourl in self.ourls:
-            epage = etl_class_data.parse_end_page( ourl )
-            parsed_end_pages.append( epage )
-        expected = [ 'foo', 'bar' ]
-        self.assertEquals( expected, parsed_end_pages )
+    def test_parse_openurl(self):
+        """ Checks parsing of openurl, including revproxied urls. """
+        expected = [
+            {'genre': ['article'], 'atitle': ['"If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines'], 'title': ['Theatre Journal'], 'date': ['2011'], 'volume': ['63'], 'issue': ['4'], 'spage': ['607'], 'epage': ['621'], 'aulast': ['J. Lorenzo'], 'aufirst': ['Perillo'], '__char_set': ['utf8']},
+            {'sid': ['sfx:citation'], 'genre': ['article'], 'atitle': ['The Plot of her Undoing'], 'title': ['Feminist Art Coalition'], 'date': ['2020-12-28'], 'aulast': ['Hartman'], 'aufirst': ['Saidiya'], '__char_set': ['utf8']},
+            ]
+        for (i, ourl) in enumerate(self.ourls):
+            parts: dict = etl_class_data.parse_openurl( ourl )
+            log.debug( f'parts, ``{parts}``' )
+            self.assertEqual( expected[i], parts )
+        
+    # def test_parse_end_page(self):
+    #     parsed_end_pages: list = []
+    #     for ourl in self.ourls:
+    #         epage = etl_class_data.parse_end_page( ourl )
+    #         parsed_end_pages.append( epage )
+    #     expected = [ 'foo', 'bar' ]
+    #     self.assertEquals( expected, parsed_end_pages )
 
     ## end class OpenUrlParserTest()
 

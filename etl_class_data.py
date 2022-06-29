@@ -1,4 +1,5 @@
 import argparse, datetime, json, logging, os, pprint, sys
+import urllib.parse
 
 import gspread
 import pymysql
@@ -284,16 +285,33 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
     return mapped_article_data
 
 
-def parse_openurl( ourl: str ) -> dict:
+def parse_openurl( raw_ourl: str ) -> dict:
     """ Returns fielded openurl elements.
         Called by map_article() """
-    import urllib.parse
-    log.debug( f'ourl, ``{ourl}``' )
+    log.debug( f'raw_ourl, ``{raw_ourl}``' )
     ourl_dct = {}
+    if raw_ourl[0:43] == 'https://login.revproxy.brown.edu/login?url=':
+        log.debug( 'removing proxy ' )
+        ourl = raw_ourl[43:]
+        log.debug( f'updated ourl, ``{ourl}``' )
+    else:
+        ourl = raw_ourl
     ourl_section: str = ourl.split( '?' )[1]
     ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
     log.debug( f'ourl_dct, ``{pprint.pformat(ourl_dct)}``' )
     return ourl_dct
+
+
+# def parse_openurl( ourl: str ) -> dict:
+#     """ Returns fielded openurl elements.
+#         Called by map_article() """
+#     import urllib.parse
+#     log.debug( f'ourl, ``{ourl}``' )
+#     ourl_dct = {}
+#     ourl_section: str = ourl.split( '?' )[1]
+#     ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
+#     log.debug( f'ourl_dct, ``{pprint.pformat(ourl_dct)}``' )
+#     return ourl_dct
 
 
 def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
@@ -316,7 +334,8 @@ def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
     log.debug( f'spage after both checks, ``{spage}``' )
     return spage
 
-def parse_end_page( )
+def parse_end_page( ourl: str ):
+    return 'foo'
 
 
 
