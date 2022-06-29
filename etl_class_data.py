@@ -269,7 +269,9 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
     ourl_parts: dict = parse_openurl( initial_article_data['sfxlink'] )
     mapped_article_data['citation_author'] = f'{initial_article_data["aulast"]}, {initial_article_data["aufirst"]}'
     mapped_article_data['citation_doi'] = initial_article_data['doi']
-    mapped_article_data['citation_end_page'] = str(initial_article_data['epage']) if initial_article_data['epage'] else ''
+
+    mapped_article_data['citation_end_page'] = str(initial_article_data['epage']) if initial_article_data['epage'] else parse_end_page_from_ourl( ourl_parts )
+    
     mapped_article_data['citation_issn'] = initial_article_data['issn']
     # mapped_article_data['citation_publication_date'] = ''  # odd; articles don't show publication-date
     mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
@@ -334,9 +336,14 @@ def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
     log.debug( f'spage after both checks, ``{spage}``' )
     return spage
 
-def parse_end_page( ourl: str ):
-    return 'foo'
 
+def parse_end_page_from_ourl( parts: dict ):
+    try:
+        epage = parts['epage'][0]
+    except:
+        epage = ''
+    log.debug( f'epage, ``{epage}``' )
+    return epage
 
 
 ## gsheet code ------------------------------------------------------

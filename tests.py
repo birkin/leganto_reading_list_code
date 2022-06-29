@@ -48,13 +48,12 @@ class OpenUrlParserTest( unittest.TestCase ):
             log.debug( f'parts, ``{parts}``' )
             self.assertEqual( expected[i], parts )
         
-    # def test_parse_end_page(self):
-    #     parsed_end_pages: list = []
-    #     for ourl in self.ourls:
-    #         epage = etl_class_data.parse_end_page( ourl )
-    #         parsed_end_pages.append( epage )
-    #     expected = [ 'foo', 'bar' ]
-    #     self.assertEquals( expected, parsed_end_pages )
+    def test_parse_end_page_from_ourl(self):
+        expected = [ '621', '' ]
+        for (i, ourl) in enumerate(self.ourls):
+            parts: dict = etl_class_data.parse_openurl( ourl )
+            epage: str = etl_class_data.parse_end_page_from_ourl( parts )
+            self.assertEqual( expected[i], epage )
 
     ## end class OpenUrlParserTest()
 
