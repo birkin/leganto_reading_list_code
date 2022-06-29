@@ -269,16 +269,13 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
     ourl_parts: dict = parse_openurl( initial_article_data['sfxlink'] )
     mapped_article_data['citation_author'] = f'{initial_article_data["aulast"]}, {initial_article_data["aufirst"]}'
     mapped_article_data['citation_doi'] = initial_article_data['doi']
-
     mapped_article_data['citation_end_page'] = str(initial_article_data['epage']) if initial_article_data['epage'] else parse_end_page_from_ourl( ourl_parts )
-    
     mapped_article_data['citation_issn'] = initial_article_data['issn']
     # mapped_article_data['citation_publication_date'] = ''  # odd; articles don't show publication-date
     mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
     mapped_article_data['citation_source1'] = initial_article_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
-    # mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else ''
-    mapped_article_data['citation_start_page'] = parse_start_page( ourl_parts, initial_article_data )
+    mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_article_data['citation_title'] = initial_article_data['title']
     mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
@@ -322,6 +319,15 @@ def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
         except:
             pass
     log.debug( f'spage after both checks, ``{spage}``' )
+    return spage
+
+
+def parse_start_page_from_ourl( parts: dict ):
+    try:
+        spage = parts['spage'][0]
+    except:
+        spage = ''
+    log.debug( f'spage, ``{spage}``' )
     return spage
 
 
