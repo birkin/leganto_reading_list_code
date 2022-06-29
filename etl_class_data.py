@@ -304,18 +304,6 @@ def parse_openurl( raw_ourl: str ) -> dict:
     return ourl_dct
 
 
-# def parse_openurl( ourl: str ) -> dict:
-#     """ Returns fielded openurl elements.
-#         Called by map_article() """
-#     import urllib.parse
-#     log.debug( f'ourl, ``{ourl}``' )
-#     ourl_dct = {}
-#     ourl_section: str = ourl.split( '?' )[1]
-#     ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
-#     log.debug( f'ourl_dct, ``{pprint.pformat(ourl_dct)}``' )
-#     return ourl_dct
-
-
 def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
     """ Grabs start-page from db field if available, otherwise looks for it from openurl.
         Called by map_article() """
