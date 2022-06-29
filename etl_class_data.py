@@ -32,6 +32,8 @@ LEGANTO_HEADINGS: dict = {
     'citation_doi': '',
     'citation_isbn': '',
     'citation_issn': '',
+    'citation_volume': '',
+    'citation_issue': '',
     'citation_start_page': '',
     'citation_end_page': '',
     'citation_source1': '',
@@ -278,12 +280,14 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
     mapped_article_data['citation_doi'] = initial_article_data['doi']
     mapped_article_data['citation_end_page'] = str(initial_article_data['epage']) if initial_article_data['epage'] else parse_end_page_from_ourl( ourl_parts )
     mapped_article_data['citation_issn'] = initial_article_data['issn']
+    mapped_article_data['citation_issue'] = initial_article_data['issue']
     mapped_article_data['citation_publication_date'] = str( initial_article_data['date'] )
     mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
     mapped_article_data['citation_source1'] = initial_article_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_article_data['citation_title'] = initial_article_data['title']
+    mapped_article_data['citation_volume'] = initial_article_data['volume']
     mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
     mapped_article_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
@@ -306,27 +310,6 @@ def parse_openurl( raw_ourl: str ) -> dict:
     ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
     log.debug( f'ourl_dct, ``{pprint.pformat(ourl_dct)}``' )
     return ourl_dct
-
-
-# def parse_start_page( ourl_parts: dict, initial_article_data: dict ) -> str:
-#     """ Grabs start-page from db field if available, otherwise looks for it from openurl.
-#         Called by map_article() """
-#     log.debug( f'ourl_parts for spage, ``{pprint.pformat(ourl_parts)}``' )
-#     spage = ''
-#     try:
-#         spage = initial_article_data['spage']
-#         if spage == None:
-#             spage = ''
-#     except:
-#         pass
-#     log.debug( f'spage after db-field check, ``{spage}``' )
-#     if spage == '' or spage == None:
-#         try:
-#             spage = ourl_parts['spage'][0]
-#         except:
-#             pass
-#     log.debug( f'spage after both checks, ``{spage}``' )
-#     return spage
 
 
 def parse_start_page_from_ourl( parts: dict ):
@@ -376,14 +359,16 @@ def update_gsheet( all_results: list ) -> None:
         'citation_doi',
         'citation_isbn',
         'citation_issn',
+        'citation_volume',
+        'citation_issue',
         'citation_start_page',
         'citation_end_page',
         'citation_source1',
         'citation_source2',
         'external_system_id'
         ]
-    end_range_column = 'N'
-    header_end_range = 'N1'
+    end_range_column = 'P'
+    header_end_range = 'P1'
     num_entries = len( all_results )
     data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
     ## prepare data -------------------------------------------------
@@ -399,6 +384,8 @@ def update_gsheet( all_results: list ) -> None:
             entry['citation_doi'],
             entry['citation_isbn'],
             entry['citation_issn'],
+            entry['citation_volume'],
+            entry['citation_issue'],
             entry['citation_start_page'],
             entry['citation_end_page'],
             entry['citation_source1'],
@@ -419,7 +406,9 @@ def update_gsheet( all_results: list ) -> None:
         }
 
     ]
+    log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
+    # 1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     ## update formatting --------------------------------------------
     worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
