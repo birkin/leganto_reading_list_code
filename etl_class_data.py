@@ -14,7 +14,7 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
-log.info( 'logging ready' )
+# log.info( 'logging ready' )
 
 
 HOST = os.environ['LGNT__DB_HOST']
@@ -84,9 +84,13 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
             leg_books: list = map_books( book_results, course_id )
             leg_articles: list = map_articles( article_results, course_id )
             all_course_results: list = leg_books + leg_articles
+            if all_course_results == []:
+                all_course_results: list = [ map_empty(course_id) ]
         else:
             all_course_results: list = [ map_empty(course_id) ]
+        log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
+        log.debug( f'all_results, ``{all_results}``' )
     ## post to google-sheet -----------------------------------------
     update_gsheet( all_results )
     ## end manage_build_reading_list()
@@ -468,7 +472,7 @@ def parse_args() -> dict:
 
 if __name__ == '__main__':
     args: dict = parse_args()
-    log.info( f'starting args, ```{args}```' )
+    log.info( f'\n\nstarting args, ```{args}```' )
     course_id: str  = args['course_id']
     log.debug( f'course_id, ``{course_id}``' )
     force: bool = args.get( 'force', False )
