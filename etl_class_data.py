@@ -90,7 +90,7 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
             all_course_results: list = [ map_empty(course_id) ]
         log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
-        log.debug( f'all_results, ``{all_results}``' )
+        log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
     ## post to google-sheet -----------------------------------------
     update_gsheet( all_results )
     ## end manage_build_reading_list()
@@ -275,7 +275,7 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
     mapped_article_data['citation_doi'] = initial_article_data['doi']
     mapped_article_data['citation_end_page'] = str(initial_article_data['epage']) if initial_article_data['epage'] else parse_end_page_from_ourl( ourl_parts )
     mapped_article_data['citation_issn'] = initial_article_data['issn']
-    # mapped_article_data['citation_publication_date'] = ''  # odd; articles don't show publication-date
+    mapped_article_data['citation_publication_date'] = str( initial_article_data['date'] )
     mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
     mapped_article_data['citation_source1'] = initial_article_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
@@ -416,7 +416,6 @@ def update_gsheet( all_results: list ) -> None:
         }
 
     ]
-    
     ## update values ------------------------------------------------
     worksheet.batch_update( new_data, value_input_option='raw' )
     ## update formatting --------------------------------------------
