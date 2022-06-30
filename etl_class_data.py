@@ -60,6 +60,7 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
     all_results: list = []
     courses_and_classes: list = []
     course_id_list = []
+    cdl_checker = CDL_Checker()
     ## make course-id list ------------------------------------------
     if raw_course_id == 'SPREADSHEET':
         course_id_list: list = get_list_from_spreadsheet()
@@ -88,8 +89,8 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
         if class_id:
             book_results: list = get_book_readings( class_id )
             article_results: list = get_article_readings( class_id )
-            leg_books: list = map_books( book_results, course_id )
-            leg_articles: list = map_articles( article_results, course_id )
+            leg_books: list = map_books( book_results, course_id, cdl_checker )
+            leg_articles: list = map_articles( article_results, course_id, cdl_checker )
             all_course_results: list = leg_books + leg_articles
             if all_course_results == []:
                 all_course_results: list = [ map_empty(course_id) ]
@@ -238,22 +239,25 @@ def get_excerpt_readings( class_id: str ) -> list:
 ## mappers and parsers ----------------------------------------------
 
 
-def map_books( book_results: list, course_id: str ) -> list:
+def map_books( book_results: list, course_id: str, cdl_checker ) -> list:
     mapped_books = []
     for book_result in book_results:
-        mapped_book: dict = map_book( book_result, course_id )
+        mapped_book: dict = map_book( book_result, course_id, cdl_checker )
         mapped_books.append( mapped_book )
     return mapped_books
 
 
-def map_book( initial_book_data: dict, course_id: str ) -> dict:
+def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
     log.debug( f'initial_book_data, ``{initial_book_data}``' )
     mapped_book_data = LEGANTO_HEADINGS.copy()
     mapped_book_data['citation_author'] = initial_book_data['bk_author']
     mapped_book_data['citation_isbn'] = initial_book_data['isbn']
     mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
     mapped_book_data['citation_secondary_type'] = 'BK'
-    mapped_book_data['citation_source1'] = initial_book_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
+
+    # mapped_book_data['citation_source1'] = initial_book_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
+    mapped_book_data['citation_source1'] = run_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
+
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
@@ -269,7 +273,7 @@ def map_empty( course_id: str ) -> dict:
     return mapped_book_data
 
 
-def map_articles( article_results: list, course_id: str ) -> list:
+def map_articles( article_results: list, course_id: str, cdl_checker ) -> list:
     mapped_articles = []
     for article_result in article_results:
         mapped_article: dict = map_article( article_result, course_id )
@@ -336,6 +340,17 @@ def parse_end_page_from_ourl( parts: dict ):
 
 
 ## cdl-checking -----------------------------------------------------
+
+
+def run_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
+    """ Sees if data contains a CDL reference, and, if so, see if I can find one.
+        Called by map_book() and map_article(). """
+    field_text: str = ocra_facnotes_data
+    if 'cdl' in ocra_facnotes_data.lower():
+        results: list = cdl_checker.search_cdl( ocra_title )
+        field_text: str = cdl_checker.prep_cdl_field_text( results )
+    log.debug( f'field_text, ``{field_text}``' )
+    return field_text
 
 
 class CDL_Checker(object):
