@@ -21,6 +21,8 @@ HOST = os.environ['LGNT__DB_HOST']
 USERNAME = os.environ['LGNT__DB_USERNAME']
 PASSWORD = os.environ['LGNT__DB_PASSWORD']
 DB = os.environ['LGNT__DB_DATABASE_NAME']
+CDL_DB = os.environ['LGNT__CDL_DB_DATABASE_NAME']
+
 
 LEGANTO_HEADINGS: dict = {
     'coursecode': '',
@@ -230,7 +232,7 @@ def get_excerpt_readings( class_id: str ) -> list:
     return result_set
 
 
-## mappers ----------------------------------------------------------
+## mappers and parsers ----------------------------------------------
 
 
 def map_books( book_results: list, course_id: str ) -> list:
@@ -328,6 +330,25 @@ def parse_end_page_from_ourl( parts: dict ):
         epage = ''
     log.debug( f'epage, ``{epage}``' )
     return epage
+
+
+## cdl-checking -----------------------------------------------------
+
+
+CDL_TITLES: list = []
+
+
+def populate_cdl_titles() -> list:
+    db_connection = get_db_connection()
+    sql = f"SELECT * FROM reserves.articles, reserves.requests WHERE articles.requestid = requests.requestid AND classid = {int(class_id)} AND format = 'article' AND articles.requestid = requests.requestid AND articles.status != 'volume on reserve' AND articles.status != 'purchase requested' ORDER BY `articles`.`atitle` ASC"
+    log.debug( f'sql, ``{sql}``' )
+    result_set: list = []
+    with db_connection:
+        with db_connection.cursor() as db_cursor:
+            db_cursor.execute( sql )
+            result_set = list( db_cursor.fetchall() )
+            assert type(result_set) == list
+    return result_set
 
 
 ## gsheet code ------------------------------------------------------
@@ -441,6 +462,18 @@ def get_db_connection():
             user=USERNAME,
             password=PASSWORD,
             database=DB,
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor )  # DictCursor means results will be dictionaries (yay!)
+    log.debug( f'made db_connection with PyMySQL.connect(), ``{db_connection}``' )
+    return db_connection
+
+
+def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
+    db_connection = pymysql.connect(  ## the with auto-closes the connection on any problem
+            host=HOST,
+            user=USERNAME,
+            password=PASSWORD,
+            database=CDL_DB,
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor )  # DictCursor means results will be dictionaries (yay!)
     log.debug( f'made db_connection with PyMySQL.connect(), ``{db_connection}``' )
