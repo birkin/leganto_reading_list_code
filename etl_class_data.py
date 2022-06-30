@@ -396,7 +396,7 @@ class CDL_Checker(object):
                 result = f'CDL link likely: <https://cdl.library.brown.edu/cdl/item/{entry["item_id"]}>'
             else:
                 result = f'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/{entry["item_id"]}>'
-        else:
+        elif len( entries ) > 1:
             result = 'TODO -- handle multiple possible results'
         log.debug( f'result, ``{result}``' )
         return result
