@@ -31,8 +31,46 @@ class CDL_Checker_Test( unittest.TestCase ):
 
     def test_search_cdl(self):
         """ Checks good fuzzy search-result. """
+        ocra_search_term = 'Critical Encounters in Secondary English: Teaching Literary Theory to Adolescents'
         expected: list = [ {'score': 32, 'file_name': 'foo'} ]
-        result: list = self.cdl_checker.search_cdl( 'blah' )
+        expected: list = [
+            {'alma_item_pid': None,
+            'alma_mms_id': '991006299729706966',
+            'author': '',
+            'barcode': None,
+            'bib_id': 'b90794643',
+            'created': datetime.datetime(2021, 6, 24, 19, 38, 39, 946705),
+            'fuzzy_score': 93,
+            'id': 1523,
+            'item_file': 'b90794643_b90794643.pdf',
+            'item_id': 'b90794643',
+            'modified': datetime.datetime(2021, 8, 23, 20, 49, 45, 623634),
+            'num_copies': 1,
+            'status': 'ready',
+            'title': 'Critical encounters in Secondary English : teaching literary theory to adolescents'}
+            ]
+        result: list = self.cdl_checker.search_cdl( ocra_search_term )
+        self.assertEqual( expected, result )
+
+    def test_prep_cdl_field_text(self):
+        source_list = [
+            {'alma_item_pid': None,
+            'alma_mms_id': '991006299729706966',
+            'author': '',
+            'barcode': None,
+            'bib_id': 'b90794643',
+            'created': datetime.datetime(2021, 6, 24, 19, 38, 39, 946705),
+            'fuzzy_score': 93,
+            'id': 1523,
+            'item_file': 'b90794643_b90794643.pdf',
+            'item_id': 'b90794643',
+            'modified': datetime.datetime(2021, 8, 23, 20, 49, 45, 623634),
+            'num_copies': 1,
+            'status': 'ready',
+            'title': 'Critical encounters in Secondary English : teaching literary theory to adolescents'}
+            ]
+        expected = 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/b90794643>'
+        result: str = self.cdl_checker.prep_cdl_field_text( source_list )
         self.assertEqual( expected, result )
 
     ## end classCdlLinkerTest()

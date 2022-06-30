@@ -4,6 +4,7 @@ import urllib.parse
 import gspread
 import pymysql
 import pymysql.cursors
+from fuzzywuzzy import fuzz
 
 
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -355,13 +356,35 @@ class CDL_Checker(object):
         return result_set
 
 
-    def search_cdl( self, title: str ) -> list:
+    def search_cdl( self, search_title: str ) -> list:
         """ Fuzzy-searches cdl-titles, returns back score and file_name. """
         if self.CDL_TITLES == []:
             log.debug( 'populating CDL_TITLES' )
-            CDL_TITLES = self.populate_cdl_titles()
-            log.debug( f'CDL_TITLES, ``{pprint.pformat(CDL_TITLES)}``' )
-        return ['test']
+            self.CDL_TITLES = self.populate_cdl_titles()
+            # log.debug( f'CDL_TITLES, ``{pprint.pformat(CDL_TITLES)}``' )
+            log.debug( f'len(self.CDL_TITLES), ``{len(self.CDL_TITLES)}``' )
+        matches = []
+        for entry in self.CDL_TITLES:
+            assert type(entry) == dict
+            score: int = fuzz.ratio( search_title, entry['title'] )
+            if score > 80:
+                entry['fuzzy_score'] = score
+                matches.append( entry )
+        log.debug( f'matches, ``{pprint.pformat(matches)}``' )
+        return matches
+
+    def prep_cdl_field_text( self, entries: list ) -> str:
+        result = 'no CDL link found'
+        if len( entries ) == 1:
+            entry = entries[0]
+            if entry['fuzzy_score'] > 97:
+                result = f'CDL link likely: <https://cdl.library.brown.edu/cdl/item/{entry["item_id"]}>'
+            else:
+                result = f'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/{entry["item_id"]}>'
+        else:
+            result = 'TODO -- handle multiple possible results'
+        log.debug( f'result, ``{result}``' )
+        return result
 
     ## end class CDL_Checker()
 
