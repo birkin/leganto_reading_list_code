@@ -14,13 +14,15 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
-# log.info( 'logging ready' )
 
 
 HOST = os.environ['LGNT__DB_HOST']
 USERNAME = os.environ['LGNT__DB_USERNAME']
 PASSWORD = os.environ['LGNT__DB_PASSWORD']
 DB = os.environ['LGNT__DB_DATABASE_NAME']
+#
+CDL_USERNAME = os.environ['LGNT__CDL_DB_USERNAME']
+CDL_PASSWORD = os.environ['LGNT__CDL_DB_PASSWORD']
 CDL_DB = os.environ['LGNT__CDL_DB_DATABASE_NAME']
 
 
@@ -335,20 +337,33 @@ def parse_end_page_from_ourl( parts: dict ):
 ## cdl-checking -----------------------------------------------------
 
 
-CDL_TITLES: list = []
+class CDL_Checker(object):
+
+    def __init__( self ):
+        self.CDL_TITLES: list = []
+
+    def populate_cdl_titles( self ) -> list:
+        db_connection = get_CDL_db_connection()
+        sql = "SELECT * FROM `cdl_app_item` ORDER BY `title` ASC"
+        log.debug( f'sql, ``{sql}``' )
+        result_set: list = []
+        with db_connection:
+            with db_connection.cursor() as db_cursor:
+                db_cursor.execute( sql )
+                result_set = list( db_cursor.fetchall() )
+                assert type(result_set) == list
+        return result_set
 
 
-def populate_cdl_titles() -> list:
-    db_connection = get_db_connection()
-    sql = f"SELECT * FROM reserves.articles, reserves.requests WHERE articles.requestid = requests.requestid AND classid = {int(class_id)} AND format = 'article' AND articles.requestid = requests.requestid AND articles.status != 'volume on reserve' AND articles.status != 'purchase requested' ORDER BY `articles`.`atitle` ASC"
-    log.debug( f'sql, ``{sql}``' )
-    result_set: list = []
-    with db_connection:
-        with db_connection.cursor() as db_cursor:
-            db_cursor.execute( sql )
-            result_set = list( db_cursor.fetchall() )
-            assert type(result_set) == list
-    return result_set
+    def search_cdl( self, title: str ) -> list:
+        """ Fuzzy-searches cdl-titles, returns back score and file_name. """
+        if self.CDL_TITLES == []:
+            log.debug( 'populating CDL_TITLES' )
+            CDL_TITLES = self.populate_cdl_titles()
+            log.debug( f'CDL_TITLES, ``{pprint.pformat(CDL_TITLES)}``' )
+        return ['test']
+
+    ## end class CDL_Checker()
 
 
 ## gsheet code ------------------------------------------------------
@@ -471,8 +486,8 @@ def get_db_connection():
 def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
     db_connection = pymysql.connect(  ## the with auto-closes the connection on any problem
             host=HOST,
-            user=USERNAME,
-            password=PASSWORD,
+            user=CDL_USERNAME,
+            password=CDL_PASSWORD,
             database=CDL_DB,
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor )  # DictCursor means results will be dictionaries (yay!)

@@ -9,21 +9,33 @@ Usage:
 """
 
 import datetime, logging, os, sys, unittest
-
 import etl_class_data
 
-# sys.path.append( os.environ['(enclosing-project-path)'] )
 
-
-# LOG_PATH: str = os.environ['LGNT__LOG_PATH']
+LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 
 logging.basicConfig(
-    # filename=LOG_PATH,
+    filename=LOG_PATH,
     level=logging.DEBUG,
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
-log.debug( 'test-logging ready' )
+
+
+class CDL_Checker_Test( unittest.TestCase ):
+
+    """ Checks cdl-link prep. """
+
+    def setUp(self) -> None:
+        self.cdl_checker = etl_class_data.CDL_Checker()
+
+    def test_search_cdl(self):
+        """ Checks good fuzzy search-result. """
+        expected: list = [ {'score': 32, 'file_name': 'foo'} ]
+        result: list = self.cdl_checker.search_cdl( 'blah' )
+        self.assertEqual( expected, result )
+
+    ## end classCdlLinkerTest()
 
 
 class OpenUrlParserTest( unittest.TestCase ):
@@ -253,9 +265,3 @@ class MapperTest( unittest.TestCase ):
 
 if __name__ == '__main__':
   unittest.main()
-
-
-
-
-
-# book, ``{'bookid': 50031, 'requestid': '20200505172840authID', 'reactivateid': '20220610163908', 'bk_title': 'Next steps with academic conversations', 'callno': '--', 'libloc': 'Rock', 'bk_author': 'Zwiers, Jeff', 'publisher': '2019', 'isbn': '', 'bk_year': None, 'edition': '', 'sfxlink': '', 'libraryhas': 'N', 'copies': 1, 'personal': 'N', 'purchase': 'N', 'loan': '3 hrs', 'bookstore': 'N', 'required': 'optional', 'facnotes': 'Ebook on reserve', 'staffnotes': '', 'status': 'requested as ebook', 'bk_updated': datetime.datetime(2022, 6, 16, 9, 29, 25), 'printed': 'n', 'date_printed': None, 'ebook_id': 112235, 'bibno': '', 'needed_by': None, 'requests.requestid': '20200505172840authID', 'classid': 9342, 'request_date': datetime.datetime(2020, 5, 5, 17, 28, 40)}``
