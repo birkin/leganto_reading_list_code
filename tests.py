@@ -8,8 +8,10 @@ Usage:
     - example: $ python3 ./tests.py SomeTest.test_something
 """
 
-import datetime, logging, os, sys, unittest
+import datetime, logging, os, unittest
+
 import etl_class_data
+from etl_class_data import CDL_Checker
 
 
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -159,7 +161,8 @@ class MapperTest( unittest.TestCase ):
             'status': 'requested as ebook'
             }
         course_id = 'EDUC2510A'
-        mapped_book_data: dict = etl_class_data.map_book( initial_book_data, course_id )
+        cdl_checker = CDL_Checker()
+        mapped_book_data: dict = etl_class_data.map_book( initial_book_data, course_id, cdl_checker )
         expected_sorted_keys = [
             'citation_author',
             'citation_doi',
@@ -188,7 +191,8 @@ class MapperTest( unittest.TestCase ):
             'citation_issue': '',
             'citation_publication_date': '',
             'citation_secondary_type': 'BK',
-            'citation_source1': 'CDL linked',
+            # 'citation_source1': 'CDL linked',
+            'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/b90794643>',
             'citation_source2': '',
             'citation_start_page': '',
             'citation_title': 'Critical Encounters in Secondary English: Teaching Literary Theory to Adolescents ',
