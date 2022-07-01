@@ -254,10 +254,8 @@ def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
     mapped_book_data['citation_isbn'] = initial_book_data['isbn']
     mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
     mapped_book_data['citation_secondary_type'] = 'BK'
-
     # mapped_book_data['citation_source1'] = initial_book_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
-    mapped_book_data['citation_source1'] = run_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
-
+    mapped_book_data['citation_source1'] = run_book_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
@@ -276,12 +274,12 @@ def map_empty( course_id: str ) -> dict:
 def map_articles( article_results: list, course_id: str, cdl_checker ) -> list:
     mapped_articles = []
     for article_result in article_results:
-        mapped_article: dict = map_article( article_result, course_id )
+        mapped_article: dict = map_article( article_result, course_id, cdl_checker )
         mapped_articles.append( mapped_article )
     return mapped_articles
 
 
-def map_article( initial_article_data: dict, course_id: str ) -> dict:
+def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> dict:
     log.debug( f'initial_article_data, ``{pprint.pformat(initial_article_data)}``' )
     mapped_article_data = LEGANTO_HEADINGS.copy()
     ourl_parts: dict = parse_openurl( initial_article_data['sfxlink'] )
@@ -292,7 +290,10 @@ def map_article( initial_article_data: dict, course_id: str ) -> dict:
     mapped_article_data['citation_issue'] = initial_article_data['issue']
     mapped_article_data['citation_publication_date'] = str( initial_article_data['date'] )
     mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
-    mapped_article_data['citation_source1'] = initial_article_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
+
+    # mapped_article_data['citation_source1'] = initial_article_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
+    mapped_article_data['citation_source1'] = run_article_cdl_check( initial_article_data['facnotes'], initial_article_data['atitle'], cdl_checker )
+
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_article_data['citation_title'] = initial_article_data['title']
@@ -342,13 +343,29 @@ def parse_end_page_from_ourl( parts: dict ):
 ## cdl-checking -----------------------------------------------------
 
 
-def run_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
+def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
     """ Sees if data contains a CDL reference, and, if so, see if I can find one.
         Called by map_book() and map_article(). """
     field_text: str = ocra_facnotes_data
     if 'cdl' in ocra_facnotes_data.lower():
         results: list = cdl_checker.search_cdl( ocra_title )
         field_text: str = cdl_checker.prep_cdl_field_text( results )
+    else:
+        results: list = cdl_checker.search_cdl( ocra_title )
+        field_text: str = cdl_checker.prep_cdl_field_text( results )
+        log.debug( f'ADDITIONAL BOOK-CDL CHECK WOULD HAVE FOUND..., ``{field_text}``' )
+    log.debug( f'field_text, ``{field_text}``' )
+    return field_text
+
+
+def run_article_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
+    """ Sees if data contains a CDL reference, and, if so, see if I can find one.
+        Called by map_book() and map_article(). """
+    field_text: str = ocra_facnotes_data
+    if ocra_facnotes_data == '':
+        results: list = cdl_checker.search_cdl( ocra_title )
+        field_text: str = cdl_checker.prep_cdl_field_text( results )
+        log.debug( f'ARTICLE CDL-CHECK RESULT, ``{field_text}``' )
     log.debug( f'field_text, ``{field_text}``' )
     return field_text
 
