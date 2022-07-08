@@ -541,7 +541,7 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    1/0
+    # 1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     ## update formatting --------------------------------------------
     worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )

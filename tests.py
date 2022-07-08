@@ -261,7 +261,8 @@ class MapperTest( unittest.TestCase ):
             'url_desc': '',
             'volume': ''}
         course_id = 'HMAN2401D'
-        mapped_article_data: dict = etl_class_data.map_article( initial_article_data, course_id )
+        cdl_checker = CDL_Checker()
+        mapped_article_data: dict = etl_class_data.map_article( initial_article_data, course_id, cdl_checker )
         expected_sorted_keys = [
             'citation_author',
             'citation_doi',
@@ -301,6 +302,10 @@ class MapperTest( unittest.TestCase ):
             }
         self.assertEqual( expected_data, mapped_article_data )
         ## end def test_map_article_data()
+
+    # def test_map_article_author(self):
+    #     """ Checks map_article_author() helper's processing of various author fields and author-data in openurl. """
+    #     self.assertEqual( 1, 2 )
 
     ## end class MapperTest()
 
