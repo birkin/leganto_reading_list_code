@@ -89,9 +89,18 @@ def manage_build_reading_list( raw_course_id: str, force: bool ):
         if class_id:
             book_results: list = get_book_readings( class_id )
             article_results: list = get_article_readings( class_id )
+
+            log.debug( '--- starting excerpt query ---' )
+            excerpt_results: list = get_excerpt_readings( class_id )  # only logging this for now
+            log.debug( f'excerpt_results, ``{pprint.pformat(excerpt_results)}``' )
+            log.debug( '--- end excerpt query ---' )
+
             leg_books: list = map_books( book_results, course_id, cdl_checker )
             leg_articles: list = map_articles( article_results, course_id, cdl_checker )
-            all_course_results: list = leg_books + leg_articles
+
+            leg_excerpts: list = map_excerpts( excerpt_results, course_id, cdl_checker )
+
+            all_course_results: list = leg_books + leg_articles + leg_excerpts
             if all_course_results == []:
                 all_course_results: list = [ map_empty(course_id) ]
         else:
@@ -290,10 +299,7 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['citation_issue'] = initial_article_data['issue']
     mapped_article_data['citation_publication_date'] = str( initial_article_data['date'] )
     mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
-
-    # mapped_article_data['citation_source1'] = initial_article_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
     mapped_article_data['citation_source1'] = run_article_cdl_check( initial_article_data['facnotes'], initial_article_data['atitle'], cdl_checker )
-
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_article_data['citation_title'] = initial_article_data['title']
@@ -303,6 +309,42 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
+
+
+
+
+def map_excerpts( excerpt_results: list, course_id: str, cdl_checker ) -> list:
+    mapped_articles = []
+    for excerpt_result in excerpt_results:
+        mapped_excerpt: dict = map_excerpt( excerpt_result, course_id, cdl_checker )
+        mapped_articles.append( mapped_excerpt )
+    return mapped_articles
+
+
+
+def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> dict:
+    log.debug( f'initial_excerpt_data, ``{pprint.pformat(initial_excerpt_data)}``' )
+    mapped_excerpt_data = LEGANTO_HEADINGS.copy()
+    ourl_parts: dict = parse_openurl( initial_excerpt_data['sfxlink'] )
+    mapped_excerpt_data['citation_author'] = f'{initial_excerpt_data["aulast"]}, {initial_excerpt_data["aufirst"]}'
+    mapped_excerpt_data['citation_doi'] = initial_excerpt_data['doi']
+    mapped_excerpt_data['citation_end_page'] = str(initial_excerpt_data['epage']) if initial_excerpt_data['epage'] else parse_end_page_from_ourl( ourl_parts )
+    mapped_excerpt_data['citation_issn'] = initial_excerpt_data['issn']
+    mapped_excerpt_data['citation_issue'] = initial_excerpt_data['issue']
+    mapped_excerpt_data['citation_publication_date'] = str( initial_excerpt_data['date'] )
+    mapped_excerpt_data['citation_secondary_type'] = 'ARTICLE'  # guess
+    mapped_excerpt_data['citation_source1'] = run_article_cdl_check( initial_excerpt_data['facnotes'], initial_excerpt_data['atitle'], cdl_checker )
+    mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
+    mapped_excerpt_data['citation_start_page'] = str(initial_excerpt_data['spage']) if initial_excerpt_data['spage'] else parse_start_page_from_ourl( ourl_parts )
+    mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['title']
+    mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
+    mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
+    mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
+    mapped_excerpt_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
+    return mapped_excerpt_data
+
+
 
 
 def parse_openurl( raw_ourl: str ) -> dict:
@@ -499,7 +541,7 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    # 1/0
+    1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     ## update formatting --------------------------------------------
     worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
