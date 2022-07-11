@@ -263,8 +263,8 @@ def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
     mapped_book_data['citation_isbn'] = initial_book_data['isbn']
     mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
     mapped_book_data['citation_secondary_type'] = 'BK'
-    # mapped_book_data['citation_source1'] = initial_book_data['facnotes']  # sometimes 'CDL Linked', 'Ebook on reserve', ''
     mapped_book_data['citation_source1'] = run_book_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
+    mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
@@ -311,15 +311,12 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     return mapped_article_data
 
 
-
-
 def map_excerpts( excerpt_results: list, course_id: str, cdl_checker ) -> list:
     mapped_articles = []
     for excerpt_result in excerpt_results:
         mapped_excerpt: dict = map_excerpt( excerpt_result, course_id, cdl_checker )
         mapped_articles.append( mapped_excerpt )
     return mapped_articles
-
 
 
 def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> dict:
@@ -336,6 +333,7 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['citation_secondary_type'] = 'ARTICLE'  # guess
     mapped_excerpt_data['citation_source1'] = run_article_cdl_check( initial_excerpt_data['facnotes'], initial_excerpt_data['atitle'], cdl_checker )
     mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
+    mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
     mapped_excerpt_data['citation_start_page'] = str(initial_excerpt_data['spage']) if initial_excerpt_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['title']
     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
@@ -344,6 +342,37 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
+
+
+
+
+def map_bruknow_openurl( db_openurl: str ) -> str:
+    """ Converts db-openurl (possibly a fragment), to a valid bruknow-openurl.
+        Called by map_books(), map_articles(), and map_excerpts() """
+    log.debug( f'starting db_openurl, ``{db_openurl}``' )
+    bruknow_openurl_pattern: str = 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN'
+    new_openurl = ''
+    if db_openurl == '':
+        new_openurl = 'no openurl found'
+    else:
+        ## break ourl out into parts --------------------------------
+        parsed_db_ourl = urllib.parse.urlparse( db_openurl )
+        log.debug( f'parsed_db_ourl, ``{parsed_db_ourl}``' )
+        ## get the query string -------------------------------------
+        query_part: str = parsed_db_ourl.query
+        log.debug( f'query_part, ``{query_part}``' )
+        ## make key-value pairs for urlencode() ---------------------
+        param_dct: dict = dict( urllib.parse.parse_qsl(query_part) )
+        log.debug( f'param_dct, ``{pprint.pformat(param_dct)}``' )
+        ## get a nice encoded querystring ---------------------------
+        encoded_querystring: str = urllib.parse.urlencode( param_dct, safe=',' )
+        log.debug( f'encoded_querystring, ``{encoded_querystring}``' )
+        ## build bruknow ourl
+        new_openurl = f'%s&%s' % ( bruknow_openurl_pattern, encoded_querystring )
+    log.debug( f'new_openurl, ``{new_openurl}``' )
+    return new_openurl
+
+
 
 
 def parse_excerpt_author( initial_excerpt_data: dict ) -> str:
@@ -361,7 +390,6 @@ def parse_excerpt_author( initial_excerpt_data: dict ) -> str:
         name = 'author_not_found'
     log.debug( f'name, ``{name}``' )
     return name
-
 
 
 def parse_openurl( raw_ourl: str ) -> dict:
@@ -515,10 +543,11 @@ def update_gsheet( all_results: list ) -> None:
         'citation_end_page',
         'citation_source1',
         'citation_source2',
+        'citation_source3',
         'external_system_id'
         ]
-    end_range_column = 'P'
-    header_end_range = 'P1'
+    end_range_column = 'Q'
+    header_end_range = 'Q1'
     num_entries = len( all_results )
     data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
     ## prepare data -------------------------------------------------
