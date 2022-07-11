@@ -305,8 +305,17 @@ class MapperTest( unittest.TestCase ):
 
     def test_parse_excerpt_author(self):
         """ Checks parse_excerpt_author() helper's processing of various author fields. """
-        excerpt_db_data: dict = { 'articleid': 117436, 'requestid': '20220404173710jdelleca', 'reactivateid': '', 'format': 'excerpt', 'atitle': 'Introduction: Rhizome ', 'title': 'A Thousand Plateaus', 'aulast': '', 'aufirst': '', 'auinit': '', 'bk_aulast': 'Felix Guattari', 'bk_aufirst': 'Gilles Deleuze', 'bk_auinit': '', 'volume': '', 'issue': '', 'publisher': '', 'date': datetime.date(1980, 1, 1), 'issn': '', 'isbn': '', 'spage': None, 'epage': None, 'assignment': '', 'art_url': '', 'url_desc': '', 'doi': '', 'publicdomain': 'none', 'fairuse': 'none', 'classuse': 'y', 'nature': 'y', 'amount': 'y', 'original': 'y', 'notice': None, 'sequence': '', 'date_due': datetime.date(1969, 12, 31), 'facnotes': '', 'staffnotes': '', 'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Introduction: Rhizome &title=A Thousand Plateaus&date=1980-01-01&volume=&issue=&spage=1&epage=25&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8', 'ereserve': 'has pdf', 'status': 'on reserve', 'art_updated': datetime.datetime(2022, 4, 4, 17, 45, 2), 'injosiah': 'dont know', 'jcallno': '', 'bibno': '', 'printed': 'n', 'date_printed': None, 'pmid': None, 'fullcit': '', 'fulltext_url': '', 'copied_from_id': None, 'staff_intervention_needed': None, 'requests.requestid': '20220404173710jdelleca', 'classid': 10488, 'request_date': datetime.datetime(2022, 4, 4, 17, 37, 10) }
-        self.assertEqual( 'Felix Guattari, Gilles Deleuze', etl_class_data.parse_excerpt_author(excerpt_db_data) )
+        excerpt_db_data: dict = { 'articleid': 117436, 'requestid': '20220404173710jdelleca', 'reactivateid': '', 'format': 'excerpt', 'atitle': 'Introduction: Rhizome ', 'title': 'A Thousand Plateaus', 
+        'aulast': '', 
+        'aufirst': '', 
+        'auinit': '', 
+        'bk_aulast': 'Felix Guattari', 
+        'bk_aufirst': 'Gilles Deleuze', 
+        'bk_auinit': '', 
+        'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Introduction: Rhizome &title=A Thousand Plateaus&date=1980-01-01&volume=&issue=&spage=1&epage=25&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8', 
+        'ereserve': 'has pdf', 'status': 'on reserve', 'volume': '', 'issue': '', 'publisher': '', 'date': datetime.date(1980, 1, 1), 'issn': '', 'isbn': '', 'spage': None, 'epage': None, 'assignment': '', 'art_url': '', 'url_desc': '', 'doi': '', 'publicdomain': 'none', 'fairuse': 'none', 'classuse': 'y', 'nature': 'y', 'amount': 'y', 'original': 'y', 'notice': None, 'sequence': '', 'date_due': datetime.date(1969, 12, 31), 'facnotes': '', 'staffnotes': '', 'art_updated': datetime.datetime(2022, 4, 4, 17, 45, 2), 'injosiah': 'dont know', 'jcallno': '', 'bibno': '', 'printed': 'n', 'date_printed': None, 'pmid': None, 'fullcit': '', 'fulltext_url': '', 'copied_from_id': None, 'staff_intervention_needed': None, 'requests.requestid': '20220404173710jdelleca', 'classid': 10488, 'request_date': datetime.datetime(2022, 4, 4, 17, 37, 10) }
+        expected = 'Felix Guattari, Gilles Deleuze'
+        self.assertEqual( expected, etl_class_data.parse_excerpt_author(excerpt_db_data) )
 
     ## end class MapperTest()
 
