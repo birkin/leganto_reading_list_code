@@ -43,6 +43,7 @@ LEGANTO_HEADINGS: dict = {
     'citation_end_page': '',
     'citation_source1': '',
     'citation_source2': '',
+    'citation_source3': '',
     'external_system_id': ''
 }
 
@@ -572,6 +573,7 @@ def update_gsheet( all_results: list ) -> None:
             entry['citation_end_page'],
             entry['citation_source1'],
             entry['citation_source2'],
+            entry['citation_source3'],
             entry['external_system_id']
             ]
         data_values.append( row )
