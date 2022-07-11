@@ -317,15 +317,23 @@ class MapperTest( unittest.TestCase ):
         expected = 'Felix Guattari, Gilles Deleuze'
         self.assertEqual( expected, etl_class_data.parse_excerpt_author(excerpt_db_data) )
 
-    def test_map_bruknow_openurl(self):
-        """ Checks transformed bruknow openurl. """
+    def test_map_bruknow_openurl_a(self):
+        """ Checks transformed bruknow openurl from domain-start. """
         initial_ourl_a = '//library.brown.edu/easyarticle/?genre=article&atitle=3, 4, 6, 14, 16&title=The Senses in Performance&date=2006-01-01&volume=&issue=&spage=&epage=&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8'
         expected = 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&genre=article&atitle=3,+4,+6,+14,+16&title=The+Senses+in+Performance&date=2006-01-01&__char_set=utf8'
         self.assertEqual( 
             expected, 
-            etl_class_data.map_bruknow_openurl(initial_ourl_a) 
+            etl_class_data.map_bruknow_openurl( initial_ourl_a ) 
             )
-        # initial_ourl_b = 'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8'
+
+    def test_map_bruknow_openurl_b(self):
+        """ Checks transformed bruknow openurl from revproxy-start. """
+        initial_ourl_b = 'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8'
+        expected = 'bar'
+        self.assertEqual( 
+            expected, 
+            etl_class_data.map_bruknow_openurl( initial_ourl_b ) 
+            )
 
     ## end class MapperTest()
 
