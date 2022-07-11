@@ -326,7 +326,8 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     log.debug( f'initial_excerpt_data, ``{pprint.pformat(initial_excerpt_data)}``' )
     mapped_excerpt_data = LEGANTO_HEADINGS.copy()
     ourl_parts: dict = parse_openurl( initial_excerpt_data['sfxlink'] )
-    mapped_excerpt_data['citation_author'] = f'{initial_excerpt_data["aulast"]}, {initial_excerpt_data["aufirst"]}'
+    # mapped_excerpt_data['citation_author'] = f'{initial_excerpt_data["aulast"]}, {initial_excerpt_data["aufirst"]}'
+    mapped_excerpt_data['citation_author'] = parse_excerpt_author( initial_excerpt_data )
     mapped_excerpt_data['citation_doi'] = initial_excerpt_data['doi']
     mapped_excerpt_data['citation_end_page'] = str(initial_excerpt_data['epage']) if initial_excerpt_data['epage'] else parse_end_page_from_ourl( ourl_parts )
     mapped_excerpt_data['citation_issn'] = initial_excerpt_data['issn']
@@ -344,6 +345,22 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
 
+
+def parse_excerpt_author( initial_excerpt_data: dict ) -> str:
+    """ Checks multiple possible fields for author info.
+        Exceprts seem to have author info in multiple places; this function handles that.
+        Called by map_excerpt() """
+    first: str = initial_excerpt_data.get( 'aufirst', '' )
+    if first == '':
+        first = initial_excerpt_data.get( 'bk_aufirst', '' )
+    last: str = initial_excerpt_data.get( 'aulst', '' )
+    if last == '':
+        last = initial_excerpt_data.get( 'bk_aulast', '' )
+    name = f'{last}, {first}'
+    if name.strip() == ',':
+        name = 'author_not_found'
+    log.debug( f'name, ``{name}``' )
+    return name
 
 
 
@@ -541,8 +558,9 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    # 1/0
+    1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
+    # worksheet.batch_update( new_data, value_input_option='USER_ENTERED' )
     ## update formatting --------------------------------------------
     worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
     worksheet.freeze( rows=1, cols=None )
