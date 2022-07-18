@@ -32,6 +32,7 @@ LEGANTO_HEADINGS: dict = {
     'section_id': '',
     'citation_secondary_type': '',
     'citation_title': '',
+    'citation_journal_title': '',
     'citation_author': '',
     'citation_publication_date': '',
     'citation_doi': '',
@@ -346,8 +347,6 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     return mapped_excerpt_data
 
 
-
-
 def map_bruknow_openurl( db_openurl: str ) -> str:
     """ Converts db-openurl (possibly a fragment), to a valid bruknow-openurl.
         Called by map_books(), map_articles(), and map_excerpts() """
@@ -375,8 +374,6 @@ def map_bruknow_openurl( db_openurl: str ) -> str:
         new_openurl = f'%s&%s' % ( bruknow_openurl_pattern, encoded_querystring )
     log.debug( f'new_openurl, ``{new_openurl}``' )
     return new_openurl
-
-
 
 
 def parse_excerpt_author( initial_excerpt_data: dict ) -> str:
@@ -536,6 +533,7 @@ def update_gsheet( all_results: list ) -> None:
         'section_id',
         'citation_secondary_type',
         'citation_title',
+        'citation_journal_title',
         'citation_author',
         'citation_publication_date',
         'citation_doi',
@@ -550,8 +548,8 @@ def update_gsheet( all_results: list ) -> None:
         'citation_source3',
         'external_system_id'
         ]
-    end_range_column = 'Q'
-    header_end_range = 'Q1'
+    end_range_column = 'R'
+    header_end_range = 'R1'
     num_entries = len( all_results )
     data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
     ## prepare data -------------------------------------------------
@@ -562,6 +560,7 @@ def update_gsheet( all_results: list ) -> None:
             entry['section_id'],
             entry['citation_secondary_type'],
             entry['citation_title'],
+            entry['citation_journal_title'],
             entry['citation_author'],
             entry['citation_publication_date'],
             entry['citation_doi'],
@@ -647,6 +646,17 @@ def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
 ## -- script-caller helpers -----------------------------------------
 
 
+# def parse_args() -> dict:
+#     """ Parses arguments when module called via __main__ """
+#     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`)' )
+#     parser.add_argument( '--course_id', help='typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
+#     parser.add_argument( '--force', help='takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
+#     args: dict = vars( parser.parse_args() )
+#     if args == {'course_id': None, 'class_id': None}:
+#         parser.print_help()
+#         sys.exit()
+#     return args
+
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`)' )
@@ -656,7 +666,9 @@ def parse_args() -> dict:
     if args == {'course_id': None, 'class_id': None}:
         parser.print_help()
         sys.exit()
+    log.debug( f'args, ``{args}``' )
     return args
+
 
 if __name__ == '__main__':
     args: dict = parse_args()
