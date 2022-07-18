@@ -259,7 +259,7 @@ def map_books( book_results: list, course_id: str, cdl_checker ) -> list:
 
 
 def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
-    log.debug( f'initial_book_data, ``{initial_book_data}``' )
+    log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
     mapped_book_data = LEGANTO_HEADINGS.copy()
     mapped_book_data['citation_author'] = initial_book_data['bk_author']
     mapped_book_data['citation_isbn'] = initial_book_data['isbn']
@@ -305,7 +305,8 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
     mapped_article_data['citation_source3'] = map_bruknow_openurl( initial_article_data.get('sfxlink', '') )  
     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
-    mapped_article_data['citation_title'] = initial_article_data['title']
+    mapped_article_data['citation_title'] = initial_article_data['atitle'].strip()
+    mapped_article_data['citation_journal_title'] = initial_article_data['title']
     mapped_article_data['citation_volume'] = initial_article_data['volume']
     mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
@@ -338,7 +339,8 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
     mapped_excerpt_data['citation_source3'] = map_bruknow_openurl( initial_excerpt_data.get('sfxlink', '') )  
     mapped_excerpt_data['citation_start_page'] = str(initial_excerpt_data['spage']) if initial_excerpt_data['spage'] else parse_start_page_from_ourl( ourl_parts )
-    mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['title']
+    mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['atitle'].strip()
+    mapped_excerpt_data['citation_journal_title'] = initial_excerpt_data['title']
     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
     mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
@@ -591,7 +593,7 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    # 1/0
+    1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     # worksheet.batch_update( new_data, value_input_option='USER_ENTERED' )
     ## update formatting --------------------------------------------
