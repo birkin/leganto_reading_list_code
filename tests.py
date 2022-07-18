@@ -170,10 +170,12 @@ class MapperTest( unittest.TestCase ):
             'citation_isbn',
             'citation_issn',
             'citation_issue',
+            'citation_journal_title',
             'citation_publication_date',
             'citation_secondary_type',
             'citation_source1',
             'citation_source2',
+            'citation_source3',
             'citation_start_page',
             'citation_title',
             'citation_volume',
@@ -194,8 +196,10 @@ class MapperTest( unittest.TestCase ):
             # 'citation_source1': 'CDL linked',
             'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/b90794643>',
             'citation_source2': '',
+            'citation_source3': 'no openurl found',
             'citation_start_page': '',
             'citation_title': 'Critical Encounters in Secondary English: Teaching Literary Theory to Adolescents ',
+            'citation_journal_title': '',
             'citation_volume': '',
             'coursecode': 'EDUC2510',
             'external_system_id': '20200505172403authID',
@@ -270,10 +274,12 @@ class MapperTest( unittest.TestCase ):
             'citation_isbn',
             'citation_issn',
             'citation_issue',
+            'citation_journal_title',
             'citation_publication_date',
             'citation_secondary_type',
             'citation_source1',
             'citation_source2',
+            'citation_source3',
             'citation_start_page',
             'citation_title',
             'citation_volume',
@@ -289,12 +295,14 @@ class MapperTest( unittest.TestCase ):
             'citation_isbn': '',
             'citation_issn': '',
             'citation_issue': '',
+            'citation_journal_title': 'Feminist Art Coalition',
             'citation_publication_date': '2020-12-28',
             'citation_secondary_type': 'ARTICLE',
             'citation_source1': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
             'citation_source2': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
+            'citation_source3': 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&genre=article&atitle=The+Plot+of+her+Undoing&title=Feminist+Art+Coalition&date=2020-12-28&aulast=Hartman&aufirst=Saidiya&__char_set=utf8',
             'citation_start_page': '',
-            'citation_title': 'Feminist Art Coalition',
+            'citation_title': 'The Plot of her Undoing',
             'citation_volume': '',
             'coursecode': 'HMAN2401',
             'external_system_id': '20210111123104OCRAcopy',
@@ -302,6 +310,19 @@ class MapperTest( unittest.TestCase ):
             }
         self.assertEqual( expected_data, mapped_article_data )
         ## end def test_map_article_data()
+
+    def test_map_excerpt_data_titles(self):
+        """ Checks article-title and journal-title excerpt-mapping. """
+        initial_excerpt_data: dict = { 'articleid': 117436, 'requestid': '20220404173710jdelleca', 'reactivateid': '', 'format': 'excerpt', 'aulast': '', 'aufirst': '', 'auinit': '', 'bk_aulast': 'Felix Guattari', 'bk_aufirst': 'Gilles Deleuze', 'bk_auinit': '', 'ereserve': 'has pdf', 'status': 'on reserve', 'volume': '', 'issue': '', 'publisher': '', 'date': datetime.date(1980, 1, 1), 'issn': '', 'isbn': '', 'spage': None, 'epage': None, 'assignment': '', 'art_url': '', 'url_desc': '', 'doi': '', 'publicdomain': 'none', 'fairuse': 'none', 'classuse': 'y', 'nature': 'y', 'amount': 'y', 'original': 'y', 'notice': None, 'sequence': '', 'date_due': datetime.date(1969, 12, 31), 'facnotes': '', 'staffnotes': '', 'art_updated': datetime.datetime(2022, 4, 4, 17, 45, 2), 'injosiah': 'dont know', 'jcallno': '', 'bibno': '', 'printed': 'n', 'date_printed': None, 'pmid': None, 'fullcit': '', 'fulltext_url': '', 'copied_from_id': None, 'staff_intervention_needed': None, 'requests.requestid': '20220404173710jdelleca', 'classid': 10488, 'request_date': datetime.datetime(2022, 4, 4, 17, 37, 10), 
+        'atitle': 'Introduction: Rhizome ', 
+        'title': 'A Thousand Plateaus', 
+        'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Introduction: Rhizome &title=A Thousand Plateaus&date=1980-01-01&volume=&issue=&spage=1&epage=25&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8', 
+        }
+        course_id = 'FOO'
+        cdl_checker = CDL_Checker()
+        mapped_excerpt_data: dict = etl_class_data.map_excerpt( initial_excerpt_data, course_id, cdl_checker )        
+        self.assertEqual( '(EXCERPT) Introduction: Rhizome', mapped_excerpt_data['citation_title'] )
+        self.assertEqual( 'A Thousand Plateaus', mapped_excerpt_data['citation_journal_title'] )
 
     def test_parse_excerpt_author(self):
         """ Checks parse_excerpt_author() helper's processing of various author fields. """
@@ -329,7 +350,7 @@ class MapperTest( unittest.TestCase ):
     def test_map_bruknow_openurl_b(self):
         """ Checks transformed bruknow openurl from revproxy-start. """
         initial_ourl_b = 'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8'
-        expected = 'bar'
+        expected = 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&genre=article&atitle=The+Plot+of+her+Undoing&title=Feminist+Art+Coalition&date=2020-12-28&aulast=Hartman&aufirst=Saidiya&__char_set=utf8'
         self.assertEqual( 
             expected, 
             etl_class_data.map_bruknow_openurl( initial_ourl_b ) 
