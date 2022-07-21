@@ -203,7 +203,7 @@ class MapperTest( unittest.TestCase ):
             'citation_volume': '',
             'coursecode': 'EDUC2510',
             'external_system_id': '20200505172403authID',
-            'section_id': 'A'
+            'section_id': ''
             }
         self.assertEqual( expected_data, mapped_book_data )
         ## end def test_map_book_data()
@@ -306,7 +306,7 @@ class MapperTest( unittest.TestCase ):
             'citation_volume': '',
             'coursecode': 'HMAN2401',
             'external_system_id': '20210111123104OCRAcopy',
-            'section_id': 'D'
+            'section_id': ''
             }
         self.assertEqual( expected_data, mapped_article_data )
         ## end def test_map_article_data()

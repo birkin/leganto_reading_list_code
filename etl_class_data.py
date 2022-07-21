@@ -270,7 +270,7 @@ def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
-    mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    # mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
     return mapped_book_data
 
@@ -278,7 +278,7 @@ def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
 def map_empty( course_id: str ) -> dict:
     mapped_book_data = LEGANTO_HEADINGS.copy()
     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
-    mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    # mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     return mapped_book_data
 
 
@@ -310,7 +310,7 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['citation_volume'] = initial_article_data['volume']
     mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
-    mapped_article_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    # mapped_article_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
 
@@ -327,7 +327,6 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     log.debug( f'initial_excerpt_data, ``{pprint.pformat(initial_excerpt_data)}``' )
     mapped_excerpt_data = LEGANTO_HEADINGS.copy()
     ourl_parts: dict = parse_openurl( initial_excerpt_data['sfxlink'] )
-    # mapped_excerpt_data['citation_author'] = f'{initial_excerpt_data["aulast"]}, {initial_excerpt_data["aufirst"]}'
     mapped_excerpt_data['citation_author'] = parse_excerpt_author( initial_excerpt_data )
     mapped_excerpt_data['citation_doi'] = initial_excerpt_data['doi']
     mapped_excerpt_data['citation_end_page'] = str(initial_excerpt_data['epage']) if initial_excerpt_data['epage'] else parse_end_page_from_ourl( ourl_parts )
@@ -344,7 +343,7 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
     mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
-    mapped_excerpt_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    # mapped_excerpt_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
 
