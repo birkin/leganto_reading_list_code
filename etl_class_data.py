@@ -53,6 +53,11 @@ SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 LAST_CHECKED_PATH: str = os.environ['LGNT__LAST_CHECKED_JSON_PATH']
 
+CSV_DATA = {}
+with open( '../scanned_data.json', encoding='utf-8' ) as file_handler:
+    jsn: str = file_handler.read()
+    CSV_DATA = json.loads( jsn )
+
 
 def manage_build_reading_list( raw_course_id: str, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
@@ -310,9 +315,42 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['citation_volume'] = initial_article_data['volume']
     mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
-    # mapped_article_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    citation_source4 = check_pdfs( initial_article_data['requests.requestid'], initial_article_data['articleid'] )
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
+
+
+def check_pdfs( request_id: str, article_id: str ) -> str:
+    log.debug( f'initial request_id, ``{request_id}``' )
+    pdf_check_result = 'no_pdf_found'
+    numeric_part = request_id[0:14]
+    log.debug( f'numeric_part, ``{numeric_part}``' )
+    pdf_keys: list = CSV_DATA.keys()
+    for key in pdf_keys:
+        dct_entry = CSV_DATA[key]
+        possible_matches: list = []
+        # if '20190817060417' in request_id:
+        #     if '20190817060417' in repr( dct_entry ):
+        #         log.debug( f'dct_entry, ``{dct_entry}``' )
+        #         log.debug( f'type(dct_entry), ``{type(dct_entry)}``' )
+        #         log.debug( f'dct_entry["requestid"], ``{dct_entry["requestid"]}``' )
+
+        # if numeric_part in dct_entry['requestid']:  # some spreadsheet entries contain only the number-part; some contain the name, too.
+        #     log.debug( 'found PDF!!')
+        #     pdf_check_result = dct_entry['filename']
+        #     break
+
+        if request_id == dct_entry['requestid'] and article_id == dct_entry['articleid']:
+            possible_matches.append( dct_entry['filename'] )
+        if len( possible_matches ) >= 1:
+            log.debug( f'PDF found!!' ) 
+        if len( possible_matches ) == 1:
+            pdf_check_result = possible_matches[0]
+        elif len( possible_matches ) > 1:
+            pdf_check_result = f'possible-matches: ``{repr(possible_matches)}``'
+
+    log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
+    return pdf_check_result
 
 
 def map_excerpts( excerpt_results: list, course_id: str, cdl_checker ) -> list:
@@ -343,7 +381,7 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
     mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
-    # mapped_excerpt_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+    citation_source4 = check_pdfs( initial_excerpt_data['requests.requestid'], initial_excerpt_data['articleid'] )
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
 
@@ -592,7 +630,7 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    # 1/0
+    1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     # worksheet.batch_update( new_data, value_input_option='USER_ENTERED' )
     ## update formatting --------------------------------------------
