@@ -1,6 +1,7 @@
 import csv, json, logging, os, pprint
 
 CSV_PATH: str = os.environ['LGNT__SCANNED_DATA_CSV_PATH']
+JSON_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 
 logging.basicConfig(
@@ -26,5 +27,5 @@ with open( CSV_PATH, encoding='utf-8' ) as csv_file_handler:
 log.debug( f'data, ``{pprint.pformat(data)}``' )
 
 jsn = json.dumps( data, sort_keys=True, indent=2 )
-with open( '../scanned_data.json', 'w', encoding='utf-8' ) as json_file_handler:
+with open( JSON_PATH, 'w', encoding='utf-8' ) as json_file_handler:
     json_file_handler.write( jsn )
