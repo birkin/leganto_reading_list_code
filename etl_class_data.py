@@ -53,8 +53,10 @@ SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 LAST_CHECKED_PATH: str = os.environ['LGNT__LAST_CHECKED_JSON_PATH']
 
+SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
+
 CSV_DATA = {}
-with open( '../scanned_data.json', encoding='utf-8' ) as file_handler:
+with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
     jsn: str = file_handler.read()
     CSV_DATA = json.loads( jsn )
 
@@ -320,8 +322,8 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     return mapped_article_data
 
 
-def check_pdfs( request_id: str, article_id: str ) -> str:
-    log.debug( f'initial request_id, ``{request_id}``' )
+def check_pdfs( course_id: str, db_dict: dict, scanned_data: dict ) -> str:
+    log.debug( f'course_id, ``{course_id}``' )
     pdf_check_result = 'no_pdf_found'
     numeric_part = request_id[0:14]
     log.debug( f'numeric_part, ``{numeric_part}``' )

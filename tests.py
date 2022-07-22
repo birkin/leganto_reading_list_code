@@ -8,12 +8,11 @@ Usage:
     - example: $ python3 ./tests.py SomeTest.test_something
 """
 
-import datetime, logging, os, unittest
-
+import datetime, json, logging, os, unittest
 import etl_class_data
-from etl_class_data import CDL_Checker
+from etl_class_data import CDL_Checker, check_pdfs
 
-
+SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 
 logging.basicConfig(
@@ -22,6 +21,85 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
+
+
+class Misc_Test( unittest.TestCase ):
+
+    """ Miscellaneous checks. """
+
+    def setUp(self) -> None:
+        pass
+
+    def load_scanned_data( self ):
+        scanned_data: dict = {}
+        with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
+            jsn: str = file_handler.read()
+            scanned_data = json.loads( jsn )
+
+    def test_check_pdfs_A(self):
+        """ Checks for accurate file-name find. """
+        initial_excerpt_data: dict = {
+            'amount': 'y',
+            'art_updated': datetime.datetime(2019, 8, 20, 15, 41, 39),
+            'art_url': '',
+            'articleid': 100230,
+            'assignment': '',
+            'atitle': 'Quinta Temporada, Los Vendidos, Los Dos Caras del Patroncito',
+            'aufirst': 'Luis ',
+            'auinit': '',
+            'aulast': 'Valdez',
+            'bibno': '',
+            'bk_aufirst': 'Luis ',
+            'bk_auinit': '',
+            'bk_aulast': 'Valdez',
+            'classid': 8851,
+            'classuse': 'y',
+            'copied_from_id': None,
+            'date': datetime.date(1990, 1, 1),
+            'date_due': datetime.date(2019, 9, 17),
+            'date_printed': datetime.datetime(2019, 8, 20, 8, 22, 54),
+            'doi': '',
+            'epage': None,
+            'ereserve': 'has pdf',
+            'facnotes': '',
+            'fairuse': 'none',
+            'format': 'excerpt',
+            'fullcit': '',
+            'fulltext_url': '',
+            'injosiah': 'dont know',
+            'isbn': '',
+            'issn': '',
+            'issue': '',
+            'jcallno': '',
+            'nature': 'y',
+            'notice': None,
+            'original': 'y',
+            'pmid': None,
+            'printed': 'y',
+            'publicdomain': 'none',
+            'publisher': 'Arte Publico',
+            'reactivateid': '',
+            'request_date': datetime.datetime(2019, 8, 17, 6, 4, 17),
+            'requestid': '20190817060417pybarra',
+            'requests.requestid': '20190817060417pybarra',
+            'sequence': '',
+            'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Quinta '
+                        'Temporada, Los Vendidos, Los Dos Caras del Patroncito&title=Early '
+                        'Works&date=1990-01-01&volume=&issue=&spage=18&epage=52&issn=&doi=&aulast=Valdez&aufirst=Luis '
+                        '&auinit=&__char_set=utf8',
+            'spage': None,
+            'staff_intervention_needed': None,
+            'staffnotes': '',
+            'status': 'on reserve',
+            'title': 'Early Works',
+            'url_desc': '',
+            'volume': ''
+            }
+        self.assertEqual( 'valdez_early.pdf', check_pdfs( initial_excerpt_data, scanned_data) )
+            
+
+    ## end class Misc_Test()
+
 
 
 class CDL_Checker_Test( unittest.TestCase ):
