@@ -1,7 +1,10 @@
 import logging, os, pathlib
 
+## setup ------------------------------------------------------------
+
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 WEB_DIR_PATH: str = os.environ['LGNT__WEB_DIRECTORY_PATH']
+WEB_DIR_URL_PATH: str = '/url/path/to/reserves_readings'  # will load from env
 
 logging.basicConfig(
     filename=LOG_PATH,
@@ -9,7 +12,6 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
-
 
 spreadsheet_courses = [ 'BIOL1234A', 'ENVR2345B', 'HIST3456C', 'ITAL4567D' ]  # would come from spreadsheet
 
@@ -26,7 +28,6 @@ shib_output_path = f'{WEB_DIR_PATH}/shib.conf'  # may be an .htaccess file; will
 
 TEMPLATE = '''
 
-
 # -------------------------------------
 # course-reserves entry for {COURSE_ID}
 # -------------------------------------
@@ -41,7 +42,7 @@ TEMPLATE = '''
 
 shib_entries: list = []
 for course in spreadsheet_courses:
-    READINGS_PATH = f'{WEB_DIR_PATH}/{course}'
+    READINGS_PATH = f'{WEB_DIR_URL_PATH}/{course}'
     course_characters = course[0:4]
     course_numerals = course[4:]
     COURSE_GROUPER_ENTRY = f'COURSE:{course_characters}:{course_numerals}:2022-Fall:S01:All'
@@ -51,3 +52,5 @@ for course in spreadsheet_courses:
 
 with open( shib_output_path, 'w', encoding='utf-8' ) as filehandler:
     filehandler.writelines( shib_entries )
+
+## EOF  
