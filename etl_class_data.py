@@ -330,15 +330,22 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
     for key, val in CSV_DATA.items():
         file_name: str = key.strip()
         file_info: dict = val
-        log.debug( f'file_name, ``{file_name}``' )
-        log.debug( f'file_info, ``{file_info}``' )
-        if db_dict_entry['requests.requestid'] == file_info['requestid']:
+        db_entry_request_id: str = db_dict_entry['requests.requestid']
+        file_info_request_id: str = file_info['requestid']
+        if db_entry_request_id == file_info_request_id:
+            log.debug( f'file_name, ``{file_name}``' )
+            log.debug( f'file_info, ``{file_info}``' )
             log.debug( 'match on request-id' )
-            if str(db_dict_entry['articleid']) == file_info['articleid']:
+            log.debug( f'db_entry_request_id, ``{db_entry_request_id}``' )
+            db_article_id: str = str( db_dict_entry['articleid'] )
+            file_info_article_id: str = file_info['articleid']
+            if db_article_id == file_info_article_id:
                 log.debug( '...and match on article-id!' )
                 possible_matches.append( file_name )
             else:
-                log.debug( '...but no match on article-id' )        
+                log.debug( '...but no match on article-id' ) 
+                log.debug( f'db_article_id, ``{db_article_id}``' )
+                log.debug( f'file_info_article_id, ``{file_info_article_id}``' )
     if len( possible_matches ) > 0:
         if len( possible_matches ) == 1:
             pdf_check_result = possible_matches[0]
