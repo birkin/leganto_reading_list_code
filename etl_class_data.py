@@ -45,6 +45,7 @@ LEGANTO_HEADINGS: dict = {
     'citation_source1': '',
     'citation_source2': '',
     'citation_source3': '',
+    'citation_source4': '',
     'external_system_id': ''
 }
 
@@ -277,7 +278,6 @@ def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
-    # mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
     return mapped_book_data
 
@@ -311,14 +311,13 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['citation_source1'] = run_article_cdl_check( initial_article_data['facnotes'], initial_article_data['atitle'], cdl_checker )
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
     mapped_article_data['citation_source3'] = map_bruknow_openurl( initial_article_data.get('sfxlink', '') )  
+    mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, CSV_DATA )
     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_article_data['citation_title'] = initial_article_data['atitle'].strip()
     mapped_article_data['citation_journal_title'] = initial_article_data['title']
     mapped_article_data['citation_volume'] = initial_article_data['volume']
     mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
-    # citation_source4 = check_pdfs( initial_article_data['requests.requestid'], initial_article_data['articleid'] )
-    citation_source4 = check_pdfs( initial_article_data, CSV_DATA )
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
 
@@ -376,14 +375,13 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['citation_source1'] = run_article_cdl_check( initial_excerpt_data['facnotes'], initial_excerpt_data['atitle'], cdl_checker )
     mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
     mapped_excerpt_data['citation_source3'] = map_bruknow_openurl( initial_excerpt_data.get('sfxlink', '') )  
+    mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA )
     mapped_excerpt_data['citation_start_page'] = str(initial_excerpt_data['spage']) if initial_excerpt_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['atitle'].strip()
     mapped_excerpt_data['citation_journal_title'] = initial_excerpt_data['title']
     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
     mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
-    # citation_source4 = check_pdfs( initial_excerpt_data['requests.requestid'], initial_excerpt_data['articleid'] )
-    citation_source4 = check_pdfs( initial_excerpt_data, CSV_DATA )
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
 
@@ -587,10 +585,11 @@ def update_gsheet( all_results: list ) -> None:
         'citation_source1',
         'citation_source2',
         'citation_source3',
+        'citation_source4',
         'external_system_id'
         ]
-    end_range_column = 'R'
-    header_end_range = 'R1'
+    end_range_column = 'S'
+    header_end_range = 'S1'
     num_entries = len( all_results )
     data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
     ## prepare data -------------------------------------------------
@@ -614,6 +613,7 @@ def update_gsheet( all_results: list ) -> None:
             entry['citation_source1'],
             entry['citation_source2'],
             entry['citation_source3'],
+            entry['citation_source4'],
             entry['external_system_id']
             ]
         data_values.append( row )
