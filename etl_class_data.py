@@ -321,39 +321,30 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
 
-
-def check_pdfs( course_id: str, db_dict: dict, scanned_data: dict ) -> str:
-    log.debug( f'course_id, ``{course_id}``' )
+def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
+    """ Check and return the pdf for the given ocra article or excerpt. 
+        Called by map_article() and map_excerpt() """
     pdf_check_result = 'no_pdf_found'
-    numeric_part = request_id[0:14]
-    log.debug( f'numeric_part, ``{numeric_part}``' )
-    pdf_keys: list = CSV_DATA.keys()
-    for key in pdf_keys:
-        dct_entry = CSV_DATA[key]
-        possible_matches: list = []
-        # if '20190817060417' in request_id:
-        #     if '20190817060417' in repr( dct_entry ):
-        #         log.debug( f'dct_entry, ``{dct_entry}``' )
-        #         log.debug( f'type(dct_entry), ``{type(dct_entry)}``' )
-        #         log.debug( f'dct_entry["requestid"], ``{dct_entry["requestid"]}``' )
-
-        # if numeric_part in dct_entry['requestid']:  # some spreadsheet entries contain only the number-part; some contain the name, too.
-        #     log.debug( 'found PDF!!')
-        #     pdf_check_result = dct_entry['filename']
-        #     break
-
-        if request_id == dct_entry['requestid'] and article_id == dct_entry['articleid']:
-            possible_matches.append( dct_entry['filename'] )
-        if len( possible_matches ) >= 1:
-            log.debug( f'PDF found!!' ) 
+    possible_matches = []
+    for key, val in CSV_DATA.items():
+        file_name: str = key.strip()
+        file_info: dict = val
+        log.debug( f'file_name, ``{file_name}``' )
+        log.debug( f'file_info, ``{file_info}``' )
+        if db_dict_entry['requests.requestid'] == file_info['requestid']:
+            log.debug( 'match on request-id' )
+            if str(db_dict_entry['articleid']) == file_info['articleid']:
+                log.debug( '...and match on article-id!' )
+                possible_matches.append( file_name )
+            else:
+                log.debug( '...but no match on article-id' )        
+    if len( possible_matches ) > 0:
         if len( possible_matches ) == 1:
             pdf_check_result = possible_matches[0]
-        elif len( possible_matches ) > 1:
-            pdf_check_result = f'possible-matches: ``{repr(possible_matches)}``'
-
+        else:
+            pdf_check_result = repr( possible_matches )
     log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
     return pdf_check_result
-
 
 def map_excerpts( excerpt_results: list, course_id: str, cdl_checker ) -> list:
     mapped_articles = []

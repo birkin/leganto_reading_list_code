@@ -28,13 +28,14 @@ class Misc_Test( unittest.TestCase ):
     """ Miscellaneous checks. """
 
     def setUp(self) -> None:
-        pass
+        self.scanned_data = self.load_scanned_data()
 
-    def load_scanned_data( self ):
+    def load_scanned_data( self ) -> dict:
         scanned_data: dict = {}
         with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
             jsn: str = file_handler.read()
             scanned_data = json.loads( jsn )
+        return scanned_data
 
     def test_check_pdfs_A(self):
         """ Checks for accurate file-name find. """
@@ -95,11 +96,11 @@ class Misc_Test( unittest.TestCase ):
             'url_desc': '',
             'volume': ''
             }
-        self.assertEqual( 'valdez_early.pdf', check_pdfs( initial_excerpt_data, scanned_data) )
+        expected = 'valdez_early.pdf'
+        result = check_pdfs( initial_excerpt_data, self.scanned_data )  
+        self.assertEqual( expected, result )  # course-id is `TAPS1610`
             
-
     ## end class Misc_Test()
-
 
 
 class CDL_Checker_Test( unittest.TestCase ):
