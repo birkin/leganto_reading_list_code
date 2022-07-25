@@ -317,7 +317,8 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['citation_volume'] = initial_article_data['volume']
     mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
-    citation_source4 = check_pdfs( initial_article_data['requests.requestid'], initial_article_data['articleid'] )
+    # citation_source4 = check_pdfs( initial_article_data['requests.requestid'], initial_article_data['articleid'] )
+    citation_source4 = check_pdfs( initial_article_data, CSV_DATA )
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
 
@@ -374,7 +375,8 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
     mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
-    citation_source4 = check_pdfs( initial_excerpt_data['requests.requestid'], initial_excerpt_data['articleid'] )
+    # citation_source4 = check_pdfs( initial_excerpt_data['requests.requestid'], initial_excerpt_data['articleid'] )
+    citation_source4 = check_pdfs( initial_excerpt_data, CSV_DATA )
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
 
