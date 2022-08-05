@@ -346,7 +346,7 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
                 pfid = str( file_info['pdfid'] )
                 file_url = f'{FILES_URL_ROOT}/{pfid}_{file_name}'
                 log.debug( f'file_url, ``{file_url}``' )
-                possible_matches.append( file_name )
+                possible_matches.append( file_url )
             else:
                 log.debug( '...but no match on article-id' ) 
                 log.debug( f'db_article_id, ``{db_article_id}``' )
@@ -638,7 +638,7 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    1/0
+    # 1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     # worksheet.batch_update( new_data, value_input_option='USER_ENTERED' )
     ## update formatting --------------------------------------------
