@@ -638,7 +638,7 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    # 1/0
+    1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     # worksheet.batch_update( new_data, value_input_option='USER_ENTERED' )
     ## update formatting --------------------------------------------
