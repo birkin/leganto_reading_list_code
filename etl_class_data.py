@@ -693,17 +693,6 @@ def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
 ## -- script-caller helpers -----------------------------------------
 
 
-# def parse_args() -> dict:
-#     """ Parses arguments when module called via __main__ """
-#     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`)' )
-#     parser.add_argument( '--course_id', help='typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-#     parser.add_argument( '--force', help='takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
-#     args: dict = vars( parser.parse_args() )
-#     if args == {'course_id': None, 'class_id': None}:
-#         parser.print_help()
-#         sys.exit()
-#     return args
-
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`)' )
