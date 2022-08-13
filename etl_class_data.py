@@ -29,6 +29,8 @@ CDL_DB = os.environ['LGNT__CDL_DB_DATABASE_NAME']
 #
 MATCHER_URL = os.environ['LGNT__MATCHER_URL']
 MATCHER_TOKEN = os.environ['LGNT__MATCHER_TOKEN']
+#
+FILES_URL_PATTERN = os.environ['FILES_URL_PATTERN']
 
 
 LEGANTO_HEADINGS: dict = {
@@ -353,18 +355,15 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
                 pfid = str( file_info['pdfid'] )
                 full_file_name: str = f'{pfid}_{file_name}'
                 ## post match ---------------------------------------
-                url = MATCHER_URL
                 post_params = { 
                     'course_code': 'updated_course_code',
                     'file_name': 'full_file_name',
                     'token': MATCHER_TOKEN
                     }
-                r = requests.post( url, data=post_params )
+                r = requests.post( MATCHER_URL, data=post_params )
                 log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
-
                 ## build file-url -----------------------------------
-                
-                file_url = f'{FILES_URL_ROOT}/{pfid}_{file_name}'
+                file_url = f'{FILES_URL_PATTERN}'.replace( '{COURSE-CODE}', updated_course_code ). replace( '{FILENAME}', full_file_name )
                 log.debug( f'file_url, ``{file_url}``' )
                 possible_matches.append( file_url )
             else:
@@ -439,7 +438,8 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, cdl_checker ) -> di
     mapped_excerpt_data['citation_source1'] = run_article_cdl_check( initial_excerpt_data['facnotes'], initial_excerpt_data['atitle'], cdl_checker )
     mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
     mapped_excerpt_data['citation_source3'] = map_bruknow_openurl( initial_excerpt_data.get('sfxlink', '') )  
-    mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA )
+    # mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA )
+    mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA, course_id )
     mapped_excerpt_data['citation_start_page'] = str(initial_excerpt_data['spage']) if initial_excerpt_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['atitle'].strip()
     mapped_excerpt_data['citation_journal_title'] = initial_excerpt_data['title']
