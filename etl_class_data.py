@@ -4,6 +4,7 @@ import urllib.parse
 import gspread
 import pymysql
 import pymysql.cursors
+import requests
 from fuzzywuzzy import fuzz
 
 
@@ -25,6 +26,9 @@ DB = os.environ['LGNT__DB_DATABASE_NAME']
 CDL_USERNAME = os.environ['LGNT__CDL_DB_USERNAME']
 CDL_PASSWORD = os.environ['LGNT__CDL_DB_PASSWORD']
 CDL_DB = os.environ['LGNT__CDL_DB_DATABASE_NAME']
+#
+MATCHER_URL = os.environ['LGNT__MATCHER_URL']
+MATCHER_TOKEN = os.environ['LGNT__MATCHER_TOKEN']
 
 
 LEGANTO_HEADINGS: dict = {
@@ -313,7 +317,8 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     mapped_article_data['citation_source1'] = run_article_cdl_check( initial_article_data['facnotes'], initial_article_data['atitle'], cdl_checker )
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
     mapped_article_data['citation_source3'] = map_bruknow_openurl( initial_article_data.get('sfxlink', '') )  
-    mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, CSV_DATA )
+    # mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, CSV_DATA )
+    mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, CSV_DATA, course_id )
     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_article_data['citation_title'] = initial_article_data['atitle'].strip()
     mapped_article_data['citation_journal_title'] = initial_article_data['title']
@@ -323,9 +328,11 @@ def map_article( initial_article_data: dict, course_id: str, cdl_checker ) -> di
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
 
-def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
+
+def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> str:
     """ Check and return the pdf for the given ocra article or excerpt. 
-        Called by map_article() and map_excerpt() """
+        Called by map_article() and map_excerpt() 
+        Note: course_code does not separate out subject from code; rather, it is like `HIST1234`. """
     pdf_check_result = 'no_pdf_found'
     possible_matches = []
     for key, val in CSV_DATA.items():
@@ -342,8 +349,21 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
             file_info_article_id: str = file_info['articleid']
             if db_article_id == file_info_article_id:
                 log.debug( '...and match on article-id!' )
-                # file_info['pdfid']
+                updated_course_code: str = f'{course_code[0:4]}-{course_code[4:]}'
                 pfid = str( file_info['pdfid'] )
+                full_file_name: str = f'{pfid}_{file_name}'
+                ## post match ---------------------------------------
+                url = MATCHER_URL
+                post_params = { 
+                    'course_code': 'updated_course_code',
+                    'file_name': 'full_file_name',
+                    'token': MATCHER_TOKEN
+                    }
+                r = requests.post( url, data=post_params )
+                log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
+
+                ## build file-url -----------------------------------
+                
                 file_url = f'{FILES_URL_ROOT}/{pfid}_{file_name}'
                 log.debug( f'file_url, ``{file_url}``' )
                 possible_matches.append( file_url )
@@ -358,6 +378,44 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
             pdf_check_result = repr( possible_matches )
     log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
     return pdf_check_result
+
+
+# def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
+#     """ Check and return the pdf for the given ocra article or excerpt. 
+#         Called by map_article() and map_excerpt() """
+#     pdf_check_result = 'no_pdf_found'
+#     possible_matches = []
+#     for key, val in CSV_DATA.items():
+#         file_name: str = key.strip()
+#         file_info: dict = val
+#         db_entry_request_id: str = db_dict_entry['requests.requestid']
+#         file_info_request_id: str = file_info['requestid']
+#         if db_entry_request_id == file_info_request_id:
+#             log.debug( f'file_name, ``{file_name}``' )
+#             log.debug( f'file_info, ``{file_info}``' )
+#             log.debug( 'match on request-id' )
+#             log.debug( f'db_entry_request_id, ``{db_entry_request_id}``' )
+#             db_article_id: str = str( db_dict_entry['articleid'] )
+#             file_info_article_id: str = file_info['articleid']
+#             if db_article_id == file_info_article_id:
+#                 log.debug( '...and match on article-id!' )
+#                 # file_info['pdfid']
+#                 pfid = str( file_info['pdfid'] )
+#                 file_url = f'{FILES_URL_ROOT}/{pfid}_{file_name}'
+#                 log.debug( f'file_url, ``{file_url}``' )
+#                 possible_matches.append( file_url )
+#             else:
+#                 log.debug( '...but no match on article-id' ) 
+#                 log.debug( f'db_article_id, ``{db_article_id}``' )
+#                 log.debug( f'file_info_article_id, ``{file_info_article_id}``' )
+#     if len( possible_matches ) > 0:
+#         if len( possible_matches ) == 1:
+#             pdf_check_result = possible_matches[0]
+#         else:
+#             pdf_check_result = repr( possible_matches )
+#     log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
+#     return pdf_check_result
+
 
 def map_excerpts( excerpt_results: list, course_id: str, cdl_checker ) -> list:
     mapped_articles = []
