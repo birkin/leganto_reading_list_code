@@ -356,8 +356,8 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
                 full_file_name: str = f'{pfid}_{file_name}'
                 ## post match ---------------------------------------
                 post_params = { 
-                    'course_code': 'updated_course_code',
-                    'file_name': 'full_file_name',
+                    'course_code': updated_course_code,
+                    'file_name': full_file_name,
                     'token': MATCHER_TOKEN
                     }
                 r = requests.post( MATCHER_URL, data=post_params )
