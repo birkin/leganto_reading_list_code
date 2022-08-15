@@ -67,7 +67,7 @@ with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
     jsn: str = file_handler.read()
     CSV_DATA = json.loads( jsn )
 
-FILES_URL_ROOT = os.environ['LGNT__WEB_URL_ROOT']
+# FILES_URL_ROOT = os.environ['LGNT__WEB_URL_ROOT']
 
 
 def manage_build_reading_list( raw_course_id: str, force: bool ):
