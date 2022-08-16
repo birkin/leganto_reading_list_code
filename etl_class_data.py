@@ -696,7 +696,7 @@ def update_gsheet( all_results: list ) -> None:
     ]
     log.debug( f'new_data, ``{pprint.pformat(new_data)}``' )
     ## update values ------------------------------------------------
-    # 1/0
+    1/0
     worksheet.batch_update( new_data, value_input_option='raw' )
     # worksheet.batch_update( new_data, value_input_option='USER_ENTERED' )
     ## update formatting --------------------------------------------
@@ -753,9 +753,10 @@ def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
 
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
-    parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`)' )
-    parser.add_argument( '--course_id', help='typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-    parser.add_argument( '--force', help='takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
+    parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
+    parser.add_argument( '--course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
+    parser.add_argument( '--update_ss', help='(required) takes boolean False or True, used to specify whether spreadsheet should be updated with prepared data', required=True )
+    parser.add_argument( '--force', help='(optional) takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
     args: dict = vars( parser.parse_args() )
     if args == {'course_id': None, 'class_id': None}:
         parser.print_help()
