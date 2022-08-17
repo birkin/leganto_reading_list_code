@@ -70,7 +70,7 @@ with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
 # FILES_URL_ROOT = os.environ['LGNT__WEB_URL_ROOT']
 
 
-def manage_build_reading_list( raw_course_id: str, force: bool ):
+def manage_build_reading_list( raw_course_id: str, updaate_ss: bool, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
     log.debug( f'raw course_id, ``{raw_course_id}``; force, ``{force}``')
@@ -751,27 +751,54 @@ def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
 ## -- script-caller helpers -----------------------------------------
 
 
+# def parse_args() -> dict:
+#     """ Parses arguments when module called via __main__ """
+#     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
+#     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
+#     parser.add_argument( '-update_ss', help='(required) takes boolean False or True, used to specify whether spreadsheet should be updated with prepared data', required=True )
+#     parser.add_argument( '-force', help='(optional) takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
+#     args: dict = vars( parser.parse_args() )
+#     if args == {'course_id': None, 'class_id': None}:
+#         parser.print_help()
+#         sys.exit()
+#     log.debug( f'args, ``{args}``' )
+#     return args
+
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
-    parser.add_argument( '--course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-    parser.add_argument( '--update_ss', help='(required) takes boolean False or True, used to specify whether spreadsheet should be updated with prepared data', required=True )
-    parser.add_argument( '--force', help='(optional) takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
+    parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
+    parser.add_argument( '-update_ss', help='(required) takes boolean False or True, used to specify whether spreadsheet should be updated with prepared data', required=True )
+    parser.add_argument( '-force', help='(optional) takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
     args: dict = vars( parser.parse_args() )
-    if args == {'course_id': None, 'class_id': None}:
+    fail_check = False
+    if args['course_id'] == None or len(args['course_id']) < 8:
+        fail_check = True
+    if args['update_ss'] == None:
+        fail_check = True
+    try: 
+        json.loads( args['update_ss'] )
+    except:
+        log.exception( 'json-load of `update_ss` failed' )
+        fail_check = True
+    if args['force']:
+        try:
+            json.loads( args['force'] )
+        except:
+            log.exception( 'json-load of `force` failed' )
+    if fail_check == True:
         parser.print_help()
         sys.exit()
     log.debug( f'args, ``{args}``' )
     return args
 
-
 if __name__ == '__main__':
     args: dict = parse_args()
     log.info( f'\n\nstarting args, ```{args}```' )
     course_id: str  = args['course_id']
-    log.debug( f'course_id, ``{course_id}``' )
+    update_ss: bool = args['update_ss']
     force: bool = args.get( 'force', False )
-    manage_build_reading_list( course_id, force )
+    manage_build_reading_list( course_id, update_ss, force )
 
 
 ## EOF
