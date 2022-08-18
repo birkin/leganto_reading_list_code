@@ -691,14 +691,19 @@ def update_gsheet( all_results: list ) -> None:
 
 
 def get_db_connection():
-    db_connection = pymysql.connect(  ## the with auto-closes the connection on any problem
-            host=HOST,
-            user=USERNAME,
-            password=PASSWORD,
-            database=DB,
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor )  # DictCursor means results will be dictionaries (yay!)
-    log.debug( f'made db_connection with PyMySQL.connect(), ``{db_connection}``' )
+    """ Returns a connection to the database. """
+    try:
+        db_connection = pymysql.connect(  ## the with auto-closes the connection on any problem
+                host=HOST,
+                user=USERNAME,
+                password=PASSWORD,
+                database=DB,
+                charset='utf8mb4',
+                cursorclass=pymysql.cursors.DictCursor )  # DictCursor means results will be dictionaries (yay!)
+        log.debug( f'made db_connection with PyMySQL.connect(), ``{db_connection}``' )
+    except:
+        log.exception( f'PyMySQL.connect() failed; traceback follows...' )
+        raise   ## re-raise the exception
     return db_connection
 
 
@@ -717,19 +722,6 @@ def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
 ## -- script-caller helpers -----------------------------------------
 
 
-# def parse_args() -> dict:
-#     """ Parses arguments when module called via __main__ """
-#     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
-#     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-#     parser.add_argument( '-update_ss', help='(required) takes boolean False or True, used to specify whether spreadsheet should be updated with prepared data', required=True )
-#     parser.add_argument( '-force', help='(optional) takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
-#     args: dict = vars( parser.parse_args() )
-#     if args == {'course_id': None, 'class_id': None}:
-#         parser.print_help()
-#         sys.exit()
-#     log.debug( f'args, ``{args}``' )
-#     return args
-
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
@@ -738,6 +730,7 @@ def parse_args() -> dict:
     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
     args: dict = vars( parser.parse_args() )
     log.info( f'\n\nperceived args, ```{args}```' )
+    ## do a bit of validation ---------------------------------------
     fail_check = False
     if args['course_id'] == None or len(args['course_id']) < 8:
         fail_check = True
@@ -756,7 +749,6 @@ def parse_args() -> dict:
     if fail_check == True:
         parser.print_help()
         sys.exit()
-    log.debug( f'args, ``{args}``' )
     return args
 
 if __name__ == '__main__':
