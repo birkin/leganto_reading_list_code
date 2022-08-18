@@ -4,7 +4,7 @@ import urllib.parse
 import gspread, pymysql, requests
 import pymysql.cursors
 from fuzzywuzzy import fuzz
-from lib import map_prep
+
 
 
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -17,22 +17,38 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
+## envar settings ---------------------------------------------------
+
 HOST = os.environ['LGNT__DB_HOST']
 USERNAME = os.environ['LGNT__DB_USERNAME']
 PASSWORD = os.environ['LGNT__DB_PASSWORD']
 DB = os.environ['LGNT__DB_DATABASE_NAME']
-#
+
 CDL_USERNAME = os.environ['LGNT__CDL_DB_USERNAME']
 CDL_PASSWORD = os.environ['LGNT__CDL_DB_PASSWORD']
 CDL_DB = os.environ['LGNT__CDL_DB_DATABASE_NAME']
-#
+
 MATCHER_URL = os.environ['LGNT__MATCHER_URL']
 MATCHER_TOKEN = os.environ['LGNT__MATCHER_TOKEN']
-#
+
 FILES_URL_PATTERN = os.environ['LGNT__FILES_URL_PATTERN']
-# 
+
 COURSES_FILEPATH = os.environ['LGNT__COURSES_FILEPATH']
 
+CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
+SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
+
+LAST_CHECKED_PATH: str = os.environ['LGNT__LAST_CHECKED_JSON_PATH']
+
+SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
+
+CSV_DATA = {}
+with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
+    jsn: str = file_handler.read()
+    CSV_DATA = json.loads( jsn )
+
+
+## other constants --------------------------------------------------
 
 LEGANTO_HEADINGS: dict = {
     'coursecode': '',
@@ -56,20 +72,8 @@ LEGANTO_HEADINGS: dict = {
     'external_system_id': ''
 }
 
-CREDENTIALS: dict = json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] )
-SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
-LAST_CHECKED_PATH: str = os.environ['LGNT__LAST_CHECKED_JSON_PATH']
-
-SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
-
-CSV_DATA = {}
-with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
-    jsn: str = file_handler.read()
-    CSV_DATA = json.loads( jsn )
-
-# FILES_URL_ROOT = os.environ['LGNT__WEB_URL_ROOT']
-
+## main manager function --------------------------------------------
 
 def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
@@ -80,13 +84,14 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
     courses_and_classes: list = []
     course_id_list = []
     cdl_checker = CDL_Checker()
+    oit_course_loader = OIT_Course_Loader( COURSES_FILEPATH )
     ## make course-id list ------------------------------------------
     if raw_course_id == 'SPREADSHEET':
         course_id_list: list = get_list_from_spreadsheet()
         if force:
             log.debug( 'skipping recent-updates check' )
         else:
-            ## check for recent updates ---------------------------------
+            ## check for recent updates -----------------------------
             recent_updates: bool = check_for_updates( course_id_list )
             if recent_updates == False:
                 log.debug( 'no recent updates; quitting' )
@@ -113,7 +118,7 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
             ## ocra excerpt data ------------------------------------
             excerpt_results: list = get_excerpt_readings( class_id )
             ## leganto book data ------------------------------------
-            leg_books: list = map_books( book_results, course_id, cdl_checker )
+            leg_books: list = map_books( book_results, course_id, oit_course_loader, cdl_checker )
             ## leganto article data ---------------------------------
             leg_articles: list = map_articles( article_results, course_id, cdl_checker )
             ## leganto excerpt data ---------------------------------
@@ -270,15 +275,15 @@ def get_excerpt_readings( class_id: str ) -> list:
 ## mappers and parsers ----------------------------------------------
 
 
-def map_books( book_results: list, course_id: str, cdl_checker ) -> list:
+def map_books( book_results: list, course_id: str, oit_course_loader, cdl_checker ) -> list:
     mapped_books = []
     for book_result in book_results:
-        mapped_book: dict = map_book( book_result, course_id, cdl_checker )
+        mapped_book: dict = map_book( book_result, course_id, oit_course_loader, cdl_checker )
         mapped_books.append( mapped_book )
     return mapped_books
 
 
-def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
+def map_book( initial_book_data: dict, course_id: str, oit_course_loader, cdl_checker ) -> dict:
     log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
     mapped_book_data = LEGANTO_HEADINGS.copy()
     mapped_book_data['citation_author'] = initial_book_data['bk_author']
@@ -289,7 +294,7 @@ def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
     mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     # mapped_book_data['coursecode'] = f'{course_id[0:8]}'
-    leganto_course_code: str = map_prep.prepare_leganto_coursecode( course_id, COURSES_FILEPATH )
+    leganto_course_code: str = oit_course_loader.prepare_leganto_coursecode( course_id )
     log.debug( f'leganto_course_code, ``{leganto_course_code}``' )
     mapped_book_data['coursecode'] = leganto_course_code
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']

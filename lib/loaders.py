@@ -1,10 +1,27 @@
-import csv
+import csv, logging, pprint
+
+log = logging.getLogger(__name__)
 
 
-def load_csv( filepath: str ) -> list:
-    """ Load courses CSV file into a list of dictionaries. """
-    rows = []
-    with open( filepath ) as f:
-        reader = csv.DictReader(f)
-        rows = list(reader)
-    return rows
+class OIT_Course_Loader( object ):
+
+    def __init__(self, COURSES_FILEPATH: str) -> None:
+        self.OIT_course_data: list = self.load_OIT_course_data( COURSES_FILEPATH )
+
+    def load_OIT_course_data( self, COURSES_FILEPATH: str ) -> list:
+        """ On instantiation, loads courses CSV file into a list of dictionaries. """
+        rows = []
+        with open( COURSES_FILEPATH ) as f:
+            reader = csv.DictReader( f, delimiter = '\t' )
+            rows = list(reader)
+        return rows
+
+    def prepare_leganto_coursecode( self, ss_course_id: str ) -> str:
+        """ Looks up required fields from OIT course_info. """
+        for row in self.OIT_course_data:
+            log.debug( f'row, ``{pprint.pformat(row)}``' )
+            break
+
+        return 'foo'
+
+    ## end class OIT_Course_Loader()
