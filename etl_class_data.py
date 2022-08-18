@@ -31,6 +31,8 @@ MATCHER_URL = os.environ['LGNT__MATCHER_URL']
 MATCHER_TOKEN = os.environ['LGNT__MATCHER_TOKEN']
 #
 FILES_URL_PATTERN = os.environ['LGNT__FILES_URL_PATTERN']
+# 
+COURSES_FILEPATH = os.environ['LGNT__COURSES_FILEPATH']
 
 
 LEGANTO_HEADINGS: dict = {
@@ -105,19 +107,19 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         class_id: str = class_id_entry['class_id']
         course_id: str = class_id_entry['course_id']
         if class_id:
+            ## ocra book data ---------------------------------------
             book_results: list = get_book_readings( class_id )
+            ## ocra article data ------------------------------------
             article_results: list = get_article_readings( class_id )
-
-            log.debug( '--- starting excerpt query ---' )
-            excerpt_results: list = get_excerpt_readings( class_id )  # only logging this for now
-            log.debug( f'excerpt_results, ``{pprint.pformat(excerpt_results)}``' )
-            log.debug( '--- end excerpt query ---' )
-
+            ## ocra excerpt data ------------------------------------
+            excerpt_results: list = get_excerpt_readings( class_id )
+            ## leganto book data ------------------------------------
             leg_books: list = map_books( book_results, course_id, cdl_checker )
+            ## leganto article data ---------------------------------
             leg_articles: list = map_articles( article_results, course_id, cdl_checker )
-
+            ## leganto excerpt data ---------------------------------
             leg_excerpts: list = map_excerpts( excerpt_results, course_id, cdl_checker )
-
+            ## leganto combined data --------------------------------
             all_course_results: list = leg_books + leg_articles + leg_excerpts
             if all_course_results == []:
                 all_course_results: list = [ map_empty(course_id) ]
