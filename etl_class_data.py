@@ -70,7 +70,7 @@ with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
 # FILES_URL_ROOT = os.environ['LGNT__WEB_URL_ROOT']
 
 
-def manage_build_reading_list( raw_course_id: str, updaate_ss: bool, force: bool ):
+def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
     log.debug( f'raw course_id, ``{raw_course_id}``; force, ``{force}``')
@@ -127,7 +127,10 @@ def manage_build_reading_list( raw_course_id: str, updaate_ss: bool, force: bool
         all_results = all_results + all_course_results
         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
     ## post to google-sheet -----------------------------------------
-    update_gsheet( all_results )
+    if update_ss:
+        update_gsheet( all_results )
+    else:
+        log.debug( f'update_ss is ``{update_ss}``; not updating gsheet' )
     ## end manage_build_reading_list()
 
 
@@ -377,43 +380,6 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
             pdf_check_result = repr( possible_matches )
     log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
     return pdf_check_result
-
-
-# def check_pdfs( db_dict_entry: dict, scanned_data: dict ) -> str:
-#     """ Check and return the pdf for the given ocra article or excerpt. 
-#         Called by map_article() and map_excerpt() """
-#     pdf_check_result = 'no_pdf_found'
-#     possible_matches = []
-#     for key, val in CSV_DATA.items():
-#         file_name: str = key.strip()
-#         file_info: dict = val
-#         db_entry_request_id: str = db_dict_entry['requests.requestid']
-#         file_info_request_id: str = file_info['requestid']
-#         if db_entry_request_id == file_info_request_id:
-#             log.debug( f'file_name, ``{file_name}``' )
-#             log.debug( f'file_info, ``{file_info}``' )
-#             log.debug( 'match on request-id' )
-#             log.debug( f'db_entry_request_id, ``{db_entry_request_id}``' )
-#             db_article_id: str = str( db_dict_entry['articleid'] )
-#             file_info_article_id: str = file_info['articleid']
-#             if db_article_id == file_info_article_id:
-#                 log.debug( '...and match on article-id!' )
-#                 # file_info['pdfid']
-#                 pfid = str( file_info['pdfid'] )
-#                 file_url = f'{FILES_URL_ROOT}/{pfid}_{file_name}'
-#                 log.debug( f'file_url, ``{file_url}``' )
-#                 possible_matches.append( file_url )
-#             else:
-#                 log.debug( '...but no match on article-id' ) 
-#                 log.debug( f'db_article_id, ``{db_article_id}``' )
-#                 log.debug( f'file_info_article_id, ``{file_info_article_id}``' )
-#     if len( possible_matches ) > 0:
-#         if len( possible_matches ) == 1:
-#             pdf_check_result = possible_matches[0]
-#         else:
-#             pdf_check_result = repr( possible_matches )
-#     log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
-#     return pdf_check_result
 
 
 def map_excerpts( excerpt_results: list, course_id: str, cdl_checker ) -> list:
@@ -768,9 +734,10 @@ def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-    parser.add_argument( '-update_ss', help='(required) takes boolean False or True, used to specify whether spreadsheet should be updated with prepared data', required=True )
-    parser.add_argument( '-force', help='(optional) takes boolean False or True, used to skip spreadsheet recently-updated check', required=False )
+    parser.add_argument( '-update_ss', help='(required) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=True )
+    parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
     args: dict = vars( parser.parse_args() )
+    log.info( f'\n\nperceived args, ```{args}```' )
     fail_check = False
     if args['course_id'] == None or len(args['course_id']) < 8:
         fail_check = True
@@ -794,7 +761,6 @@ def parse_args() -> dict:
 
 if __name__ == '__main__':
     args: dict = parse_args()
-    log.info( f'\n\nstarting args, ```{args}```' )
     course_id: str  = args['course_id']
     update_ss: bool = args['update_ss']
     force: bool = args.get( 'force', False )
