@@ -1,11 +1,10 @@
 import argparse, datetime, json, logging, os, pprint, sys
 import urllib.parse
 
-import gspread
-import pymysql
+import gspread, pymysql, requests
 import pymysql.cursors
-import requests
 from fuzzywuzzy import fuzz
+from lib import map_prep
 
 
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -75,7 +74,7 @@ with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
 def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
-    log.debug( f'raw course_id, ``{raw_course_id}``; force, ``{force}``')
+    log.debug( f'raw course_id, ``{raw_course_id}``; update_ss, ``{update_ss}``; force, ``{force}``')
     ## setup --------------------------------------------------------
     all_results: list = []
     courses_and_classes: list = []
@@ -289,7 +288,10 @@ def map_book( initial_book_data: dict, course_id: str, cdl_checker ) -> dict:
     mapped_book_data['citation_source1'] = run_book_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
     mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
-    mapped_book_data['coursecode'] = f'{course_id[0:8]}'
+    # mapped_book_data['coursecode'] = f'{course_id[0:8]}'
+    leganto_course_code: str = map_prep.prepare_leganto_coursecode( course_id, COURSES_FILEPATH )
+    log.debug( f'leganto_course_code, ``{leganto_course_code}``' )
+    mapped_book_data['coursecode'] = leganto_course_code
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
     return mapped_book_data
@@ -753,12 +755,21 @@ def parse_args() -> dict:
         sys.exit()
     return args
 
+
 if __name__ == '__main__':
     args: dict = parse_args()
     course_id: str  = args['course_id']
-    update_ss: bool = args['update_ss']
-    force: bool = args.get( 'force', False )
+    update_ss: bool = json.loads( args['update_ss'] )
+    force: bool = json.loads( args['force'] ) if args['force'] else False
     manage_build_reading_list( course_id, update_ss, force )
+
+
+# if __name__ == '__main__':
+#     args: dict = parse_args()
+#     course_id: str  = args['course_id']
+#     update_ss: bool = args['update_ss']
+#     force: bool = args.get( 'force', False )
+#     manage_build_reading_list( course_id, update_ss, force )
 
 
 ## EOF
