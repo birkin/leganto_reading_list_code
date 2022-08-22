@@ -128,9 +128,9 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
             ## leganto combined data --------------------------------
             all_course_results: list = leg_books + leg_articles + leg_excerpts
             if all_course_results == []:
-                all_course_results: list = [ map_empty(course_id) ]
+                all_course_results: list = [ map_empty(leganto_course_id) ]
         else:
-            all_course_results: list = [ map_empty(course_id) ]
+            all_course_results: list = [ map_empty(leganto_course_id) ]
         log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
@@ -304,11 +304,17 @@ def map_book( initial_book_data: dict, course_id: str, leganto_course_id: str, o
     return mapped_book_data
 
 
-def map_empty( course_id: str ) -> dict:
-    mapped_book_data = LEGANTO_HEADINGS.copy()
-    mapped_book_data['coursecode'] = f'{course_id[0:8]}'
-    # mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
-    return mapped_book_data
+def map_empty( leganto_course_id: str ) -> dict:
+    mapped_data: dict = LEGANTO_HEADINGS.copy()
+    mapped_data['coursecode'] = leganto_course_id
+    return mapped_data
+
+
+# def map_empty( course_id: str ) -> dict:
+#     mapped_book_data = LEGANTO_HEADINGS.copy()
+#     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
+#     # mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
+#     return mapped_book_data
 
 
 def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker ) -> list:
