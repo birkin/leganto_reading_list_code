@@ -7,11 +7,16 @@ from fuzzywuzzy import fuzz
 from lib.loaders import OIT_Course_Loader
 
 
+## logging ----------------------------------------------------------
+
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 
+log_level_dict: dict = { 'DEBUG': logging.DEBUG, 'INFO': logging.INFO, 'WARNING': logging.WARNING, 'ERROR': logging.ERROR, 'CRITICAL': logging.CRITICAL }    
+LOG_LEVEL: str = os.environ['LGNT__LOG_LEVEL']
+log_level_value = log_level_dict[LOG_LEVEL]  # yields logging.DEBUG or logging.INFO, etc.
 logging.basicConfig(
     filename=LOG_PATH,
-    level=logging.DEBUG,
+    level=log_level_value,
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
@@ -89,15 +94,15 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
     if raw_course_id == 'SPREADSHEET':
         course_id_list: list = get_list_from_spreadsheet()
         if force:
-            log.debug( 'skipping recent-updates check' )
+            log.info( 'skipping recent-updates check' )
         else:
             ## check for recent updates -----------------------------
             recent_updates: bool = check_for_updates( course_id_list )
             if recent_updates == False:
-                log.debug( 'no recent updates; quitting' )
+                log.info( 'no recent updates; quitting' )
                 return        
             else:
-                log.debug( 'recent updates found' )
+                log.info( 'recent updates found' )
     else:
         course_id_list: list = raw_course_id.split( ',' )
     for course_id_entry in course_id_list:
@@ -134,11 +139,13 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
+    log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
     ## post to google-sheet -----------------------------------------
     if update_ss:
+        log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
         update_gsheet( all_results )
     else:
-        log.debug( f'update_ss is ``{update_ss}``; not updating gsheet' )
+        log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
     ## end manage_build_reading_list()
 
 
@@ -751,7 +758,7 @@ def parse_args() -> dict:
     parser.add_argument( '-update_ss', help='(required) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=True )
     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
     args: dict = vars( parser.parse_args() )
-    log.info( f'\n\nperceived args, ```{args}```' )
+    log.info( f'\n\nSTARTING script; perceived args, ```{args}```' )
     ## do a bit of validation ---------------------------------------
     fail_check = False
     if args['course_id'] == None or len(args['course_id']) < 8:
