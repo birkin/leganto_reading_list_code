@@ -4,7 +4,7 @@ import urllib.parse
 import gspread, pymysql, requests
 import pymysql.cursors
 from fuzzywuzzy import fuzz
-
+from lib.loaders import OIT_Course_Loader
 
 
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -110,6 +110,7 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         log.debug( f'class_id_entry, ``{class_id_entry}``' )
         class_id: str = class_id_entry['class_id']
         course_id: str = class_id_entry['course_id']
+        log.debug( 'GET LEGANTO-FORMATTED COURSE-ID HERE' )
         if class_id:
             ## ocra book data ---------------------------------------
             book_results: list = get_book_readings( class_id )

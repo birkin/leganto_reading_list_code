@@ -18,6 +18,7 @@ class OIT_Course_Loader( object ):
 
     def prepare_leganto_coursecode( self, ss_course_id: str ) -> str:
         """ Looks up required fields from OIT course_info. """
+        log.debug( f'preparing leganto coursecode for {ss_course_id}' )
         for row in self.OIT_course_data:
             log.debug( f'row, ``{pprint.pformat(row)}``' )
             break
