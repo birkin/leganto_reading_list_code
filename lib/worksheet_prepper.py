@@ -18,11 +18,41 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
     ## process leganto worksheet ------------------------------------
     process_leganto_worksheet( sheet )
-
-
+    ## process staff worksheet --------------------------------------
+    process_staff_worksheet( sheet )
     return
-
     ## end def update_gsheet()
+
+
+def process_staff_worksheet( sheet ):
+    ## create leganto worksheet -------------------------------------
+    title: str = f'staff_{datetime.datetime.now()}'
+    staff_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
+    ## finalize staff data ----------------------------------------
+    headers = [ 'header_a', 'header_b' ]
+    data_values = []
+    rows = [
+        [ 'data_row_1_col_a', 'data_row_1_col_b' ],
+        [ 'data_row_2_col_a', 'data_row_2_col_b' ]
+    ]
+    for row in rows:
+        data_values.append( row )
+    new_data = [
+        { 
+            'range': f'A1:B1',
+            'values': [ headers ]
+        },
+        {
+            'range': f'A2:B3',
+            'values': data_values
+        }
+    ]
+    staff_worksheet.batch_update( new_data, value_input_option='raw' )
+    ## update leganto-sheet formatting --------------------------------------------
+    staff_worksheet.format( f'A1:B1', {'textFormat': {'bold': True}} )
+    staff_worksheet.freeze( rows=1, cols=None )
+    ## (no need to sort sheets here)
+    return
 
 
 def process_leganto_worksheet( sheet ):
