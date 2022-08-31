@@ -16,6 +16,16 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
+    ## process leganto worksheet ------------------------------------
+    process_leganto_worksheet( sheet )
+
+
+    return
+
+    ## end def update_gsheet()
+
+
+def process_leganto_worksheet( sheet ):
     ## create leganto worksheet -------------------------------------
     title: str = f'leganto_{datetime.datetime.now()}'
     leganto_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
@@ -51,36 +61,76 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     log.debug( f'wrkshts after sort, ``{wrkshts}``' )
     num_wrkshts: int = len( wrkshts )
     log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
-    if num_wrkshts > 3:  # keep requested_checks, and two recent checks
+    if num_wrkshts > 2:  # keep requested_checks, and the leganto sheet
         wrkshts: list = sheet.worksheets()
         wrkshts_to_delete = wrkshts[2:]
         for wrksht in wrkshts_to_delete:
             sheet.del_worksheet( wrksht )
     wrkshts: list = sheet.worksheets()
     log.debug( f'wrkshts after deletion, ``{wrkshts}``' )
-
-
-
-
-
-
-    ## re-order worksheets so most recent is 2nd --------------------
-    # wrkshts: list = sheet.worksheets()
-    # log.debug( f'wrkshts, ``{wrkshts}``' )
-    # reordered_wrkshts: list = [ wrkshts[0], wrkshts[-1] ]
-    # log.debug( f'reordered_wrkshts, ``{reordered_wrkshts}``' )
-    # sheet.reorder_worksheets( reordered_wrkshts )
-    # ## delete old checks (keeps current and previous) ---------------
-    # num_wrkshts: int = len( wrkshts )
-    # log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
-    # if num_wrkshts > 3:  # keep requested_checks, and two recent checks
-    #     wrkshts: list = sheet.worksheets()
-    #     wrkshts_to_delete = wrkshts[3:]
-    #     for wrksht in wrkshts_to_delete:
-    #         sheet.del_worksheet( wrksht )
     return
 
-    ## end def update_gsheet()
+
+# def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str ) -> None:
+#     """ Writes data to gsheet, then...
+#         - sorts the worksheets so the most recent check appears first in the worksheet list.
+#         - deletes checks older than the curent and previous checks.
+#         Called by check_bibs() """
+#     ## access spreadsheet -------------------------------------------
+#     log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
+#     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+#     sheet = credentialed_connection.open( SPREADSHEET_NAME )
+#     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
+#     ## create leganto worksheet -------------------------------------
+#     title: str = f'leganto_{datetime.datetime.now()}'
+#     leganto_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
+#     ## finalize leganto data ----------------------------------------
+#     headers = [ 'header_a', 'header_b' ]
+#     data_values = []
+#     rows = [
+#         [ 'data_row_1_col_a', 'data_row_1_col_b' ],
+#         [ 'data_row_2_col_a', 'data_row_2_col_b' ]
+#     ]
+#     for row in rows:
+#         data_values.append( row )
+#     new_data = [
+#         { 
+#             'range': f'A1:B1',
+#             'values': [ headers ]
+#         },
+#         {
+#             'range': f'A2:B3',
+#             'values': data_values
+#         }
+#     ]
+#     leganto_worksheet.batch_update( new_data, value_input_option='raw' )
+#     ## update leganto-sheet formatting --------------------------------------------
+#     leganto_worksheet.format( f'A1:B1', {'textFormat': {'bold': True}} )
+#     leganto_worksheet.freeze( rows=1, cols=None )
+#     ## make leganto-sheet 2nd...
+#     wrkshts: list = sheet.worksheets()
+#     log.debug( f'wrkshts, ``{wrkshts}``' )
+#     reordered_wrkshts: list = [ wrkshts[0], wrkshts[-1] ]
+#     sheet.reorder_worksheets( reordered_wrkshts )
+#     wrkshts: list = sheet.worksheets()
+#     log.debug( f'wrkshts after sort, ``{wrkshts}``' )
+#     num_wrkshts: int = len( wrkshts )
+#     log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
+#     if num_wrkshts > 3:  # keep requested_checks, and two recent checks
+#         wrkshts: list = sheet.worksheets()
+#         wrkshts_to_delete = wrkshts[2:]
+#         for wrksht in wrkshts_to_delete:
+#             sheet.del_worksheet( wrksht )
+#     wrkshts: list = sheet.worksheets()
+#     log.debug( f'wrkshts after deletion, ``{wrkshts}``' )
+
+#     return
+
+#     ## end def update_gsheet()
+
+
+
+
 
 # def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str ) -> None:
 #     """ Writes data to gsheet, then...
