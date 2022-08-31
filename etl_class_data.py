@@ -8,18 +8,6 @@ from lib import worksheet_prepper
 from lib.loaders import OIT_Course_Loader
 
 
-## logging ----------------------------------------------------------
-
-LOG_PATH: str = os.environ['LGNT__LOG_PATH']
-
-log_level_dict: dict = { 'DEBUG': logging.DEBUG, 'INFO': logging.INFO, 'WARNING': logging.WARNING, 'ERROR': logging.ERROR, 'CRITICAL': logging.CRITICAL }    
-LOG_LEVEL: str = os.environ['LGNT__LOG_LEVEL']
-log_level_value = log_level_dict[LOG_LEVEL]  # yields logging.DEBUG or logging.INFO, etc.
-logging.basicConfig(
-    filename=LOG_PATH,
-    level=log_level_value,
-    format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
-    datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
 
 
