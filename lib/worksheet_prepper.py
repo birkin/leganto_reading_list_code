@@ -26,7 +26,9 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
 
 def process_staff_worksheet( sheet ):
     ## create leganto worksheet -------------------------------------
-    title: str = f'staff_{datetime.datetime.now()}'
+    # title: str = f'staff_{datetime.datetime.now()}'
+    dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
+    title: str = f'staff_{dt_stamp}'
     staff_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
     ## finalize staff data ----------------------------------------
     headers = [ 'header_a', 'header_b' ]
@@ -57,7 +59,9 @@ def process_staff_worksheet( sheet ):
 
 def process_leganto_worksheet( sheet ):
     ## create leganto worksheet -------------------------------------
-    title: str = f'leganto_{datetime.datetime.now()}'
+    # title: str = f'leganto_{datetime.datetime.now()}'
+    dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
+    title: str = f'leganto_{dt_stamp}'
     leganto_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
     ## finalize leganto data ----------------------------------------
     headers = [ 'header_a', 'header_b' ]
