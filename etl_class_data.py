@@ -44,7 +44,7 @@ with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
 
 ## other constants --------------------------------------------------
 
-LEGANTO_HEADINGS: dict = {
+MAPPED_CATEGORIES: dict = {
     'coursecode': '',
     'section_id': '',
     'citation_secondary_type': '',
@@ -65,7 +65,6 @@ LEGANTO_HEADINGS: dict = {
     'citation_source4': '',
     'external_system_id': ''
 }
-
 
 ## main manager function --------------------------------------------
 
@@ -284,7 +283,7 @@ def map_books( book_results: list, course_id: str, leganto_course_id: str, oit_c
 
 def map_book( initial_book_data: dict, course_id: str, leganto_course_id: str, oit_course_loader, cdl_checker ) -> dict:
     log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
-    mapped_book_data = LEGANTO_HEADINGS.copy()
+    mapped_book_data: dict = MAPPED_CATEGORIES.copy()
     mapped_book_data['citation_author'] = initial_book_data['bk_author']
     mapped_book_data['citation_isbn'] = initial_book_data['isbn']
     mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
@@ -302,16 +301,9 @@ def map_book( initial_book_data: dict, course_id: str, leganto_course_id: str, o
 
 
 def map_empty( leganto_course_id: str ) -> dict:
-    mapped_data: dict = LEGANTO_HEADINGS.copy()
+    mapped_data: dict = MAPPED_CATEGORIES.copy()
     mapped_data['coursecode'] = leganto_course_id
     return mapped_data
-
-
-# def map_empty( course_id: str ) -> dict:
-#     mapped_book_data = LEGANTO_HEADINGS.copy()
-#     mapped_book_data['coursecode'] = f'{course_id[0:8]}'
-#     # mapped_book_data['section_id'] = course_id[8:] if len(course_id) > 8 else ''
-#     return mapped_book_data
 
 
 def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker ) -> list:
@@ -328,7 +320,7 @@ def map_article( initial_article_data: dict, course_id: str, leganto_course_id: 
         - the `course_id` is used for building the url for the leganto citation_source4 field (the pdf-url).
         - the `leganto_course_code` is used for the leganto `coursecode` field. """
     log.debug( f'initial_article_data, ``{pprint.pformat(initial_article_data)}``' )
-    mapped_article_data = LEGANTO_HEADINGS.copy()
+    mapped_article_data: dict = MAPPED_CATEGORIES.copy()
     ourl_parts: dict = parse_openurl( initial_article_data['sfxlink'] )
     mapped_article_data['citation_author'] = f'{initial_article_data["aulast"]}, {initial_article_data["aufirst"]}'
     mapped_article_data['citation_doi'] = initial_article_data['doi']
@@ -410,7 +402,7 @@ def map_excerpts( excerpt_results: list, course_id: str, leganto_course_id: str,
 
 def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: str, cdl_checker ) -> dict:
     log.debug( f'initial_excerpt_data, ``{pprint.pformat(initial_excerpt_data)}``' )
-    mapped_excerpt_data = LEGANTO_HEADINGS.copy()
+    mapped_excerpt_data: dict = MAPPED_CATEGORIES.copy()
     ourl_parts: dict = parse_openurl( initial_excerpt_data['sfxlink'] )
     mapped_excerpt_data['citation_author'] = parse_excerpt_author( initial_excerpt_data )
     mapped_excerpt_data['citation_doi'] = initial_excerpt_data['doi']
