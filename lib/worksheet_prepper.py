@@ -17,13 +17,13 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
     ## process leganto worksheet ------------------------------------
-    process_leganto_worksheet( sheet )
+    process_leganto_worksheet( sheet, all_results )
     ## process staff worksheet --------------------------------------
-    process_staff_worksheet( sheet )
+    process_staff_worksheet( sheet, all_results )
     return
 
 
-def process_leganto_worksheet( sheet ):
+def process_leganto_worksheet( sheet, all_results: list ):
     ## create leganto worksheet -------------------------------------
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
     title: str = f'leganto_{dt_stamp}'
@@ -107,7 +107,7 @@ def process_leganto_worksheet( sheet ):
 #     # end def process_staff_worksheet()
 
 
-def process_staff_worksheet( sheet ):
+def process_staff_worksheet( sheet, all_results: list ):
     ## create leganto worksheet -------------------------------------
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
     title: str = f'staff_{dt_stamp}'
