@@ -63,7 +63,8 @@ MAPPED_CATEGORIES: dict = {
     'citation_source2': '',
     'citation_source3': '',
     'citation_source4': '',
-    'external_system_id': ''
+    'external_system_id': '',
+    'reading_list_name': ''
 }
 
 ## main manager function --------------------------------------------
@@ -118,6 +119,7 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         course_id: str = class_info_entry['course_id']
         leganto_course_id: str = class_info_entry['leganto_course_id']
         leganto_section_id: str = class_info_entry['leganto_section_code']
+        leganto_course_title: str = class_info_entry['leganto_course_title']
         if class_id:
             ## ocra book data ---------------------------------------
             book_results: list = get_book_readings( class_id )
@@ -125,21 +127,18 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
             article_results: list = get_article_readings( class_id )
             ## ocra excerpt data ------------------------------------
             excerpt_results: list = get_excerpt_readings( class_id )
-            ## leganto book data ------------------------------------
-            # leg_books: list = map_books( book_results, course_id, leganto_course_id, oit_course_loader, cdl_checker )
-            
-            leg_books: list = map_books( book_results, leganto_course_id, leganto_section_id, cdl_checker )
-
+            ## leganto book data ------------------------------------            
+            leg_books: list = map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
             ## leganto article data ---------------------------------
-            leg_articles: list = map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id )
+            leg_articles: list = map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title )
             ## leganto excerpt data ---------------------------------
-            leg_excerpts: list = map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id )
+            leg_excerpts: list = map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title )
             ## leganto combined data --------------------------------
             all_course_results: list = leg_books + leg_articles + leg_excerpts
             if all_course_results == []:
-                all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id) ]
+                all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         else:
-            all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id) ]
+            all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
@@ -151,6 +150,7 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         worksheet_prepper.update_gsheet( all_results, CREDENTIALS, SPREADSHEET_NAME )
     else:
         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
+
     ## end manage_build_reading_list()
 
 
@@ -361,15 +361,15 @@ def get_excerpt_readings( class_id: str ) -> list:
 ## mappers and parsers ----------------------------------------------
 
 
-def map_books( book_results: list, leganto_course_id: str, leganto_section_id, cdl_checker ) -> list:
+def map_books( book_results: list, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> list:
     mapped_books = []
     for book_result in book_results:
-        mapped_book: dict = map_book( book_result, leganto_course_id, leganto_section_id, cdl_checker )
+        mapped_book: dict = map_book( book_result, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
         mapped_books.append( mapped_book )
     return mapped_books
 
 
-def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_id: str, cdl_checker ) -> dict:
+def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> dict:
     log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
     mapped_book_data: dict = MAPPED_CATEGORIES.copy()
     mapped_book_data['citation_author'] = initial_book_data['bk_author']
@@ -380,6 +380,7 @@ def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_i
     mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
     mapped_book_data['coursecode'] = leganto_course_id
+    mapped_book_data['reading_list_name'] = leganto_course_title
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
     mapped_book_data['section_id'] = leganto_section_id
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
@@ -414,9 +415,10 @@ def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_i
 #     return mapped_book_data
 
 
-def map_empty( leganto_course_id: str, leganto_section_id: str ) -> dict:
+def map_empty( leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> dict:
     mapped_data: dict = MAPPED_CATEGORIES.copy()
     mapped_data['coursecode'] = leganto_course_id
+    mapped_data['reading_list_name'] = leganto_course_title
     mapped_data['section_id'] = leganto_section_id
     return mapped_data
 
@@ -427,15 +429,15 @@ def map_empty( leganto_course_id: str, leganto_section_id: str ) -> dict:
 #     return mapped_data
 
 
-def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str ) -> list:
+def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str ) -> list:
     mapped_articles = []
     for article_result in article_results:
-        mapped_article: dict = map_article( article_result, course_id, leganto_course_id, cdl_checker, leganto_section_id )
+        mapped_article: dict = map_article( article_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title )
         mapped_articles.append( mapped_article )
     return mapped_articles
 
 
-def map_article( initial_article_data: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str ) -> dict:
+def map_article( initial_article_data: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str ) -> dict:
     """ This function maps the data from the database to the format required by the Leganto API. 
         Notes: 
         - the `course_id` is used for building the url for the leganto citation_source4 field (the pdf-url).
@@ -461,6 +463,7 @@ def map_article( initial_article_data: dict, course_id: str, leganto_course_id: 
     # mapped_article_data['coursecode'] = f'{course_id[0:8]}'
     mapped_article_data['coursecode'] = leganto_course_id    
     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
+    mapped_article_data['reading_list_name'] = leganto_course_title
     mapped_article_data['section_id'] = leganto_section_id
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
@@ -600,15 +603,15 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
 #     return pdf_check_result
 
 
-def map_excerpts( excerpt_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str ) -> list:
+def map_excerpts( excerpt_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str ) -> list:
     mapped_articles = []
     for excerpt_result in excerpt_results:
-        mapped_excerpt: dict = map_excerpt( excerpt_result, course_id, leganto_course_id, cdl_checker, leganto_section_id )
+        mapped_excerpt: dict = map_excerpt( excerpt_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title )
         mapped_articles.append( mapped_excerpt )
     return mapped_articles
 
 
-def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str ) -> dict:
+def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str ) -> dict:
     log.debug( f'initial_excerpt_data, ``{pprint.pformat(initial_excerpt_data)}``' )
     mapped_excerpt_data: dict = MAPPED_CATEGORIES.copy()
     ourl_parts: dict = parse_openurl( initial_excerpt_data['sfxlink'] )
@@ -628,9 +631,9 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: 
     mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['atitle'].strip()
     mapped_excerpt_data['citation_journal_title'] = initial_excerpt_data['title']
     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
-    # mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
     mapped_excerpt_data['coursecode'] = leganto_course_id
     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
+    mapped_excerpt_data['reading_list_name'] = leganto_course_title
     mapped_excerpt_data['section_id'] = leganto_section_id
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data

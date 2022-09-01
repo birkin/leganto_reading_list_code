@@ -57,6 +57,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict[header] = ''
     log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
     for result in all_results:
+        log.debug( f'result-dict-entry, ``{pprint.pformat(result)}``' )
         result: dict = result
         row_dict['citation_author'] = result['citation_author']
         row_dict['citation_doi'] = result['citation_doi']
@@ -74,6 +75,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
         row_dict['external_system_id'] = result['external_system_id']
         row_dict['reading_list_code'] = row_dict['coursecode']
+        row_dict['reading_list_name'] = result['reading_list_name']
         row_dict['section_id'] = result['section_id']
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
         row_values: list = list( row_dict.values() )
