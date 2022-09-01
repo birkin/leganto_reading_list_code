@@ -133,7 +133,7 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
             ## leganto article data ---------------------------------
             leg_articles: list = map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id )
             ## leganto excerpt data ---------------------------------
-            leg_excerpts: list = map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker )
+            leg_excerpts: list = map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id )
             ## leganto combined data --------------------------------
             all_course_results: list = leg_books + leg_articles + leg_excerpts
             if all_course_results == []:
@@ -600,15 +600,15 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
 #     return pdf_check_result
 
 
-def map_excerpts( excerpt_results: list, course_id: str, leganto_course_id: str, cdl_checker ) -> list:
+def map_excerpts( excerpt_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str ) -> list:
     mapped_articles = []
     for excerpt_result in excerpt_results:
-        mapped_excerpt: dict = map_excerpt( excerpt_result, course_id, leganto_course_id, cdl_checker )
+        mapped_excerpt: dict = map_excerpt( excerpt_result, course_id, leganto_course_id, cdl_checker, leganto_section_id )
         mapped_articles.append( mapped_excerpt )
     return mapped_articles
 
 
-def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: str, cdl_checker ) -> dict:
+def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str ) -> dict:
     log.debug( f'initial_excerpt_data, ``{pprint.pformat(initial_excerpt_data)}``' )
     mapped_excerpt_data: dict = MAPPED_CATEGORIES.copy()
     ourl_parts: dict = parse_openurl( initial_excerpt_data['sfxlink'] )
@@ -631,8 +631,44 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: 
     # mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
     mapped_excerpt_data['coursecode'] = leganto_course_id
     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
+    mapped_excerpt_data['section_id'] = leganto_section_id
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
+
+
+# def map_excerpts( excerpt_results: list, course_id: str, leganto_course_id: str, cdl_checker ) -> list:
+#     mapped_articles = []
+#     for excerpt_result in excerpt_results:
+#         mapped_excerpt: dict = map_excerpt( excerpt_result, course_id, leganto_course_id, cdl_checker )
+#         mapped_articles.append( mapped_excerpt )
+#     return mapped_articles
+
+
+# def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: str, cdl_checker ) -> dict:
+#     log.debug( f'initial_excerpt_data, ``{pprint.pformat(initial_excerpt_data)}``' )
+#     mapped_excerpt_data: dict = MAPPED_CATEGORIES.copy()
+#     ourl_parts: dict = parse_openurl( initial_excerpt_data['sfxlink'] )
+#     mapped_excerpt_data['citation_author'] = parse_excerpt_author( initial_excerpt_data )
+#     mapped_excerpt_data['citation_doi'] = initial_excerpt_data['doi']
+#     mapped_excerpt_data['citation_end_page'] = str(initial_excerpt_data['epage']) if initial_excerpt_data['epage'] else parse_end_page_from_ourl( ourl_parts )
+#     mapped_excerpt_data['citation_issn'] = initial_excerpt_data['issn']
+#     mapped_excerpt_data['citation_issue'] = initial_excerpt_data['issue']
+#     mapped_excerpt_data['citation_publication_date'] = str( initial_excerpt_data['date'] )
+#     mapped_excerpt_data['citation_secondary_type'] = 'ARTICLE'  # guess
+#     mapped_excerpt_data['citation_source1'] = run_article_cdl_check( initial_excerpt_data['facnotes'], initial_excerpt_data['atitle'], cdl_checker )
+#     mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
+#     mapped_excerpt_data['citation_source3'] = map_bruknow_openurl( initial_excerpt_data.get('sfxlink', '') )  
+#     # mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA )
+#     mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA, course_id )
+#     mapped_excerpt_data['citation_start_page'] = str(initial_excerpt_data['spage']) if initial_excerpt_data['spage'] else parse_start_page_from_ourl( ourl_parts )
+#     mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['atitle'].strip()
+#     mapped_excerpt_data['citation_journal_title'] = initial_excerpt_data['title']
+#     mapped_excerpt_data['citation_volume'] = initial_excerpt_data['volume']
+#     # mapped_excerpt_data['coursecode'] = f'{course_id[0:8]}'
+#     mapped_excerpt_data['coursecode'] = leganto_course_id
+#     mapped_excerpt_data['external_system_id'] = initial_excerpt_data['requests.requestid']
+#     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
+#     return mapped_excerpt_data
 
 
 def map_bruknow_openurl( db_openurl: str ) -> str:
