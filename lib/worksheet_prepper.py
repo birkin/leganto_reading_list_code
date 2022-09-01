@@ -87,8 +87,11 @@ def process_leganto_worksheet( sheet, all_results: list ):
             'values': data_values
         }
     ]
+    leganto_worksheet.batch_update( new_data, value_input_option='raw' )
 
     ## update leganto-sheet formatting ------------------------------
+    leganto_worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
+    leganto_worksheet.freeze( rows=1, cols=None )
 
     ## make leganto-sheet the 2nd sheet -----------------------------
 
@@ -96,10 +99,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
 
     ## finalize leganto data ----------------------------------------
     # headers = [ 'header_a', 'header_b' ]
-    leganto_worksheet.batch_update( new_data, value_input_option='raw' )
     ## update leganto-sheet formatting --------------------------------------------
-    leganto_worksheet.format( f'A1:B1', {'textFormat': {'bold': True}} )
-    leganto_worksheet.freeze( rows=1, cols=None )
     ## make leganto-sheet 2nd...
     wrkshts: list = sheet.worksheets()
     log.debug( f'wrkshts, ``{wrkshts}``' )
