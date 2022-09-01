@@ -68,6 +68,7 @@ MAPPED_CATEGORIES: dict = {
 
 ## main manager function --------------------------------------------
 
+
 def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
@@ -93,18 +94,30 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
                 log.info( 'recent updates found' )
     else:
         course_id_list: list = raw_course_id.split( ',' )
-    for course_id_entry in course_id_list:
-        class_id: str = get_class_id( course_id_entry )
-        leganto_course_id: str = oit_course_loader.prepare_leganto_coursecode( course_id_entry )
-        class_id_dict: dict = { 'course_id': course_id_entry, 'class_id': class_id, 'leganto_course_id': leganto_course_id }
-        courses_and_classes.append( class_id_dict )
+    for course_id_entry in course_id_list:  # now that we have the spreadsheet course_id_list, get necessary OIT data
+        course_id_entry: str = course_id_entry
+        log.debug( f'course_id_entry, ``{course_id_entry}``' )
+        oit_course_data: dict = oit_course_loader.grab_oit_course_data( course_id_entry )
+        log.debug( f'oit_course_data, ``{oit_course_data}``' )
+        leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else ''
+        leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
+        leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
+        class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
+        class_info_dict: dict = { 
+            'course_id': course_id_entry, 
+            'class_id': class_id, 
+            'leganto_course_id': leganto_course_id,
+            'leganto_course_title': leganto_course_title,
+            'leganto_section_code': leganto_section_code }
+        courses_and_classes.append( class_info_dict )
     ## process class-id-list ----------------------------------------
-    for class_id_entry in courses_and_classes:
-        assert type(class_id_entry) == dict
-        log.debug( f'class_id_entry, ``{class_id_entry}``' )
-        class_id: str = class_id_entry['class_id']
-        course_id: str = class_id_entry['course_id']
-        leganto_course_id: str = class_id_entry['leganto_course_id']
+    for class_info_entry in courses_and_classes:
+        assert type(class_info_entry) == dict
+        log.debug( f'class_info_entry, ``{class_info_entry}``' )
+        class_id: str = class_info_entry['class_id']
+        course_id: str = class_info_entry['course_id']
+        leganto_course_id: str = class_info_entry['leganto_course_id']
+        leganto_section_id: str = class_info_entry['leganto_section_code']
         if class_id:
             ## ocra book data ---------------------------------------
             book_results: list = get_book_readings( class_id )
@@ -113,7 +126,10 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
             ## ocra excerpt data ------------------------------------
             excerpt_results: list = get_excerpt_readings( class_id )
             ## leganto book data ------------------------------------
-            leg_books: list = map_books( book_results, course_id, leganto_course_id, oit_course_loader, cdl_checker )
+            # leg_books: list = map_books( book_results, course_id, leganto_course_id, oit_course_loader, cdl_checker )
+            
+            leg_books: list = map_books( book_results, leganto_course_id, leganto_section_id, cdl_checker )
+
             ## leganto article data ---------------------------------
             leg_articles: list = map_articles( article_results, course_id, leganto_course_id, cdl_checker )
             ## leganto excerpt data ---------------------------------
@@ -136,6 +152,78 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
     else:
         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
     ## end manage_build_reading_list()
+
+
+# def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool ):
+#     """ Manages db-querying, assembling, and posting to gsheet. 
+#         Called by if...main: """
+#     log.debug( f'raw course_id, ``{raw_course_id}``; update_ss, ``{update_ss}``; force, ``{force}``')
+#     ## setup --------------------------------------------------------
+#     all_results: list = []
+#     courses_and_classes: list = []
+#     course_id_list = []
+#     cdl_checker = CDL_Checker()
+#     oit_course_loader = OIT_Course_Loader( COURSES_FILEPATH )
+#     ## make course-id list ------------------------------------------
+#     if raw_course_id == 'SPREADSHEET':
+#         course_id_list: list = get_list_from_spreadsheet()
+#         if force:
+#             log.info( 'skipping recent-updates check' )
+#         else:
+#             ## check for recent updates -----------------------------
+#             recent_updates: bool = check_for_updates( course_id_list )
+#             if recent_updates == False:
+#                 log.info( 'no recent updates; quitting' )
+#                 return        
+#             else:
+#                 log.info( 'recent updates found' )
+#     else:
+#         course_id_list: list = raw_course_id.split( ',' )
+#     for course_id_entry in course_id_list:  ## now that we have the spreadsheet course_id_list, get necessary OIT data
+#         course_id_entry: str = course_id_entry
+#         log.debug( f'course_id_entry, ``{course_id_entry}``' )
+#         class_id: str = get_class_id( course_id_entry )
+#         leganto_course_id: str = oit_course_loader.prepare_leganto_coursecode( course_id_entry )
+#         class_id_dict: dict = { 'course_id': course_id_entry, 'class_id': class_id, 'leganto_course_id': leganto_course_id }
+#         courses_and_classes.append( class_id_dict )
+#     ## process class-id-list ----------------------------------------
+#     for class_id_entry in courses_and_classes:
+#         assert type(class_id_entry) == dict
+#         log.debug( f'class_id_entry, ``{class_id_entry}``' )
+#         class_id: str = class_id_entry['class_id']
+#         course_id: str = class_id_entry['course_id']
+#         leganto_course_id: str = class_id_entry['leganto_course_id']
+#         if class_id:
+#             ## ocra book data ---------------------------------------
+#             book_results: list = get_book_readings( class_id )
+#             ## ocra article data ------------------------------------
+#             article_results: list = get_article_readings( class_id )
+#             ## ocra excerpt data ------------------------------------
+#             excerpt_results: list = get_excerpt_readings( class_id )
+#             ## leganto book data ------------------------------------
+#             leg_books: list = map_books( book_results, course_id, leganto_course_id, oit_course_loader, cdl_checker )
+#             ## leganto article data ---------------------------------
+#             leg_articles: list = map_articles( article_results, course_id, leganto_course_id, cdl_checker )
+#             ## leganto excerpt data ---------------------------------
+#             leg_excerpts: list = map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker )
+#             ## leganto combined data --------------------------------
+#             all_course_results: list = leg_books + leg_articles + leg_excerpts
+#             if all_course_results == []:
+#                 all_course_results: list = [ map_empty(leganto_course_id) ]
+#         else:
+#             all_course_results: list = [ map_empty(leganto_course_id) ]
+#         log.debug( f'all_course_results, ``{all_course_results}``' )
+#         all_results = all_results + all_course_results
+#         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
+#     log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
+#     ## post to google-sheet -----------------------------------------
+#     if update_ss:
+#         log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
+#         # update_gsheet( all_results )
+#         worksheet_prepper.update_gsheet( all_results, CREDENTIALS, SPREADSHEET_NAME )
+#     else:
+#         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
+#     ## end manage_build_reading_list()
 
 
 ## helpers ----------------------------------------------------------
@@ -273,15 +361,23 @@ def get_excerpt_readings( class_id: str ) -> list:
 ## mappers and parsers ----------------------------------------------
 
 
-def map_books( book_results: list, course_id: str, leganto_course_id: str, oit_course_loader, cdl_checker ) -> list:
+# def map_books( book_results: list, course_id: str, leganto_course_id: str, oit_course_loader, cdl_checker ) -> list:
+#     mapped_books = []
+#     for book_result in book_results:
+#         mapped_book: dict = map_book( book_result, course_id, leganto_course_id, oit_course_loader, cdl_checker )
+#         mapped_books.append( mapped_book )
+#     return mapped_books
+
+
+def map_books( book_results: list, leganto_course_id: str, leganto_section_id, cdl_checker ) -> list:
     mapped_books = []
     for book_result in book_results:
-        mapped_book: dict = map_book( book_result, course_id, leganto_course_id, oit_course_loader, cdl_checker )
+        mapped_book: dict = map_book( book_result, leganto_course_id, leganto_section_id, cdl_checker )
         mapped_books.append( mapped_book )
     return mapped_books
 
 
-def map_book( initial_book_data: dict, course_id: str, leganto_course_id: str, oit_course_loader, cdl_checker ) -> dict:
+def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_id: str, cdl_checker ) -> dict:
     log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
     mapped_book_data: dict = MAPPED_CATEGORIES.copy()
     mapped_book_data['citation_author'] = initial_book_data['bk_author']
@@ -291,13 +387,31 @@ def map_book( initial_book_data: dict, course_id: str, leganto_course_id: str, o
     mapped_book_data['citation_source1'] = run_book_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
     mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
     mapped_book_data['citation_title'] = initial_book_data['bk_title']
-    # mapped_book_data['coursecode'] = f'{course_id[0:8]}'
-    # leganto_course_code: str = oit_course_loader.prepare_leganto_coursecode( course_id )
-    # log.debug( f'leganto_course_code, ``{leganto_course_code}``' )
     mapped_book_data['coursecode'] = leganto_course_id
     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
+    mapped_book_data['section_id'] = leganto_section_id
     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
     return mapped_book_data
+
+
+# def map_book( initial_book_data: dict, course_id: str, leganto_course_id: str, oit_course_loader, cdl_checker ) -> dict:
+#     log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
+#     mapped_book_data: dict = MAPPED_CATEGORIES.copy()
+#     mapped_book_data['citation_author'] = initial_book_data['bk_author']
+#     mapped_book_data['citation_isbn'] = initial_book_data['isbn']
+#     mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
+#     mapped_book_data['citation_secondary_type'] = 'BK'
+#     mapped_book_data['citation_source1'] = run_book_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
+#     mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
+#     mapped_book_data['citation_title'] = initial_book_data['bk_title']
+#     # mapped_book_data['coursecode'] = f'{course_id[0:8]}'
+#     # leganto_course_code: str = oit_course_loader.prepare_leganto_coursecode( course_id )
+#     # log.debug( f'leganto_course_code, ``{leganto_course_code}``' )
+#     mapped_book_data['coursecode'] = leganto_course_id
+#     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
+#     mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
+#     log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
+#     return mapped_book_data
 
 
 def map_empty( leganto_course_id: str ) -> dict:

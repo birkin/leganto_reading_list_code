@@ -6,23 +6,7 @@ import gspread
 log = logging.getLogger(__name__)
 
 
-def calculate_end_column( number_of_columns: int ) -> str:
-    """ Calculates end-column string from number-of-columns. """
-    alphabet: list = list( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' )
-    result = ''
-    if number_of_columns <= 26:
-        zero_length = number_of_columns - 1
-        result: str = alphabet[zero_length]
-    else:
-        ( multiple, remainder ) = divmod( number_of_columns, 26 )
-        log.debug( f'multiple, ``{multiple}``; remainder, ``{remainder}``' )
-        zero_multiple: int = multiple - 1
-        zero_remainder: int = remainder - 1
-        char_one: str = alphabet[zero_multiple]
-        char_two: str = alphabet[zero_remainder]
-        result = f'{char_one}{char_two}'
-    log.debug( f'result, ``{result}``' )
-    return result
+## 3 main manager/worker functions ----------------------------------
 
 
 def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str ) -> None:
@@ -136,62 +120,6 @@ def process_leganto_worksheet( sheet, all_results: list ):
     # end def process_leganto_worksheet()
 
 
-def calculate_leganto_title( title: str ) -> str:
-    """ Removes `(EXCERPT) ` if necessary. """
-    return_title = title
-    if '(EXCERPT)' in title:
-        return_title = title.replace( '(EXCERPT)', '' )
-        return_title = return_title.strip()
-    log.debug( f'return_title, ``{return_title}``' )
-    return return_title
-
-
-def calculate_leganto_type( perceived_type: str ) -> str:
-    """ Converts `ARTICLE` to `JR` """
-    return_type = perceived_type
-    if perceived_type == 'ARTICLE':
-        return_type = 'JR'
-    log.debug( f'return_type, ``{return_type}``' )
-    return return_type
-
-
-def calculate_leganto_course_code( data_string: str ) -> str:
-    """ Removes commentary if necessary. """
-    calculated_course_code = data_string
-    if 'oit_course_code_not_found' in data_string:
-        calculated_course_code = ''
-    log.debug( f'calculated_course_code, ``{calculated_course_code}``' )
-    return calculated_course_code
-
-
-def calculate_leganto_citation_source( result: dict ) -> str:
-    """ Prioritizes PDF, then CDL. """
-    link: str = ''
-    possible_pdf_data: str = result['citation_source4']
-    possible_cdl_data: str = result['citation_source1']
-    if possible_pdf_data:
-        log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
-        if possible_pdf_data == 'no_pdf_found':
-            link = ''
-        else:
-            link = possible_pdf_data
-    elif possible_cdl_data:
-        log.debug( f'in `possible_cdl_data`; possible_cdl_data, ``{possible_cdl_data}``')
-        if possible_cdl_data == 'TODO -- handle multiple possible results':
-            link = ''
-        elif possible_cdl_data == 'no CDL link found':
-            link = ''
-        elif 'CDL link' in possible_cdl_data:
-            # log.debug( 'here' )
-            link = possible_cdl_data.replace( 'CDL link likely: <', '' )
-            link = link.replace( 'CDL link possibly: <', '' )
-            link = link.replace( '>', '' )
-        else:
-            link = possible_cdl_data
-    log.debug( f'link, ``{link}``' )
-    return link
-
-
 def process_staff_worksheet( sheet, all_results: list ):
     ## create staff worksheet -------------------------------------
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
@@ -272,6 +200,86 @@ def process_staff_worksheet( sheet, all_results: list ):
 
     # end def process_staff_worksheet()
 
+
+## helpers ----------------------------------------------------------
+
+
+def calculate_end_column( number_of_columns: int ) -> str:
+    """ Calculates end-column string from number-of-columns. """
+    alphabet: list = list( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' )
+    result = ''
+    if number_of_columns <= 26:
+        zero_length = number_of_columns - 1
+        result: str = alphabet[zero_length]
+    else:
+        ( multiple, remainder ) = divmod( number_of_columns, 26 )
+        log.debug( f'multiple, ``{multiple}``; remainder, ``{remainder}``' )
+        zero_multiple: int = multiple - 1
+        zero_remainder: int = remainder - 1
+        char_one: str = alphabet[zero_multiple]
+        char_two: str = alphabet[zero_remainder]
+        result = f'{char_one}{char_two}'
+    log.debug( f'result, ``{result}``' )
+    return result
+
+
+def calculate_leganto_title( title: str ) -> str:
+    """ Removes `(EXCERPT) ` if necessary. """
+    return_title = title
+    if '(EXCERPT)' in title:
+        return_title = title.replace( '(EXCERPT)', '' )
+        return_title = return_title.strip()
+    log.debug( f'return_title, ``{return_title}``' )
+    return return_title
+
+
+def calculate_leganto_type( perceived_type: str ) -> str:
+    """ Converts `ARTICLE` to `JR` """
+    return_type = perceived_type
+    if perceived_type == 'ARTICLE':
+        return_type = 'JR'
+    log.debug( f'return_type, ``{return_type}``' )
+    return return_type
+
+
+def calculate_leganto_course_code( data_string: str ) -> str:
+    """ Removes commentary if necessary. """
+    calculated_course_code = data_string
+    if 'oit_course_code_not_found' in data_string:
+        calculated_course_code = ''
+    log.debug( f'calculated_course_code, ``{calculated_course_code}``' )
+    return calculated_course_code
+
+
+def calculate_leganto_citation_source( result: dict ) -> str:
+    """ Prioritizes PDF, then CDL. """
+    link: str = ''
+    possible_pdf_data: str = result['citation_source4']
+    possible_cdl_data: str = result['citation_source1']
+    if possible_pdf_data:
+        log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
+        if possible_pdf_data == 'no_pdf_found':
+            link = ''
+        else:
+            link = possible_pdf_data
+    elif possible_cdl_data:
+        log.debug( f'in `possible_cdl_data`; possible_cdl_data, ``{possible_cdl_data}``')
+        if possible_cdl_data == 'TODO -- handle multiple possible results':
+            link = ''
+        elif possible_cdl_data == 'no CDL link found':
+            link = ''
+        elif 'CDL link' in possible_cdl_data:
+            # log.debug( 'here' )
+            link = possible_cdl_data.replace( 'CDL link likely: <', '' )
+            link = link.replace( 'CDL link possibly: <', '' )
+            link = link.replace( '>', '' )
+        else:
+            link = possible_cdl_data
+    log.debug( f'link, ``{link}``' )
+    return link
+
+
+## old code below, for reference 'til 2023-Jan-01
 
 # def update_gsheet( all_results: list ) -> None:
 #     """ Writes data to gsheet, then...
