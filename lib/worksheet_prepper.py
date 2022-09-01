@@ -76,7 +76,8 @@ def process_leganto_worksheet( sheet, all_results: list ):
         result: dict = result
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
         row_dict['section_id'] = result['section_id']
-        row_dict['citation_secondary_type'] = result['citation_secondary_type']
+        # row_dict['citation_secondary_type'] = result['citation_secondary_type']
+        row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
         row_dict['citation_title'] = result['citation_title']
         row_dict['citation_journal_title'] = result['citation_journal_title']
         row_dict['citation_author'] = result['citation_author']
@@ -135,7 +136,17 @@ def process_leganto_worksheet( sheet, all_results: list ):
     # end def process_leganto_worksheet()
 
 
+def calculate_leganto_type( perceived_type: str ) -> str:
+    """ Converts `ARTICLE` to `JR` """
+    return_type = perceived_type
+    if perceived_type == 'ARTICLE':
+        return_type = 'JR'
+    log.debug( f'return_type, ``{return_type}``' )
+    return return_type
+
+
 def calculate_leganto_course_code( data_string: str ) -> str:
+    """ Removes commentary if necessary. """
     calculated_course_code = data_string
     if 'oit_course_code_not_found' in data_string:
         calculated_course_code = ''
