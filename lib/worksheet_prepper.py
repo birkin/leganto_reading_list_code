@@ -47,7 +47,6 @@ def process_leganto_worksheet( sheet, all_results: list ):
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
     title: str = f'leganto_{dt_stamp}'
     leganto_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
-
     ## prepare headers ----------------------------------------------
     headers = [
         'coursecode', 'section_id', 'searchable_id1', 'searchable_id2', 'searchable_id3', 'reading_list_code', 
@@ -89,11 +88,8 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['citation_issue'] = result['citation_issue']
         row_dict['citation_start_page'] = result['citation_start_page']
         row_dict['citation_end_page'] = result['citation_end_page']
-        row_dict['citation_source1'] = result['citation_source1']
-        row_dict['citation_source1'] = result['citation_source1']
-        row_dict['citation_source2'] = result['citation_source2']
-        row_dict['citation_source3'] = result['citation_source3']
-        row_dict['citation_source4'] = result['citation_source4']
+        # row_dict['citation_source1'] = result['citation_source1']
+        row_dict['citation_source1'] = calculate_leganto_citation_source( result )
         row_dict['external_system_id'] = result['external_system_id']
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
         row_values: list = list( row_dict.values() )
@@ -139,72 +135,23 @@ def process_leganto_worksheet( sheet, all_results: list ):
     # end def process_leganto_worksheet()
 
 
-# def process_leganto_worksheet( sheet, all_results: list ):
-#     ## create leganto worksheet -------------------------------------
-#     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
-#     title: str = f'leganto_{dt_stamp}'
-#     leganto_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
-
-#     ## prepare headers ----------------------------------------------
-#     headers = [
-#         'coursecode', 'section_id', 'searchable_id1', 'searchable_id2', 'searchable_id3', 'reading_list_code', 
-#         'reading_list_name', 'reading_list_description', 'reading_list_subject', 'reading_list_status', 'RLStatus', 
-#         'visibility', 'reading_list_assigned_to', 'reading_list_library_note', 'reading_list_instructor_note', 
-#         'owner_user_name', 'creativecommon', 'section_name', 'section_description', 'section_start_date', 
-#         'section_end_date', 'section_tags', 'citation_secondary_type', 'citation_status', 'citation_tags', 
-#         'citation_mms_id', 'citation_original_system_id', 'citation_title', 'citation_journal_title', 'citation_author', 
-#         'citation_publication_date', 'citation_edition', 'citation_isbn', 'citation_issn', 
-#         'citation_place_of_publication', 'citation_publisher', 'citation_volume', 'citation_issue', 'citation_pages', 
-#         'citation_start_page', 'citation_end_page', 'citation_doi', 'citation_oclc', 'citation_lccn', 
-#         'citation_chapter', 'rlterms_chapter_title', 'citation_chapter_author', 'editor', 'citation_source', 
-#         'citation_source1', 'citation_source2', 'citation_source3', 'citation_source4', 'citation_source5', 
-#         'citation_source6', 'citation_source7', 'citation_source8', 'citation_source9', 'citation_source10', 
-#         'citation_note', 'additional_person_name', 'file_name', 'citation_public_note', 'license_type', 
-#         'citation_instructor_note', 'citation_library_note', 'external_system_id'
-#     ]
-#     ## prepare values -----------------------------------------------
-#     data_values = []
-#     rows = [
-#         [ 'data_row_1_col_a', 'data_row_1_col_b' ],
-#         [ 'data_row_2_col_a', 'data_row_2_col_b' ]
-#     ]
-#     for row in rows:
-#         data_values.append( row )
-#     ## finalize leganto data ----------------------------------------
-#     end_range_column = calculate_end_column( len(headers) )
-#     new_data = [
-#         { 
-#             'range': f'A1:{end_range_column}1',
-#             'values': [ headers ]
-#         },
-#         {
-#             'range': f'A2:B3',
-#             'values': data_values
-#         }
-#     ]
-#     leganto_worksheet.batch_update( new_data, value_input_option='raw' )
-#     ## update leganto-sheet formatting ------------------------------
-#     leganto_worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
-#     leganto_worksheet.freeze( rows=1, cols=None )
-#     ## make leganto-sheet the 2nd sheet -----------------------------
-#     wrkshts: list = sheet.worksheets()
-#     log.debug( f'wrkshts, ``{wrkshts}``' )
-#     reordered_wrkshts: list = [ wrkshts[0], wrkshts[-1] ]
-#     sheet.reorder_worksheets( reordered_wrkshts )
-#     wrkshts: list = sheet.worksheets()
-#     log.debug( f'wrkshts after sort, ``{wrkshts}``' )
-#     num_wrkshts: int = len( wrkshts )
-#     log.debug( f'num_wrkshts, ``{num_wrkshts}``' )
-#     if num_wrkshts > 2:  # keep requested_checks, and the leganto sheet
-#         wrkshts: list = sheet.worksheets()
-#         wrkshts_to_delete = wrkshts[2:]
-#         for wrksht in wrkshts_to_delete:
-#             sheet.del_worksheet( wrksht )
-#     wrkshts: list = sheet.worksheets()
-#     log.debug( f'wrkshts after deletion, ``{wrkshts}``' )
-#     return
-
-#     # end def process_leganto_worksheet()
+def calculate_leganto_citation_source( result: dict ) -> str:
+    """ Prioritizes PDF, then CDL. """
+    link: str = ''
+    possible_pdf_data: str = result['citation_source4']
+    possible_cdl_data: str = result['citation_source1']
+    if possible_pdf_data:
+        log.debug( 'in `possible_pdf_data`')
+        link = possible_pdf_data
+    elif possible_cdl_data:
+        log.debug( 'in `possible_cdl_data`')
+        link = possible_cdl_data
+        link = link.replace( 'no CDL link found', '' )
+        link = link.replace( 'CDL link likely: <', '' )
+        link = link.replace( 'CDL link possibly: <', '' )
+        link = link.replace( '>', '' )
+    log.debug( f'link, ``{link}``' )
+    return link
 
 
 def process_staff_worksheet( sheet, all_results: list ):
