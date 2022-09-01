@@ -45,7 +45,7 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
 def process_leganto_worksheet( sheet, all_results: list ):
     ## create leganto worksheet -------------------------------------
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
-    title: str = f'leganto_{dt_stamp}'
+    title: str = f'for_leganto_{dt_stamp}'
     leganto_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
     ## prepare headers ----------------------------------------------
     headers = [
@@ -176,7 +176,7 @@ def calculate_leganto_citation_source( result: dict ) -> str:
 def process_staff_worksheet( sheet, all_results: list ):
     ## create staff worksheet -------------------------------------
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
-    title: str = f'staff_{dt_stamp}'
+    title: str = f'for_staff_{dt_stamp}'
     staff_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
     ## prepare headers ----------------------------------------------
     headers = [
