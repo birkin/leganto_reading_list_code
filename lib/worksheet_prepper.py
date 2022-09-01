@@ -76,9 +76,9 @@ def process_leganto_worksheet( sheet, all_results: list ):
         result: dict = result
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
         row_dict['section_id'] = result['section_id']
-        # row_dict['citation_secondary_type'] = result['citation_secondary_type']
         row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
-        row_dict['citation_title'] = result['citation_title']
+        # row_dict['citation_title'] = result['citation_title']
+        row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
         row_dict['citation_journal_title'] = result['citation_journal_title']
         row_dict['citation_author'] = result['citation_author']
         row_dict['citation_publication_date'] = result['citation_publication_date']
@@ -134,6 +134,16 @@ def process_leganto_worksheet( sheet, all_results: list ):
     return
 
     # end def process_leganto_worksheet()
+
+
+def calculate_leganto_title( title: str ) -> str:
+    """ Removes `(EXCERPT) ` if necessary. """
+    return_title = title
+    if '(EXCERPT)' in title:
+        return_title = title.replace( '(EXCERPT)', '' )
+        return_title = return_title.strip()
+    log.debug( f'return_title, ``{return_title}``' )
+    return return_title
 
 
 def calculate_leganto_type( perceived_type: str ) -> str:
