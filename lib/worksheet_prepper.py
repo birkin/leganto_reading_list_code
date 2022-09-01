@@ -58,24 +58,23 @@ def process_leganto_worksheet( sheet, all_results: list ):
     log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
     for result in all_results:
         result: dict = result
-        row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
-        row_dict['section_id'] = result['section_id']
-        row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
-        # row_dict['citation_title'] = result['citation_title']
-        row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
-        row_dict['citation_journal_title'] = result['citation_journal_title']
         row_dict['citation_author'] = result['citation_author']
-        row_dict['citation_publication_date'] = result['citation_publication_date']
         row_dict['citation_doi'] = result['citation_doi']
+        row_dict['citation_end_page'] = result['citation_end_page']
         row_dict['citation_isbn'] = result['citation_isbn']
         row_dict['citation_issn'] = result['citation_issn']
-        row_dict['citation_volume'] = result['citation_volume']
         row_dict['citation_issue'] = result['citation_issue']
-        row_dict['citation_start_page'] = result['citation_start_page']
-        row_dict['citation_end_page'] = result['citation_end_page']
-        # row_dict['citation_source1'] = result['citation_source1']
+        row_dict['citation_journal_title'] = result['citation_journal_title']
+        row_dict['citation_publication_date'] = result['citation_publication_date']
+        row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
         row_dict['citation_source1'] = calculate_leganto_citation_source( result )
+        row_dict['citation_start_page'] = result['citation_start_page']
+        row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
+        row_dict['citation_volume'] = result['citation_volume']
+        row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
         row_dict['external_system_id'] = result['external_system_id']
+        row_dict['reading_list_code'] = row_dict['coursecode']
+        row_dict['section_id'] = result['section_id']
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
         row_values: list = list( row_dict.values() )
         data_values.append( row_values )
