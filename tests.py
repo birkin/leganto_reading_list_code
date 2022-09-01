@@ -9,8 +9,11 @@ Usage:
 """
 
 import datetime, json, logging, os, unittest
+
 import etl_class_data
 from etl_class_data import CDL_Checker, check_pdfs
+from lib import worksheet_prepper
+
 
 SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -37,68 +40,74 @@ class Misc_Test( unittest.TestCase ):
             scanned_data = json.loads( jsn )
         return scanned_data
 
-    def test_check_pdfs_A(self):
-        """ Checks for accurate file-name find. """
-        initial_excerpt_data: dict = {
-            'amount': 'y',
-            'art_updated': datetime.datetime(2019, 8, 20, 15, 41, 39),
-            'art_url': '',
-            'articleid': 100230,
-            'assignment': '',
-            'atitle': 'Quinta Temporada, Los Vendidos, Los Dos Caras del Patroncito',
-            'aufirst': 'Luis ',
-            'auinit': '',
-            'aulast': 'Valdez',
-            'bibno': '',
-            'bk_aufirst': 'Luis ',
-            'bk_auinit': '',
-            'bk_aulast': 'Valdez',
-            'classid': 8851,
-            'classuse': 'y',
-            'copied_from_id': None,
-            'date': datetime.date(1990, 1, 1),
-            'date_due': datetime.date(2019, 9, 17),
-            'date_printed': datetime.datetime(2019, 8, 20, 8, 22, 54),
-            'doi': '',
-            'epage': None,
-            'ereserve': 'has pdf',
-            'facnotes': '',
-            'fairuse': 'none',
-            'format': 'excerpt',
-            'fullcit': '',
-            'fulltext_url': '',
-            'injosiah': 'dont know',
-            'isbn': '',
-            'issn': '',
-            'issue': '',
-            'jcallno': '',
-            'nature': 'y',
-            'notice': None,
-            'original': 'y',
-            'pmid': None,
-            'printed': 'y',
-            'publicdomain': 'none',
-            'publisher': 'Arte Publico',
-            'reactivateid': '',
-            'request_date': datetime.datetime(2019, 8, 17, 6, 4, 17),
-            'requestid': '20190817060417pybarra',
-            'requests.requestid': '20190817060417pybarra',
-            'sequence': '',
-            'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Quinta '
-                        'Temporada, Los Vendidos, Los Dos Caras del Patroncito&title=Early '
-                        'Works&date=1990-01-01&volume=&issue=&spage=18&epage=52&issn=&doi=&aulast=Valdez&aufirst=Luis '
-                        '&auinit=&__char_set=utf8',
-            'spage': None,
-            'staff_intervention_needed': None,
-            'staffnotes': '',
-            'status': 'on reserve',
-            'title': 'Early Works',
-            'url_desc': '',
-            'volume': ''
-            }
-        expected = 'valdez_early.pdf'
-        result = check_pdfs( initial_excerpt_data, self.scanned_data )  
-        self.assertEqual( expected, result )  # course-id is `TAPS1610`
+    def test_column_math(self):
+        """ Checks calculated end-column. """
+        self.assertEqual( 'B', worksheet_prepper.calculate_end_column(2) )
+        self.assertEqual( 'AA', worksheet_prepper.calculate_end_column(27) )
+        self.assertEqual( 'BO', worksheet_prepper.calculate_end_column( 67 ) )
+
+    # def test_check_pdfs_A(self):
+    #     """ Checks for accurate file-name find. """
+    #     initial_excerpt_data: dict = {
+    #         'amount': 'y',
+    #         'art_updated': datetime.datetime(2019, 8, 20, 15, 41, 39),
+    #         'art_url': '',
+    #         'articleid': 100230,
+    #         'assignment': '',
+    #         'atitle': 'Quinta Temporada, Los Vendidos, Los Dos Caras del Patroncito',
+    #         'aufirst': 'Luis ',
+    #         'auinit': '',
+    #         'aulast': 'Valdez',
+    #         'bibno': '',
+    #         'bk_aufirst': 'Luis ',
+    #         'bk_auinit': '',
+    #         'bk_aulast': 'Valdez',
+    #         'classid': 8851,
+    #         'classuse': 'y',
+    #         'copied_from_id': None,
+    #         'date': datetime.date(1990, 1, 1),
+    #         'date_due': datetime.date(2019, 9, 17),
+    #         'date_printed': datetime.datetime(2019, 8, 20, 8, 22, 54),
+    #         'doi': '',
+    #         'epage': None,
+    #         'ereserve': 'has pdf',
+    #         'facnotes': '',
+    #         'fairuse': 'none',
+    #         'format': 'excerpt',
+    #         'fullcit': '',
+    #         'fulltext_url': '',
+    #         'injosiah': 'dont know',
+    #         'isbn': '',
+    #         'issn': '',
+    #         'issue': '',
+    #         'jcallno': '',
+    #         'nature': 'y',
+    #         'notice': None,
+    #         'original': 'y',
+    #         'pmid': None,
+    #         'printed': 'y',
+    #         'publicdomain': 'none',
+    #         'publisher': 'Arte Publico',
+    #         'reactivateid': '',
+    #         'request_date': datetime.datetime(2019, 8, 17, 6, 4, 17),
+    #         'requestid': '20190817060417pybarra',
+    #         'requests.requestid': '20190817060417pybarra',
+    #         'sequence': '',
+    #         'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Quinta '
+    #                     'Temporada, Los Vendidos, Los Dos Caras del Patroncito&title=Early '
+    #                     'Works&date=1990-01-01&volume=&issue=&spage=18&epage=52&issn=&doi=&aulast=Valdez&aufirst=Luis '
+    #                     '&auinit=&__char_set=utf8',
+    #         'spage': None,
+    #         'staff_intervention_needed': None,
+    #         'staffnotes': '',
+    #         'status': 'on reserve',
+    #         'title': 'Early Works',
+    #         'url_desc': '',
+    #         'volume': ''
+    #         }
+    #     expected = 'valdez_early.pdf'
+    #     result = check_pdfs( initial_excerpt_data, self.scanned_data )  
+    #     self.assertEqual( expected, result )  # course-id is `TAPS1610`
             
     ## end class Misc_Test()
 
@@ -204,208 +213,208 @@ class MapperTest( unittest.TestCase ):
     def setUp( self ):
         self.maxDiff = None
 
-    def test_map_book_data(self):
-        initial_book_data: dict = {
-            'bibno': '',
-            'bk_author': 'Appleman, Deborah',
-            'bk_title': 'Critical Encounters in Secondary English: Teaching Literary '
-                        'Theory to Adolescents ',
-            'bk_updated': datetime.datetime(2022, 6, 16, 9, 29, 5),
-            'bk_year': None,
-            'bookid': 50027,
-            'bookstore': 'N',
-            'callno': '-',
-            'classid': 9342,
-            'copies': 1,
-            'date_printed': None,
-            'ebook_id': 112561,
-            'edition': '',
-            'facnotes': 'CDL linked',
-            'isbn': '',
-            'libloc': 'Rock',
-            'libraryhas': 'N',
-            'loan': '3 hrs',
-            'needed_by': None,
-            'personal': 'N',
-            'printed': 'n',
-            'publisher': '3rd edition',
-            'purchase': 'N',
-            'reactivateid': '20220610163908',
-            'request_date': datetime.datetime(2020, 5, 5, 17, 24, 3),
-            'requestid': '20200505172403authID',
-            'requests.requestid': '20200505172403authID',
-            'required': 'optional',
-            'sfxlink': '',
-            'staffnotes': '',
-            'status': 'requested as ebook'
-            }
-        course_id = 'EDUC2510A'
-        cdl_checker = CDL_Checker()
-        mapped_book_data: dict = etl_class_data.map_book( initial_book_data, course_id, cdl_checker )
-        expected_sorted_keys = [
-            'citation_author',
-            'citation_doi',
-            'citation_end_page',
-            'citation_isbn',
-            'citation_issn',
-            'citation_issue',
-            'citation_journal_title',
-            'citation_publication_date',
-            'citation_secondary_type',
-            'citation_source1',
-            'citation_source2',
-            'citation_source3',
-            'citation_source4',
-            'citation_start_page',
-            'citation_title',
-            'citation_volume',
-            'coursecode',
-            'external_system_id',
-            'section_id'
-            ]
-        self.assertEqual( expected_sorted_keys, sorted(list(mapped_book_data.keys())) )
-        expected_data = {
-            'citation_author': 'Appleman, Deborah',
-            'citation_doi': '',
-            'citation_end_page': '',
-            'citation_isbn': '',
-            'citation_issn': '',
-            'citation_issue': '',
-            'citation_publication_date': '',
-            'citation_secondary_type': 'BK',
-            # 'citation_source1': 'CDL linked',
-            'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/b90794643>',
-            'citation_source2': '',
-            'citation_source3': 'no openurl found',
-            'citation_source4': '',
-            'citation_start_page': '',
-            'citation_title': 'Critical Encounters in Secondary English: Teaching Literary Theory to Adolescents ',
-            'citation_journal_title': '',
-            'citation_volume': '',
-            'coursecode': 'EDUC2510',
-            'external_system_id': '20200505172403authID',
-            'section_id': ''
-            }
-        self.assertEqual( expected_data, mapped_book_data )
-        ## end def test_map_book_data()
+    # def test_map_book_data(self):
+    #     initial_book_data: dict = {
+    #         'bibno': '',
+    #         'bk_author': 'Appleman, Deborah',
+    #         'bk_title': 'Critical Encounters in Secondary English: Teaching Literary '
+    #                     'Theory to Adolescents ',
+    #         'bk_updated': datetime.datetime(2022, 6, 16, 9, 29, 5),
+    #         'bk_year': None,
+    #         'bookid': 50027,
+    #         'bookstore': 'N',
+    #         'callno': '-',
+    #         'classid': 9342,
+    #         'copies': 1,
+    #         'date_printed': None,
+    #         'ebook_id': 112561,
+    #         'edition': '',
+    #         'facnotes': 'CDL linked',
+    #         'isbn': '',
+    #         'libloc': 'Rock',
+    #         'libraryhas': 'N',
+    #         'loan': '3 hrs',
+    #         'needed_by': None,
+    #         'personal': 'N',
+    #         'printed': 'n',
+    #         'publisher': '3rd edition',
+    #         'purchase': 'N',
+    #         'reactivateid': '20220610163908',
+    #         'request_date': datetime.datetime(2020, 5, 5, 17, 24, 3),
+    #         'requestid': '20200505172403authID',
+    #         'requests.requestid': '20200505172403authID',
+    #         'required': 'optional',
+    #         'sfxlink': '',
+    #         'staffnotes': '',
+    #         'status': 'requested as ebook'
+    #         }
+    #     course_id = 'EDUC2510A'
+    #     cdl_checker = CDL_Checker()
+    #     mapped_book_data: dict = etl_class_data.map_book( initial_book_data, course_id, cdl_checker )
+    #     expected_sorted_keys = [
+    #         'citation_author',
+    #         'citation_doi',
+    #         'citation_end_page',
+    #         'citation_isbn',
+    #         'citation_issn',
+    #         'citation_issue',
+    #         'citation_journal_title',
+    #         'citation_publication_date',
+    #         'citation_secondary_type',
+    #         'citation_source1',
+    #         'citation_source2',
+    #         'citation_source3',
+    #         'citation_source4',
+    #         'citation_start_page',
+    #         'citation_title',
+    #         'citation_volume',
+    #         'coursecode',
+    #         'external_system_id',
+    #         'section_id'
+    #         ]
+    #     self.assertEqual( expected_sorted_keys, sorted(list(mapped_book_data.keys())) )
+    #     expected_data = {
+    #         'citation_author': 'Appleman, Deborah',
+    #         'citation_doi': '',
+    #         'citation_end_page': '',
+    #         'citation_isbn': '',
+    #         'citation_issn': '',
+    #         'citation_issue': '',
+    #         'citation_publication_date': '',
+    #         'citation_secondary_type': 'BK',
+    #         # 'citation_source1': 'CDL linked',
+    #         'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/b90794643>',
+    #         'citation_source2': '',
+    #         'citation_source3': 'no openurl found',
+    #         'citation_source4': '',
+    #         'citation_start_page': '',
+    #         'citation_title': 'Critical Encounters in Secondary English: Teaching Literary Theory to Adolescents ',
+    #         'citation_journal_title': '',
+    #         'citation_volume': '',
+    #         'coursecode': 'EDUC2510',
+    #         'external_system_id': '20200505172403authID',
+    #         'section_id': ''
+    #         }
+    #     self.assertEqual( expected_data, mapped_book_data )
+    #     ## end def test_map_book_data()
 
-    def test_map_article_data(self):
-        initial_article_data: dict = {
-            'amount': 'y',
-            'art_updated': datetime.datetime(2021, 1, 11, 12, 31, 4),
-            'art_url': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
-            'articleid': 109044,
-            'assignment': '',
-            'atitle': 'The Plot of her Undoing',
-            'aufirst': 'Saidiya',
-            'auinit': '',
-            'aulast': 'Hartman',
-            'bibno': '',
-            'bk_aufirst': '',
-            'bk_auinit': '',
-            'bk_aulast': '',
-            'classid': 9756,
-            'classuse': 'y',
-            'copied_from_id': 108626,
-            'date': datetime.date(2020, 12, 28),
-            'date_due': None,
-            'date_printed': None,
-            'doi': '',
-            'epage': None,
-            'ereserve': 'web link',
-            'facnotes': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
-            'fairuse': 'none',
-            'format': 'article',
-            'fullcit': '',
-            'fulltext_url': '',
-            'injosiah': 'dont know',
-            'isbn': '',
-            'issn': '',
-            'issue': '',
-            'jcallno': '',
-            'nature': 'y',
-            'notice': None,
-            'original': 'y',
-            'pmid': None,
-            'printed': 'n',
-            'publicdomain': 'none',
-            'publisher': '',
-            'reactivateid': '',
-            'request_date': datetime.datetime(2021, 1, 11, 12, 31, 4),
-            'requestid': '20210111123104OCRAcopy',
-            'requests.requestid': '20210111123104OCRAcopy',
-            'sequence': 'Week 6',
-            'sfxlink': 'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The '
-                        'Plot of her Undoing&title=Feminist Art '
-                        'Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8',
-            'spage': None,
-            'staff_intervention_needed': None,
-            'staffnotes': '',
-            'status': 'on reserve',
-            'title': 'Feminist Art Coalition',
-            'url_desc': '',
-            'volume': ''}
-        course_id = 'HMAN2401D'
-        cdl_checker = CDL_Checker()
-        mapped_article_data: dict = etl_class_data.map_article( initial_article_data, course_id, cdl_checker )
-        expected_sorted_keys = [
-            'citation_author',
-            'citation_doi',
-            'citation_end_page',
-            'citation_isbn',
-            'citation_issn',
-            'citation_issue',
-            'citation_journal_title',
-            'citation_publication_date',
-            'citation_secondary_type',
-            'citation_source1',
-            'citation_source2',
-            'citation_source3',
-            'citation_source4',
-            'citation_start_page',
-            'citation_title',
-            'citation_volume',
-            'coursecode',
-            'external_system_id',
-            'section_id'
-            ]
-        self.assertEqual( expected_sorted_keys, sorted(list(mapped_article_data.keys())) )
-        expected_data = {
-            'citation_author': 'Hartman, Saidiya',
-            'citation_doi': '',
-            'citation_end_page': '',
-            'citation_isbn': '',
-            'citation_issn': '',
-            'citation_issue': '',
-            'citation_journal_title': 'Feminist Art Coalition',
-            'citation_publication_date': '2020-12-28',
-            'citation_secondary_type': 'ARTICLE',
-            'citation_source1': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
-            'citation_source2': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
-            'citation_source3': 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&genre=article&atitle=The+Plot+of+her+Undoing&title=Feminist+Art+Coalition&date=2020-12-28&aulast=Hartman&aufirst=Saidiya&__char_set=utf8',
-            'citation_source4': 'no_pdf_found',
-            'citation_start_page': '',
-            'citation_title': 'The Plot of her Undoing',
-            'citation_volume': '',
-            'coursecode': 'HMAN2401',
-            'external_system_id': '20210111123104OCRAcopy',
-            'section_id': ''
-            }
-        self.assertEqual( expected_data, mapped_article_data )
-        ## end def test_map_article_data()
+    # def test_map_article_data(self):
+    #     initial_article_data: dict = {
+    #         'amount': 'y',
+    #         'art_updated': datetime.datetime(2021, 1, 11, 12, 31, 4),
+    #         'art_url': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
+    #         'articleid': 109044,
+    #         'assignment': '',
+    #         'atitle': 'The Plot of her Undoing',
+    #         'aufirst': 'Saidiya',
+    #         'auinit': '',
+    #         'aulast': 'Hartman',
+    #         'bibno': '',
+    #         'bk_aufirst': '',
+    #         'bk_auinit': '',
+    #         'bk_aulast': '',
+    #         'classid': 9756,
+    #         'classuse': 'y',
+    #         'copied_from_id': 108626,
+    #         'date': datetime.date(2020, 12, 28),
+    #         'date_due': None,
+    #         'date_printed': None,
+    #         'doi': '',
+    #         'epage': None,
+    #         'ereserve': 'web link',
+    #         'facnotes': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
+    #         'fairuse': 'none',
+    #         'format': 'article',
+    #         'fullcit': '',
+    #         'fulltext_url': '',
+    #         'injosiah': 'dont know',
+    #         'isbn': '',
+    #         'issn': '',
+    #         'issue': '',
+    #         'jcallno': '',
+    #         'nature': 'y',
+    #         'notice': None,
+    #         'original': 'y',
+    #         'pmid': None,
+    #         'printed': 'n',
+    #         'publicdomain': 'none',
+    #         'publisher': '',
+    #         'reactivateid': '',
+    #         'request_date': datetime.datetime(2021, 1, 11, 12, 31, 4),
+    #         'requestid': '20210111123104OCRAcopy',
+    #         'requests.requestid': '20210111123104OCRAcopy',
+    #         'sequence': 'Week 6',
+    #         'sfxlink': 'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The '
+    #                     'Plot of her Undoing&title=Feminist Art '
+    #                     'Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8',
+    #         'spage': None,
+    #         'staff_intervention_needed': None,
+    #         'staffnotes': '',
+    #         'status': 'on reserve',
+    #         'title': 'Feminist Art Coalition',
+    #         'url_desc': '',
+    #         'volume': ''}
+    #     course_id = 'HMAN2401D'
+    #     cdl_checker = CDL_Checker()
+    #     mapped_article_data: dict = etl_class_data.map_article( initial_article_data, course_id, cdl_checker )
+    #     expected_sorted_keys = [
+    #         'citation_author',
+    #         'citation_doi',
+    #         'citation_end_page',
+    #         'citation_isbn',
+    #         'citation_issn',
+    #         'citation_issue',
+    #         'citation_journal_title',
+    #         'citation_publication_date',
+    #         'citation_secondary_type',
+    #         'citation_source1',
+    #         'citation_source2',
+    #         'citation_source3',
+    #         'citation_source4',
+    #         'citation_start_page',
+    #         'citation_title',
+    #         'citation_volume',
+    #         'coursecode',
+    #         'external_system_id',
+    #         'section_id'
+    #         ]
+    #     self.assertEqual( expected_sorted_keys, sorted(list(mapped_article_data.keys())) )
+    #     expected_data = {
+    #         'citation_author': 'Hartman, Saidiya',
+    #         'citation_doi': '',
+    #         'citation_end_page': '',
+    #         'citation_isbn': '',
+    #         'citation_issn': '',
+    #         'citation_issue': '',
+    #         'citation_journal_title': 'Feminist Art Coalition',
+    #         'citation_publication_date': '2020-12-28',
+    #         'citation_secondary_type': 'ARTICLE',
+    #         'citation_source1': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
+    #         'citation_source2': 'https://static1.squarespace.com/static/5c805bf0d86cc90a02b81cdc/t/5db8b219a910fa05af05dbf4/1572385305368/NotesOnFeminism-2_SaidiyaHartman.pdf',
+    #         'citation_source3': 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&genre=article&atitle=The+Plot+of+her+Undoing&title=Feminist+Art+Coalition&date=2020-12-28&aulast=Hartman&aufirst=Saidiya&__char_set=utf8',
+    #         'citation_source4': 'no_pdf_found',
+    #         'citation_start_page': '',
+    #         'citation_title': 'The Plot of her Undoing',
+    #         'citation_volume': '',
+    #         'coursecode': 'HMAN2401',
+    #         'external_system_id': '20210111123104OCRAcopy',
+    #         'section_id': ''
+    #         }
+    #     self.assertEqual( expected_data, mapped_article_data )
+    #     ## end def test_map_article_data()
 
-    def test_map_excerpt_data_titles(self):
-        """ Checks article-title and journal-title excerpt-mapping. """
-        initial_excerpt_data: dict = { 'articleid': 117436, 'requestid': '20220404173710jdelleca', 'reactivateid': '', 'format': 'excerpt', 'aulast': '', 'aufirst': '', 'auinit': '', 'bk_aulast': 'Felix Guattari', 'bk_aufirst': 'Gilles Deleuze', 'bk_auinit': '', 'ereserve': 'has pdf', 'status': 'on reserve', 'volume': '', 'issue': '', 'publisher': '', 'date': datetime.date(1980, 1, 1), 'issn': '', 'isbn': '', 'spage': None, 'epage': None, 'assignment': '', 'art_url': '', 'url_desc': '', 'doi': '', 'publicdomain': 'none', 'fairuse': 'none', 'classuse': 'y', 'nature': 'y', 'amount': 'y', 'original': 'y', 'notice': None, 'sequence': '', 'date_due': datetime.date(1969, 12, 31), 'facnotes': '', 'staffnotes': '', 'art_updated': datetime.datetime(2022, 4, 4, 17, 45, 2), 'injosiah': 'dont know', 'jcallno': '', 'bibno': '', 'printed': 'n', 'date_printed': None, 'pmid': None, 'fullcit': '', 'fulltext_url': '', 'copied_from_id': None, 'staff_intervention_needed': None, 'requests.requestid': '20220404173710jdelleca', 'classid': 10488, 'request_date': datetime.datetime(2022, 4, 4, 17, 37, 10), 
-        'atitle': 'Introduction: Rhizome ', 
-        'title': 'A Thousand Plateaus', 
-        'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Introduction: Rhizome &title=A Thousand Plateaus&date=1980-01-01&volume=&issue=&spage=1&epage=25&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8', 
-        }
-        course_id = 'FOO'
-        cdl_checker = CDL_Checker()
-        mapped_excerpt_data: dict = etl_class_data.map_excerpt( initial_excerpt_data, course_id, cdl_checker )        
-        self.assertEqual( '(EXCERPT) Introduction: Rhizome', mapped_excerpt_data['citation_title'] )
-        self.assertEqual( 'A Thousand Plateaus', mapped_excerpt_data['citation_journal_title'] )
+    # def test_map_excerpt_data_titles(self):
+    #     """ Checks article-title and journal-title excerpt-mapping. """
+    #     initial_excerpt_data: dict = { 'articleid': 117436, 'requestid': '20220404173710jdelleca', 'reactivateid': '', 'format': 'excerpt', 'aulast': '', 'aufirst': '', 'auinit': '', 'bk_aulast': 'Felix Guattari', 'bk_aufirst': 'Gilles Deleuze', 'bk_auinit': '', 'ereserve': 'has pdf', 'status': 'on reserve', 'volume': '', 'issue': '', 'publisher': '', 'date': datetime.date(1980, 1, 1), 'issn': '', 'isbn': '', 'spage': None, 'epage': None, 'assignment': '', 'art_url': '', 'url_desc': '', 'doi': '', 'publicdomain': 'none', 'fairuse': 'none', 'classuse': 'y', 'nature': 'y', 'amount': 'y', 'original': 'y', 'notice': None, 'sequence': '', 'date_due': datetime.date(1969, 12, 31), 'facnotes': '', 'staffnotes': '', 'art_updated': datetime.datetime(2022, 4, 4, 17, 45, 2), 'injosiah': 'dont know', 'jcallno': '', 'bibno': '', 'printed': 'n', 'date_printed': None, 'pmid': None, 'fullcit': '', 'fulltext_url': '', 'copied_from_id': None, 'staff_intervention_needed': None, 'requests.requestid': '20220404173710jdelleca', 'classid': 10488, 'request_date': datetime.datetime(2022, 4, 4, 17, 37, 10), 
+    #     'atitle': 'Introduction: Rhizome ', 
+    #     'title': 'A Thousand Plateaus', 
+    #     'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Introduction: Rhizome &title=A Thousand Plateaus&date=1980-01-01&volume=&issue=&spage=1&epage=25&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8', 
+    #     }
+    #     course_id = 'FOO'
+    #     cdl_checker = CDL_Checker()
+    #     mapped_excerpt_data: dict = etl_class_data.map_excerpt( initial_excerpt_data, course_id, cdl_checker )        
+    #     self.assertEqual( '(EXCERPT) Introduction: Rhizome', mapped_excerpt_data['citation_title'] )
+    #     self.assertEqual( 'A Thousand Plateaus', mapped_excerpt_data['citation_journal_title'] )
 
     def test_parse_excerpt_author(self):
         """ Checks parse_excerpt_author() helper's processing of various author fields. """
