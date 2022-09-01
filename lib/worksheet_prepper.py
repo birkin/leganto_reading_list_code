@@ -78,6 +78,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['reading_list_name'] = result['reading_list_name']
         row_dict['reading_list_status'] = 'BeingPrepared' if result['coursecode'] else ''
         row_dict['section_id'] = result['section_id']
+        row_dict['section_name'] = 'Resources' if result['coursecode'] else ''
         row_dict['visibility'] = 'RESTRICTED' if result['coursecode'] else ''
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
         row_values: list = list( row_dict.values() )
