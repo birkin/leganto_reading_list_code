@@ -74,7 +74,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
     log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
     for result in all_results:
         result: dict = result
-        row_dict['coursecode'] = result['coursecode']
+        row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
         row_dict['section_id'] = result['section_id']
         row_dict['citation_secondary_type'] = result['citation_secondary_type']
         row_dict['citation_title'] = result['citation_title']
@@ -133,6 +133,14 @@ def process_leganto_worksheet( sheet, all_results: list ):
     return
 
     # end def process_leganto_worksheet()
+
+
+def calculate_leganto_course_code( data_string: str ) -> str:
+    calculated_course_code = data_string
+    if 'oit_course_code_not_found' in data_string:
+        calculated_course_code = ''
+    log.debug( f'calculated_course_code, ``{calculated_course_code}``' )
+    return calculated_course_code
 
 
 def calculate_leganto_citation_source( result: dict ) -> str:
