@@ -70,6 +70,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
         row_dict['citation_source1'] = calculate_leganto_citation_source( result )
         row_dict['citation_start_page'] = result['citation_start_page']
+        row_dict['citation_status'] = 'BeingPrepared' if result['coursecode'] else ''
         row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
