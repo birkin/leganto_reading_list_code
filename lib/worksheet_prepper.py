@@ -6,14 +6,15 @@ import gspread
 log = logging.getLogger(__name__)
 
 
-def calculate_end_column( length: int ) -> str:
+def calculate_end_column( number_of_columns: int ) -> str:
+    """ Calculates end-column string from number-of-columns. """
     alphabet: list = list( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' )
     result = ''
-    if length <= 26:
-        zero_length = length - 1
+    if number_of_columns <= 26:
+        zero_length = number_of_columns - 1
         result: str = alphabet[zero_length]
     else:
-        ( multiple, remainder ) = divmod( length, 26 )
+        ( multiple, remainder ) = divmod( number_of_columns, 26 )
         log.debug( f'multiple, ``{multiple}``; remainder, ``{remainder}``' )
         zero_multiple: int = multiple - 1
         zero_remainder: int = remainder - 1
@@ -65,8 +66,27 @@ def process_leganto_worksheet( sheet, all_results: list ):
         'citation_instructor_note', 'citation_library_note', 'external_system_id'
     ]
     ## prepare values -----------------------------------------------
+    data_values = []
+    rows = [
+        [ 'data_row_1_col_a', 'data_row_1_col_b' ],
+        [ 'data_row_2_col_a', 'data_row_2_col_b' ]
+    ]
+    for row in rows:
+        data_values.append( row )
 
     ## finalize leganto data ----------------------------------------
+    end_range_column = calculate_end_column( len(headers) )
+    header_end_range = f'{end_range_column}1'
+    new_data = [
+        { 
+            'range': f'A1:{end_range_column}1',
+            'values': [ headers ]
+        },
+        {
+            'range': f'A2:B3',
+            'values': data_values
+        }
+    ]
 
     ## update leganto-sheet formatting ------------------------------
 
@@ -76,23 +96,6 @@ def process_leganto_worksheet( sheet, all_results: list ):
 
     ## finalize leganto data ----------------------------------------
     # headers = [ 'header_a', 'header_b' ]
-    data_values = []
-    rows = [
-        [ 'data_row_1_col_a', 'data_row_1_col_b' ],
-        [ 'data_row_2_col_a', 'data_row_2_col_b' ]
-    ]
-    for row in rows:
-        data_values.append( row )
-    new_data = [
-        { 
-            'range': f'A1:B1',
-            'values': [ headers ]
-        },
-        {
-            'range': f'A2:B3',
-            'values': data_values
-        }
-    ]
     leganto_worksheet.batch_update( new_data, value_input_option='raw' )
     ## update leganto-sheet formatting --------------------------------------------
     leganto_worksheet.format( f'A1:B1', {'textFormat': {'bold': True}} )
