@@ -67,21 +67,49 @@ def process_leganto_worksheet( sheet, all_results: list ):
     ]
     ## prepare values -----------------------------------------------
     data_values = []
-    rows = [
-        [ 'data_row_1_col_a', 'data_row_1_col_b' ],
-        [ 'data_row_2_col_a', 'data_row_2_col_b' ]
-    ]
-    for row in rows:
-        data_values.append( row )
+    row_dict = {}
+    for header in headers:
+        header: str = header
+        row_dict[header] = ''
+    log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
+    for result in all_results:
+        result: dict = result
+        result_coursecode = result['coursecode']
+        row_dict['coursecode'] = result['coursecode']
+        row_dict['section_id'] = result['section_id']
+        row_dict['citation_secondary_type'] = result['citation_secondary_type']
+        row_dict['citation_title'] = result['citation_title']
+        row_dict['citation_journal_title'] = result['citation_journal_title']
+        row_dict['citation_author'] = result['citation_author']
+        row_dict['citation_publication_date'] = result['citation_publication_date']
+        row_dict['citation_doi'] = result['citation_doi']
+        row_dict['citation_isbn'] = result['citation_isbn']
+        row_dict['citation_issn'] = result['citation_issn']
+        row_dict['citation_volume'] = result['citation_volume']
+        row_dict['citation_issue'] = result['citation_issue']
+        row_dict['citation_start_page'] = result['citation_start_page']
+        row_dict['citation_end_page'] = result['citation_end_page']
+        row_dict['citation_source1'] = result['citation_source1']
+        row_dict['citation_source1'] = result['citation_source1']
+        row_dict['citation_source2'] = result['citation_source2']
+        row_dict['citation_source3'] = result['citation_source3']
+        row_dict['citation_source4'] = result['citation_source4']
+        row_dict['external_system_id'] = result['external_system_id']
+        log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
+        data_values.append( row_dict )
+    log.debug( f'data_values, ``{data_values}``' )
     ## finalize leganto data ----------------------------------------
     end_range_column = calculate_end_column( len(headers) )
+    num_entries = len( all_results )
+    data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
+    log.debug( f'data_end_range, ``{data_end_range}``' )
     new_data = [
         { 
             'range': f'A1:{end_range_column}1',
             'values': [ headers ]
         },
         {
-            'range': f'A2:B3',
+            'range': f'A2:{data_end_range}',
             'values': data_values
         }
     ]
@@ -108,7 +136,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
     return
 
     # end def process_leganto_worksheet()
-    
+
 
 # def process_leganto_worksheet( sheet, all_results: list ):
 #     ## create leganto worksheet -------------------------------------
