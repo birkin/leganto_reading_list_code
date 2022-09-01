@@ -137,9 +137,9 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
             ## leganto combined data --------------------------------
             all_course_results: list = leg_books + leg_articles + leg_excerpts
             if all_course_results == []:
-                all_course_results: list = [ map_empty(leganto_course_id) ]
+                all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id) ]
         else:
-            all_course_results: list = [ map_empty(leganto_course_id) ]
+            all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id) ]
         log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
@@ -414,10 +414,17 @@ def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_i
 #     return mapped_book_data
 
 
-def map_empty( leganto_course_id: str ) -> dict:
+def map_empty( leganto_course_id: str, leganto_section_id: str ) -> dict:
     mapped_data: dict = MAPPED_CATEGORIES.copy()
     mapped_data['coursecode'] = leganto_course_id
+    mapped_data['section_id'] = leganto_section_id
     return mapped_data
+
+
+# def map_empty( leganto_course_id: str ) -> dict:
+#     mapped_data: dict = MAPPED_CATEGORIES.copy()
+#     mapped_data['coursecode'] = leganto_course_id
+#     return mapped_data
 
 
 def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker ) -> list:
