@@ -100,7 +100,7 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         log.debug( f'course_id_entry, ``{course_id_entry}``' )
         oit_course_data: dict = oit_course_loader.grab_oit_course_data( course_id_entry )
         log.debug( f'oit_course_data, ``{oit_course_data}``' )
-        leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else ''
+        leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else f'oit_course_code_not_found_for__{course_id_entry}'
         leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
         leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
         class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
