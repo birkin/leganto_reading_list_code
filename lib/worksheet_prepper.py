@@ -67,6 +67,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['citation_issue'] = result['citation_issue']
         row_dict['citation_journal_title'] = result['citation_journal_title']
         row_dict['citation_publication_date'] = result['citation_publication_date']
+        row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if result['coursecode'] else ''
         row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
         row_dict['citation_source'] = calculate_leganto_citation_source( result )
         # row_dict['citation_source1'] = calculate_leganto_citation_source( result )
