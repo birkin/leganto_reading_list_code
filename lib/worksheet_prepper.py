@@ -70,14 +70,15 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if result['coursecode'] else ''
         row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
         row_dict['citation_source'] = calculate_leganto_citation_source( result )
-        # row_dict['citation_source1'] = calculate_leganto_citation_source( result )
         row_dict['citation_start_page'] = result['citation_start_page']
         row_dict['citation_status'] = 'BeingPrepared' if result['coursecode'] else ''
         row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
-        # row_dict['external_system_id'] = ''
         row_dict['reading_list_code'] = row_dict['coursecode']
+        # row_dict['reading_list_library_note'] = f'Possible full-text link: <{result["citation_source2"]}>.' if result["citation_source2"] else ''
+        # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
+        row_dict['reading_list_library_note'] = calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
         row_dict['reading_list_name'] = result['reading_list_name']
         row_dict['reading_list_status'] = 'BeingPrepared' if result['coursecode'] else ''
         row_dict['section_id'] = result['section_id']
@@ -284,6 +285,27 @@ def calculate_leganto_citation_source( result: dict ) -> str:
             link = possible_cdl_data
     log.debug( f'link, ``{link}``' )
     return link
+
+
+def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str ) -> str:
+    """ Returns possibly-helpful info for staff. """
+    log.debug( f'possible_full_text, ``{possible_full_text}``' )
+    log.debug( f'possible_openurl, ``{possible_openurl}``' )
+    message = ''
+    if possible_full_text:
+        message = f'Possible full-text link: <{possible_full_text}>.'
+    if possible_openurl:
+        if 'https' in possible_openurl:
+            params: str = possible_openurl.split( 'openurl?' )[1]  # sometimes there's a link, but with no parameters.
+            if params:
+                log.debug( 'params exist' )
+                ourl_message: str = f'Occasionally-helpful link: <{possible_openurl}>.'
+                if message:
+                    message = f'{message} {ourl_message}'
+                else:
+                    message = ourl_message
+    log.debug( f'staff-message, ``{message}``' )
+    return message
 
 
 ## old code below, for reference 'til 2023-Jan-01
