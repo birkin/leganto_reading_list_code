@@ -76,7 +76,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
-        row_dict['external_system_id'] = result['external_system_id']
+        # row_dict['external_system_id'] = ''
         row_dict['reading_list_code'] = row_dict['coursecode']
         row_dict['reading_list_name'] = result['reading_list_name']
         row_dict['reading_list_status'] = 'BeingPrepared' if result['coursecode'] else ''
