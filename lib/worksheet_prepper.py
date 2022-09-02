@@ -58,6 +58,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
     log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
     for result in all_results:
         log.debug( f'result-dict-entry, ``{pprint.pformat(result)}``' )
+        course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
         result: dict = result
         row_dict['citation_author'] = result['citation_author']
         row_dict['citation_doi'] = result['citation_doi']
@@ -67,11 +68,11 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['citation_issue'] = result['citation_issue']
         row_dict['citation_journal_title'] = result['citation_journal_title']
         row_dict['citation_publication_date'] = result['citation_publication_date']
-        row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if result['coursecode'] else ''
+        row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if course_code_found else ''
         row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
         row_dict['citation_source'] = calculate_leganto_citation_source( result )
         row_dict['citation_start_page'] = result['citation_start_page']
-        row_dict['citation_status'] = 'BeingPrepared' if result['coursecode'] else ''
+        row_dict['citation_status'] = 'BeingPrepared' if course_code_found else ''
         row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
@@ -80,10 +81,10 @@ def process_leganto_worksheet( sheet, all_results: list ):
         # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
         row_dict['reading_list_library_note'] = calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
         row_dict['reading_list_name'] = result['reading_list_name']
-        row_dict['reading_list_status'] = 'BeingPrepared' if result['coursecode'] else ''
+        row_dict['reading_list_status'] = 'BeingPrepared' if course_code_found else ''
         row_dict['section_id'] = result['section_id']
-        row_dict['section_name'] = 'Resources' if result['coursecode'] else ''
-        row_dict['visibility'] = 'RESTRICTED' if result['coursecode'] else ''
+        row_dict['section_name'] = 'Resources' if course_code_found else ''
+        row_dict['visibility'] = 'RESTRICTED' if course_code_found else ''
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
         row_values: list = list( row_dict.values() )
         data_values.append( row_values )
