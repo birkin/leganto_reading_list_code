@@ -68,8 +68,8 @@ MAPPED_CATEGORIES: dict = {
     'reading_list_name': ''
 }
 
-## main manager function --------------------------------------------
 
+## main manager function --------------------------------------------
 
 def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool ):
     """ Manages db-querying, assembling, and posting to gsheet. 
@@ -152,7 +152,7 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
     else:
         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
     ## create .csv file ---------------------------------------------
-    csv_maker.create_csv( all_results )
+    csv_maker.create_csv( all_results, worksheet_prepper.headers )
     log.info( 'csv produced' )
     ## end manage_build_reading_list()
 

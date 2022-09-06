@@ -5,6 +5,23 @@ import gspread
 
 log = logging.getLogger(__name__)
 
+headers = [
+    'coursecode', 'section_id', 'searchable_id1', 'searchable_id2', 'searchable_id3', 'reading_list_code', 
+    'reading_list_name', 'reading_list_description', 'reading_list_subject', 'reading_list_status', 'RLStatus', 
+    'visibility', 'reading_list_assigned_to', 'reading_list_library_note', 'reading_list_instructor_note', 
+    'owner_user_name', 'creativecommon', 'section_name', 'section_description', 'section_start_date', 
+    'section_end_date', 'section_tags', 'citation_secondary_type', 'citation_status', 'citation_tags', 
+    'citation_mms_id', 'citation_original_system_id', 'citation_title', 'citation_journal_title', 'citation_author', 
+    'citation_publication_date', 'citation_edition', 'citation_isbn', 'citation_issn', 
+    'citation_place_of_publication', 'citation_publisher', 'citation_volume', 'citation_issue', 'citation_pages', 
+    'citation_start_page', 'citation_end_page', 'citation_doi', 'citation_oclc', 'citation_lccn', 
+    'citation_chapter', 'rlterms_chapter_title', 'citation_chapter_author', 'editor', 'citation_source', 
+    'citation_source1', 'citation_source2', 'citation_source3', 'citation_source4', 'citation_source5', 
+    'citation_source6', 'citation_source7', 'citation_source8', 'citation_source9', 'citation_source10', 
+    'citation_note', 'additional_person_name', 'file_name', 'citation_public_note', 'license_type', 
+    'citation_instructor_note', 'citation_library_note', 'external_system_id'
+]
+
 
 ## 3 main manager/worker functions ----------------------------------
 
@@ -32,22 +49,22 @@ def process_leganto_worksheet( sheet, all_results: list ):
     title: str = f'for_leganto_{dt_stamp}'
     leganto_worksheet = sheet.add_worksheet( title=title, rows=100, cols=20 )
     ## prepare headers ----------------------------------------------
-    headers = [
-        'coursecode', 'section_id', 'searchable_id1', 'searchable_id2', 'searchable_id3', 'reading_list_code', 
-        'reading_list_name', 'reading_list_description', 'reading_list_subject', 'reading_list_status', 'RLStatus', 
-        'visibility', 'reading_list_assigned_to', 'reading_list_library_note', 'reading_list_instructor_note', 
-        'owner_user_name', 'creativecommon', 'section_name', 'section_description', 'section_start_date', 
-        'section_end_date', 'section_tags', 'citation_secondary_type', 'citation_status', 'citation_tags', 
-        'citation_mms_id', 'citation_original_system_id', 'citation_title', 'citation_journal_title', 'citation_author', 
-        'citation_publication_date', 'citation_edition', 'citation_isbn', 'citation_issn', 
-        'citation_place_of_publication', 'citation_publisher', 'citation_volume', 'citation_issue', 'citation_pages', 
-        'citation_start_page', 'citation_end_page', 'citation_doi', 'citation_oclc', 'citation_lccn', 
-        'citation_chapter', 'rlterms_chapter_title', 'citation_chapter_author', 'editor', 'citation_source', 
-        'citation_source1', 'citation_source2', 'citation_source3', 'citation_source4', 'citation_source5', 
-        'citation_source6', 'citation_source7', 'citation_source8', 'citation_source9', 'citation_source10', 
-        'citation_note', 'additional_person_name', 'file_name', 'citation_public_note', 'license_type', 
-        'citation_instructor_note', 'citation_library_note', 'external_system_id'
-    ]
+    # headers = [
+    #     'coursecode', 'section_id', 'searchable_id1', 'searchable_id2', 'searchable_id3', 'reading_list_code', 
+    #     'reading_list_name', 'reading_list_description', 'reading_list_subject', 'reading_list_status', 'RLStatus', 
+    #     'visibility', 'reading_list_assigned_to', 'reading_list_library_note', 'reading_list_instructor_note', 
+    #     'owner_user_name', 'creativecommon', 'section_name', 'section_description', 'section_start_date', 
+    #     'section_end_date', 'section_tags', 'citation_secondary_type', 'citation_status', 'citation_tags', 
+    #     'citation_mms_id', 'citation_original_system_id', 'citation_title', 'citation_journal_title', 'citation_author', 
+    #     'citation_publication_date', 'citation_edition', 'citation_isbn', 'citation_issn', 
+    #     'citation_place_of_publication', 'citation_publisher', 'citation_volume', 'citation_issue', 'citation_pages', 
+    #     'citation_start_page', 'citation_end_page', 'citation_doi', 'citation_oclc', 'citation_lccn', 
+    #     'citation_chapter', 'rlterms_chapter_title', 'citation_chapter_author', 'editor', 'citation_source', 
+    #     'citation_source1', 'citation_source2', 'citation_source3', 'citation_source4', 'citation_source5', 
+    #     'citation_source6', 'citation_source7', 'citation_source8', 'citation_source9', 'citation_source10', 
+    #     'citation_note', 'additional_person_name', 'file_name', 'citation_public_note', 'license_type', 
+    #     'citation_instructor_note', 'citation_library_note', 'external_system_id'
+    # ]
     log.debug( f'headers, ``{headers}``' )
     ## prepare values -----------------------------------------------
     data_values = []

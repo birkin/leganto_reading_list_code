@@ -23,27 +23,26 @@ def create_csv( data: list, headers: list ) -> None:
     """ Credit: <https://python-adv-web-apps.readthedocs.io/en/latest/csv.html#writing-from-a-dictionary> """
 
     log.debug( f'data, ``{pprint.pformat(data)}``' )
+    log.debug( f'headers, ``{pprint.pformat(headers)}``' )
 
     output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.csv'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469`
     log.debug( f'output_filename, ``{output_filename}``' ) 
 
+    output_filepath: str = f'{CSV_OUTPUT_DIR_PATH}/{output_filename}'
+
     ## open a new file for writing - if file exists, contents will be erased
-    csvfile = open('new_file.csv', 'w')
+    csvfile = open( output_filepath, 'w' )
 
-    ## set the headers
-    headers = ['Presidency', 'President', 'Wikipedia_entry', 'Took_office', 'Left_office', 'Party', 'Home_state', 'Occupation', 'College', 'Age_when_took_office', 'Birth_date', 'Birthplace', 'Death_date', 'Location_death']
+    ## make a new variable - c - for Python's DictWriter object - note that fieldnames is required
+    c = csv.DictWriter( csvfile, fieldnames=headers) 
 
-    # # make a new variable - c - for Python's DictWriter object -
-    # # note that fieldnames is required
-    # c = csv.DictWriter(csvfile, fieldnames=headers)
+    ## optional - write a header row
+    c.writeheader()
 
-    # # optional - write a header row
-    # c.writeheader()
+    ## write all rows from list to file
+    c.writerows( data )
 
-    # # write all rows from list to file
-    # c.writerows(presidents_list)
-
-    # # save and close file
-    # csvfile.close()
+    # save and close file
+    csvfile.close()
 
     return
