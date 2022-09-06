@@ -101,7 +101,8 @@ def process_leganto_worksheet( sheet, all_results: list ) -> list:
         row_dict['citation_source'] = calculate_leganto_citation_source( result )
         row_dict['citation_start_page'] = result['citation_start_page']
         row_dict['citation_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-        row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
+        # row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
+        row_dict['citation_title'] = clean_citation_title( result['citation_title'] )
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
         row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
@@ -245,6 +246,47 @@ def process_staff_worksheet( sheet, all_results: list ):
 ## helpers ----------------------------------------------------------
 
 
+def clean_citation_title( db_title: str ) -> str:
+    log.debug( f'db_title initially, ``{db_title}``' )
+    if db_title:
+        db_title = db_title.strip()
+        if '(EXCERPT)' in db_title:
+            db_title = db_title.replace( '(EXCERPT)', '' )
+        db_title = db_title.strip()
+        if db_title[-1] == ':':
+            db_title = db_title[0:-1]
+        if db_title[-1] == '.':
+            log.debug( 'found period' )
+            db_title = db_title[0:-1]
+        if db_title[0] == '“':  # starting smart-quotes
+            ## remove initial-smart-quotes if there's only one, and only one end-smart-quotes, and it's at the end.
+            log.debug( 'found starting smart-quotes' )
+            count_start: int = db_title.count( '“' )
+            if count_start == 1:
+                count_end: int = db_title.count( '”' )
+                if count_end == 1:
+                    if db_title[-1] == '”':  # ok, remove both
+                        db_title = db_title[1:-1]
+        if db_title[0] == '“':
+            count_quotes: int = db_title.count( '“' )
+            if count_quotes == 1:
+                db_title = db_title[1:] 
+        if db_title[0] == '"':
+            ## remove initial-quotes if there are two, and the other is at the end.
+            log.debug( 'found starting simple-quotes' )
+            count_quotes: int = db_title.count( '"' )
+            if count_quotes == 2:
+                if db_title[-1] == '"':  # ok, remove both
+                    db_title = db_title[1:-1]
+        if db_title[0] == '"':
+            count_quotes: int = db_title.count( '"' )
+            if count_quotes == 1:
+                db_title = db_title[1:]
+        db_title = db_title.strip()
+    log.debug( f'db_title cleaned, ``{db_title}``' )
+    return db_title
+
+
 def clean_citation_author( db_author: str ) -> str:
     log.debug( f'db_author initially, ``{db_author}``' )
     if db_author:
@@ -277,14 +319,14 @@ def calculate_end_column( number_of_columns: int ) -> str:
     return result
 
 
-def calculate_leganto_title( title: str ) -> str:
-    """ Removes `(EXCERPT) ` if necessary. """
-    return_title = title
-    if '(EXCERPT)' in title:
-        return_title = title.replace( '(EXCERPT)', '' )
-        return_title = return_title.strip()
-    log.debug( f'return_title, ``{return_title}``' )
-    return return_title
+# def calculate_leganto_title( title: str ) -> str:
+#     """ Removes `(EXCERPT) ` if necessary. """
+#     return_title = title
+#     if '(EXCERPT)' in title:
+#         return_title = title.replace( '(EXCERPT)', '' )
+#         return_title = return_title.strip()
+#     log.debug( f'return_title, ``{return_title}``' )
+#     return return_title
 
 
 def calculate_leganto_type( perceived_type: str ) -> str:

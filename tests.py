@@ -46,6 +46,23 @@ class Misc_Test( unittest.TestCase ):
         self.assertEqual( 'AA', worksheet_prepper.calculate_end_column(27) )
         self.assertEqual( 'BO', worksheet_prepper.calculate_end_column( 67 ) )
 
+
+    def test_clean_citation_title(self):
+        """ Checks cleaned leganto title. """
+        self.assertEqual( 'Bharatha Natyam-What Are You?', 
+            worksheet_prepper.clean_citation_title( '(EXCERPT) "Bharatha Natyam-What Are You?.' ) 
+            )
+        self.assertEqual( 'Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama', 
+            worksheet_prepper.clean_citation_title( '“Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama”' ) 
+            )
+        self.assertEqual( 'Ritual', 
+            worksheet_prepper.clean_citation_title( '"Ritual"' ) 
+            )
+        self.assertEqual( 'Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg',
+            worksheet_prepper.clean_citation_title( '“Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg' ) 
+            )
+
+
     # def test_check_pdfs_A(self):
     #     """ Checks for accurate file-name find. """
     #     initial_excerpt_data: dict = {
