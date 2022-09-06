@@ -87,7 +87,8 @@ def process_leganto_worksheet( sheet, all_results: list ) -> list:
         
         course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
 
-        row_dict['citation_author'] = result['citation_author']
+        # row_dict['citation_author'] = result['citation_author']
+        row_dict['citation_author'] = clean_citation_author( result['citation_author'] ) 
         row_dict['citation_doi'] = result['citation_doi']
         row_dict['citation_end_page'] = result['citation_end_page']
         row_dict['citation_isbn'] = result['citation_isbn']
@@ -242,6 +243,19 @@ def process_staff_worksheet( sheet, all_results: list ):
 
 
 ## helpers ----------------------------------------------------------
+
+
+def clean_citation_author( db_author: str ) -> str:
+    log.debug( f'db_author initially, ``{db_author}``' )
+    if db_author:
+        db_author = db_author.strip()
+        if db_author[0] == ',':
+            db_author = db_author[1:]
+        if db_author[-1] == ',':
+            db_author = db_author[0:-1]
+        db_author = db_author.strip()
+    log.debug( f'db_author cleaned, ``{db_author}``' )
+    return db_author
 
 
 def calculate_end_column( number_of_columns: int ) -> str:
