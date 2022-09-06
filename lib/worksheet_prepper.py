@@ -26,7 +26,7 @@ headers = [
 ## 3 main manager/worker functions ----------------------------------
 
 
-def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str ) -> None:
+def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str ) -> dict:
     """ Writes data to gsheet, then...
         - sorts the worksheets so the most recent check appears first in the worksheet list.
         - deletes checks older than the curent and previous checks.
@@ -37,13 +37,14 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
     ## process leganto worksheet ------------------------------------
-    process_leganto_worksheet( sheet, all_results )
+    leganto_data: list = process_leganto_worksheet( sheet, all_results )
     ## process staff worksheet --------------------------------------
     process_staff_worksheet( sheet, all_results )
-    return
+    return_val: dict = {'leganto_data': leganto_data}
+    return return_val
 
 
-def process_leganto_worksheet( sheet, all_results: list ):
+def process_leganto_worksheet( sheet, all_results: list ) -> list:
     ## create leganto worksheet -------------------------------------
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
     title: str = f'for_leganto_{dt_stamp}'
@@ -67,16 +68,25 @@ def process_leganto_worksheet( sheet, all_results: list ):
     # ]
     log.debug( f'headers, ``{headers}``' )
     ## prepare values -----------------------------------------------
-    data_values = []
-    row_dict = {}
-    for header in headers:
-        header: str = header
-        row_dict[header] = ''
-    log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
+    data_values = []  # for gsheet
+    csv_rows = []     # for csv output
+    # row_dict = {}
+    # for header in headers:
+    #     header: str = header
+    #     row_dict[header] = ''
+    # log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
     for result in all_results:
         log.debug( f'result-dict-entry, ``{pprint.pformat(result)}``' )
-        course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
         result: dict = result
+
+        row_dict = {}
+        for header in headers:
+            header: str = header
+            row_dict[header] = ''
+        log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
+        
+        course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
+
         row_dict['citation_author'] = result['citation_author']
         row_dict['citation_doi'] = result['citation_doi']
         row_dict['citation_end_page'] = result['citation_end_page']
@@ -104,8 +114,10 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
         row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
+        csv_rows.append( row_dict )
         row_values: list = list( row_dict.values() )
         data_values.append( row_values )
+    log.debug( f'csv_rows, ``{pprint.pformat(csv_rows)}``' )
     log.debug( f'data_values, ``{data_values}``' )
     ## finalize leganto data ----------------------------------------
     end_range_column = calculate_end_column( len(headers) )
@@ -143,7 +155,7 @@ def process_leganto_worksheet( sheet, all_results: list ):
             sheet.del_worksheet( wrksht )
     wrkshts: list = sheet.worksheets()
     log.debug( f'wrkshts after deletion, ``{wrkshts}``' )
-    return
+    return csv_rows
 
     # end def process_leganto_worksheet()
 

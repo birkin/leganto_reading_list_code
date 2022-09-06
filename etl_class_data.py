@@ -145,14 +145,15 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
     log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
     ## post to google-sheet -----------------------------------------
+    leganto_data: dict = {}
     if update_ss:
         log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
         # update_gsheet( all_results )
-        worksheet_prepper.update_gsheet( all_results, CREDENTIALS, SPREADSHEET_NAME )
+        leganto_data = worksheet_prepper.update_gsheet( all_results, CREDENTIALS, SPREADSHEET_NAME )
     else:
         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
     ## create .csv file ---------------------------------------------
-    csv_maker.create_csv( all_results, worksheet_prepper.headers )
+    csv_maker.create_csv( leganto_data['leganto_data'], worksheet_prepper.headers )
     log.info( 'csv produced' )
     ## end manage_build_reading_list()
 
