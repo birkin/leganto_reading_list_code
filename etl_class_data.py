@@ -4,6 +4,7 @@ import urllib.parse
 import gspread, pymysql, requests
 import pymysql.cursors
 from fuzzywuzzy import fuzz
+from lib import csv_maker
 from lib import worksheet_prepper
 from lib.loaders import OIT_Course_Loader
 
@@ -150,7 +151,9 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         worksheet_prepper.update_gsheet( all_results, CREDENTIALS, SPREADSHEET_NAME )
     else:
         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
-
+    ## create .csv file ---------------------------------------------
+    csv_maker.create_csv( all_results )
+    log.info( 'csv produced' )
     ## end manage_build_reading_list()
 
 
