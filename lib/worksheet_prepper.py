@@ -108,7 +108,8 @@ def process_leganto_worksheet( sheet, all_results: list ):
     leganto_worksheet.batch_update( new_data, value_input_option='raw' )
     ## update leganto-sheet formatting ------------------------------
     leganto_worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
-    leganto_worksheet.freeze( rows=1, cols=None )
+    # leganto_worksheet.freeze( rows=1, cols=None )
+    leganto_worksheet.freeze( rows=1, cols=2 )
     ## make leganto-sheet the 2nd sheet -----------------------------
     wrkshts: list = sheet.worksheets()
     log.debug( f'wrkshts, ``{wrkshts}``' )
@@ -204,7 +205,7 @@ def process_staff_worksheet( sheet, all_results: list ):
     staff_worksheet.batch_update( new_data, value_input_option='raw' )
     ## update staff-sheet formatting --------------------------------------------
     staff_worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
-    staff_worksheet.freeze( rows=1, cols=None )
+    staff_worksheet.freeze( rows=1, cols=1 )
     ## (no need to sort sheets here)
     return
 
