@@ -265,9 +265,25 @@ def get_list_from_spreadsheet() -> list:
     log.debug( f'list_of_dicts, ``{pprint.pformat(list_of_dicts)}``' )
     course_id_list: list = []
     for dct in list_of_dicts:
-        course_id: str = dct['course_id']
+        # course_id: str = dct['course_id']
+        course_id: str = str( dct.get('course_id', '') )
         course_id_list.append( course_id )
     return course_id_list
+
+
+# def get_list_from_spreadsheet() -> list:
+#     """ Builds course-id-list from spreadsheet.
+#         Called by manage_build_reading_list() """
+#     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
+#     sheet = credentialed_connection.open( SPREADSHEET_NAME )
+#     wrksheet = sheet.worksheet( 'course_ids_to_check' )
+#     list_of_dicts: list = wrksheet.get_all_records()
+#     log.debug( f'list_of_dicts, ``{pprint.pformat(list_of_dicts)}``' )
+#     course_id_list: list = []
+#     for dct in list_of_dicts:
+#         course_id: str = dct['course_id']
+#         course_id_list.append( course_id )
+#     return course_id_list
 
 
 def get_class_id( course_id: str ) -> str:
