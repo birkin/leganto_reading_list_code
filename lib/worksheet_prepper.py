@@ -68,23 +68,24 @@ def process_leganto_worksheet( sheet, all_results: list ):
         row_dict['citation_issue'] = result['citation_issue']
         row_dict['citation_journal_title'] = result['citation_journal_title']
         row_dict['citation_publication_date'] = result['citation_publication_date']
-        row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if course_code_found else ''
+        row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if result['external_system_id'] else ''
         row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
         row_dict['citation_source'] = calculate_leganto_citation_source( result )
         row_dict['citation_start_page'] = result['citation_start_page']
-        row_dict['citation_status'] = 'BeingPrepared' if course_code_found else ''
+        row_dict['citation_status'] = 'BeingPrepared' if result['external_system_id'] else ''
         row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
-        row_dict['reading_list_code'] = row_dict['coursecode']
+        row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
         # row_dict['reading_list_library_note'] = f'Possible full-text link: <{result["citation_source2"]}>.' if result["citation_source2"] else ''
         # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
         row_dict['reading_list_library_note'] = calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
-        row_dict['reading_list_name'] = result['reading_list_name']
-        row_dict['reading_list_status'] = 'BeingPrepared' if course_code_found else ''
-        row_dict['section_id'] = result['section_id']
-        row_dict['section_name'] = 'Resources' if course_code_found else ''
-        row_dict['visibility'] = 'RESTRICTED' if course_code_found else ''
+        row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
+        row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
+        # row_dict['section_id'] = result['section_id']
+        row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-DATA-FOUND'
+        row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
+        row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
         row_values: list = list( row_dict.values() )
         data_values.append( row_values )
