@@ -112,7 +112,7 @@ def process_leganto_worksheet( sheet, all_results: list ) -> list:
         row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
         row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
         # row_dict['section_id'] = result['section_id']
-        row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-DATA-FOUND'
+        row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
         row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
         row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )

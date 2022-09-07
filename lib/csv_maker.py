@@ -28,7 +28,7 @@ def create_csv( data: list, headers: list ) -> None:
     cleaned_data: list = []
     for entry in data:
         entry: dict = entry
-        if 'NO-DATA-FOUND' in entry['section_id']:
+        if 'NO-OCRA-DATA-FOUND' in entry['section_id']:
             pass
         else:
             cleaned_data.append( entry )
