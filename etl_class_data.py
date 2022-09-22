@@ -849,7 +849,15 @@ class CDL_Checker(object):
             else:
                 result = f'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/{entry["item_id"]}>'
         elif len( entries ) > 1:
-            result = 'TODO -- handle multiple possible results'
+            result: str = f'Multiple possible CDL links: '
+            cdl_pattern: str = '<https://cdl.library.brown.edu/cdl/item/ITEM_ID>'
+            for ( i, entry ) in enumerate( entries ):
+                if i == 0:
+                    append_str = cdl_pattern.replace( 'ITEM_ID', entry['item_id'] )
+                else:
+                    temp_str = cdl_pattern.replace( 'ITEM_ID', entry['item_id'] )
+                    append_str = f', {temp_str}'
+                result = result + append_str
         log.debug( f'result, ``{result}``' )
         return result
 

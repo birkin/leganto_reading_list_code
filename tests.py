@@ -139,7 +139,6 @@ class CDL_Checker_Test( unittest.TestCase ):
     def test_search_cdl(self):
         """ Checks good fuzzy search-result. """
         ocra_search_term = 'Critical Encounters in Secondary English: Teaching Literary Theory to Adolescents'
-        expected: list = [ {'score': 32, 'file_name': 'foo'} ]
         expected: list = [
             {'alma_item_pid': None,
             'alma_mms_id': '991006299729706966',
@@ -158,6 +157,47 @@ class CDL_Checker_Test( unittest.TestCase ):
             ]
         result: list = self.cdl_checker.search_cdl( ocra_search_term )
         self.assertEqual( expected, result )
+
+    def test_search_cdl__multiple_results(self):
+        """ Checks good fuzzy search-result. """
+        ocra_search_term = 'Yi Kwangsu and Modern Korean Literature'
+        expected: list = [
+            {
+            'alma_item_pid': '23328680100006966',
+            'alma_mms_id': '991003807939706966',
+            'author': 'Lee, Ann Sung-hi.',
+            'barcode': '31236019077620',
+            'bib_id': '',
+            'created': datetime.datetime(2021, 10, 23, 22, 34, 3, 371628),
+            'fuzzy_score': 82,
+            'id': 2058,
+            'item_file': '31236019077620.pdf',
+            'item_id': '23328680100006966',
+            'modified': datetime.datetime(2021, 10, 25, 14, 0, 39, 828365),
+            'num_copies': 2,
+            'status': 'ready',
+            'title': 'Yi Kwang-su and modern Korean literature, Mujŏng /'
+            },
+            {
+            'alma_item_pid': '23328680070006966',
+            'alma_mms_id': '991003807939706966',
+            'author': 'Lee, Ann Sung-hi.',
+            'barcode': '31236091503212',
+            'bib_id': '',
+            'created': datetime.datetime(2022, 8, 25, 18, 12, 42, 107910),
+            'fuzzy_score': 82,
+            'id': 2903,
+            'item_file': '31236091503212.pdf',
+            'item_id': '23328680070006966',
+            'modified': datetime.datetime(2022, 8, 25, 18, 13, 55, 955326),
+            'num_copies': 1,
+            'status': 'ready',
+            'title': 'Yi Kwang-su and modern Korean literature, Mujŏng /'
+            }
+        ]
+        result: list = self.cdl_checker.search_cdl( ocra_search_term )
+        self.assertEqual( expected, result )
+        ## end def test_search_cdl__multiple_results()
 
     def test_prep_cdl_field_text(self):
         source_list = [
@@ -179,6 +219,47 @@ class CDL_Checker_Test( unittest.TestCase ):
         expected = 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/b90794643>'
         result: str = self.cdl_checker.prep_cdl_field_text( source_list )
         self.assertEqual( expected, result )
+
+
+    def test_prep_cdl_field_text__multiple_results(self):
+        source_list = [
+            {
+            'alma_item_pid': '23328680100006966',
+            'alma_mms_id': '991003807939706966',
+            'author': 'Lee, Ann Sung-hi.',
+            'barcode': '31236019077620',
+            'bib_id': '',
+            'created': datetime.datetime(2021, 10, 23, 22, 34, 3, 371628),
+            'fuzzy_score': 82,
+            'id': 2058,
+            'item_file': '31236019077620.pdf',
+            'item_id': '23328680100006966',
+            'modified': datetime.datetime(2021, 10, 25, 14, 0, 39, 828365),
+            'num_copies': 2,
+            'status': 'ready',
+            'title': 'Yi Kwang-su and modern Korean literature, Mujŏng /'
+            },
+            {
+            'alma_item_pid': '23328680070006966',
+            'alma_mms_id': '991003807939706966',
+            'author': 'Lee, Ann Sung-hi.',
+            'barcode': '31236091503212',
+            'bib_id': '',
+            'created': datetime.datetime(2022, 8, 25, 18, 12, 42, 107910),
+            'fuzzy_score': 82,
+            'id': 2903,
+            'item_file': '31236091503212.pdf',
+            'item_id': '23328680070006966',
+            'modified': datetime.datetime(2022, 8, 25, 18, 13, 55, 955326),
+            'num_copies': 1,
+            'status': 'ready',
+            'title': 'Yi Kwang-su and modern Korean literature, Mujŏng /'
+            }
+        ]
+        expected = 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23328680100006966>, <https://cdl.library.brown.edu/cdl/item/23328680070006966>'
+        result: str = self.cdl_checker.prep_cdl_field_text( source_list )
+        self.assertEqual( expected, result )
+        ## end def test_prep_cdl_field_text__multiple_results()
 
     ## end classCdlLinkerTest()
 
