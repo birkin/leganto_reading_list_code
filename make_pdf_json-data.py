@@ -34,8 +34,12 @@ end_time = datetime.datetime.now()
 elapsed: str = str( end_time - start_time )
 log.debug( f'query took, ``{elapsed}``' )
 
-# parse results -----------------------------------------------------
-# for entry in result_set:
+## parse results ----------------------------------------------------
+# TODO if necessary
 
+## save data --------------------------------------------------------
+jsn: str = json.dumps( result_set, sort_keys=True, indect=2 )
+with open( PDF_JSON_PATH, 'w' ) as f_writer:
+    f_writer.write( jsn )
 
-
+## EOF
