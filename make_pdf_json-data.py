@@ -30,6 +30,7 @@ with db_connection:
 record: dict = result_set[0]
 assert type(record) == dict
 log.debug( f'record, ``{record}``' )
+log.debug( f'result_set, ``{pprint.pformat(result_set[0:5])}``' )
 end_time = datetime.datetime.now()
 elapsed: str = str( end_time - start_time )
 log.debug( f'query took, ``{elapsed}``' )
@@ -38,7 +39,8 @@ log.debug( f'query took, ``{elapsed}``' )
 # TODO if necessary
 
 ## save data --------------------------------------------------------
-jsn: str = json.dumps( result_set, sort_keys=True, indect=2 )
+jsn: str = json.dumps( result_set, sort_keys=True, indent=2 )
+log.debug( f'type(jsn), ``{type(jsn)}``' )
 with open( PDF_JSON_PATH, 'w' ) as f_writer:
     f_writer.write( jsn )
 
