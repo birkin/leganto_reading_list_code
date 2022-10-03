@@ -487,44 +487,6 @@ def map_article( initial_article_data: dict, course_id: str, leganto_course_id: 
     mapped_article_data['section_id'] = leganto_section_id
     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
     return mapped_article_data
-    
-
-# def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker ) -> list:
-#     mapped_articles = []
-#     for article_result in article_results:
-#         mapped_article: dict = map_article( article_result, course_id, leganto_course_id, cdl_checker )
-#         mapped_articles.append( mapped_article )
-#     return mapped_articles
-
-
-# def map_article( initial_article_data: dict, course_id: str, leganto_course_id: str, cdl_checker ) -> dict:
-#     """ This function maps the data from the database to the format required by the Leganto API. 
-#         Notes: 
-#         - the `course_id` is used for building the url for the leganto citation_source4 field (the pdf-url).
-#         - the `leganto_course_code` is used for the leganto `coursecode` field. """
-#     log.debug( f'initial_article_data, ``{pprint.pformat(initial_article_data)}``' )
-#     mapped_article_data: dict = MAPPED_CATEGORIES.copy()
-#     ourl_parts: dict = parse_openurl( initial_article_data['sfxlink'] )
-#     mapped_article_data['citation_author'] = f'{initial_article_data["aulast"]}, {initial_article_data["aufirst"]}'
-#     mapped_article_data['citation_doi'] = initial_article_data['doi']
-#     mapped_article_data['citation_end_page'] = str(initial_article_data['epage']) if initial_article_data['epage'] else parse_end_page_from_ourl( ourl_parts )
-#     mapped_article_data['citation_issn'] = initial_article_data['issn']
-#     mapped_article_data['citation_issue'] = initial_article_data['issue']
-#     mapped_article_data['citation_publication_date'] = str( initial_article_data['date'] )
-#     mapped_article_data['citation_secondary_type'] = 'ARTICLE'  # guess
-#     mapped_article_data['citation_source1'] = run_article_cdl_check( initial_article_data['facnotes'], initial_article_data['atitle'], cdl_checker )
-#     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
-#     mapped_article_data['citation_source3'] = map_bruknow_openurl( initial_article_data.get('sfxlink', '') )  
-#     mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, CSV_DATA, course_id )
-#     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
-#     mapped_article_data['citation_title'] = initial_article_data['atitle'].strip()
-#     mapped_article_data['citation_journal_title'] = initial_article_data['title']
-#     mapped_article_data['citation_volume'] = initial_article_data['volume']
-#     # mapped_article_data['coursecode'] = f'{course_id[0:8]}'
-#     mapped_article_data['coursecode'] = leganto_course_id    
-#     mapped_article_data['external_system_id'] = initial_article_data['requests.requestid']
-#     log.debug( f'mapped_article_data, ``{pprint.pformat(mapped_article_data)}``' )
-#     return mapped_article_data
 
 
 def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> str:
@@ -551,13 +513,13 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
                 pfid = str( file_info['pdfid'] )
                 full_file_name: str = f'{pfid}_{file_name}'
                 ## post match ---------------------------------------
-                post_params = { 
-                    'course_code': updated_course_code,
-                    'file_name': full_file_name,
-                    'token': MATCHER_TOKEN
-                    }
-                r = requests.post( MATCHER_URL, data=post_params )
-                log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
+                # post_params = { 
+                #     'course_code': updated_course_code,
+                #     'file_name': full_file_name,
+                #     'token': MATCHER_TOKEN
+                #     }
+                # r = requests.post( MATCHER_URL, data=post_params )
+                # log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
                 ## build file-url -----------------------------------
                 file_url = f'{FILES_URL_PATTERN}'.replace( '{FILENAME}', full_file_name )
                 log.debug( f'file_url, ``{file_url}``' )
@@ -607,7 +569,7 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
 #                 r = requests.post( MATCHER_URL, data=post_params )
 #                 log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
 #                 ## build file-url -----------------------------------
-#                 file_url = f'{FILES_URL_PATTERN}'.replace( '{COURSE-CODE}', updated_course_code ). replace( '{FILENAME}', full_file_name )
+#                 file_url = f'{FILES_URL_PATTERN}'.replace( '{FILENAME}', full_file_name )
 #                 log.debug( f'file_url, ``{file_url}``' )
 #                 possible_matches.append( file_url )
 #             else:
