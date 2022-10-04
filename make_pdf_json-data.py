@@ -36,10 +36,34 @@ elapsed: str = str( end_time - start_time )
 log.debug( f'query took, ``{elapsed}``' )
 
 ## parse results ----------------------------------------------------
-# TODO if necessary
+
+#   {
+#     "articleid": 8,
+#     "atitle": "Madison Lecture: Our Democratic Constitution",
+#     "filename": "breyer_madison_lecture.pdf",
+#     "pdfid": 33,
+#     "requestid": "20031210153909",
+#     "title": "New York Univerity Law Review"
+#   },
+
+pdf_data: dict = {}
+for entry in result_set:
+    result: dict = entry
+    rqst_id = result.get( 'requestid', '' )
+    if rqst_id:
+        key = result['requestid']
+        val = {
+            'articleid': result.get( 'articleid', '' ),
+            'atitle': result.get( 'atitle', '' ),
+            'filename': result.get( 'filename', '' ),
+            'pdfid': result.get( 'pdfid', '' ),
+            'title': result.get( 'title', '' )
+        }
+        pdf_data[key] = val 
 
 ## save data --------------------------------------------------------
-jsn: str = json.dumps( result_set, sort_keys=True, indent=2 )
+# jsn: str = json.dumps( result_set, sort_keys=True, indent=2 )
+jsn: str = json.dumps( pdf_data, sort_keys=True, indent=2 )
 log.debug( f'type(jsn), ``{type(jsn)}``' )
 with open( PDF_JSON_PATH, 'w' ) as f_writer:
     f_writer.write( jsn )
