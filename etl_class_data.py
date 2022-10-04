@@ -487,7 +487,8 @@ def map_article( initial_article_data: dict, course_id: str, leganto_course_id: 
     mapped_article_data['citation_source1'] = run_article_cdl_check( initial_article_data['facnotes'], initial_article_data['atitle'], cdl_checker )
     mapped_article_data['citation_source2'] = initial_article_data['art_url']  
     mapped_article_data['citation_source3'] = map_bruknow_openurl( initial_article_data.get('sfxlink', '') )  
-    mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, CSV_DATA, course_id )
+    # mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, CSV_DATA, course_id )
+    mapped_article_data['citation_source4'] = check_pdfs( initial_article_data, PDF_DATA, course_id )
     mapped_article_data['citation_start_page'] = str(initial_article_data['spage']) if initial_article_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_article_data['citation_title'] = initial_article_data['atitle'].strip()
     mapped_article_data['citation_journal_title'] = initial_article_data['title']
@@ -514,14 +515,21 @@ def check_pdfs( db_dict_entry: dict, pdf_data: dict, course_code: str ) -> str:
     """ Check and return the pdf for the given ocra article or excerpt. 
         Called by map_article() and map_excerpt() 
         Note: course_code does not separate out subject from code; rather, it is like `HIST1234`. """
+    log.debug( 'starting check_pdfs()' )
     pdf_check_result = 'no_pdf_found'
     possible_matches = []
     db_entry_request_id: str = db_dict_entry['requests.requestid']
+    log.debug( f'db_entry_request_id, ``{db_entry_request_id}``' )
     if db_entry_request_id in pdf_data.keys():
-        log.debug( 'match on request-id' )
+        log.debug( 'match on db request-id' )
         file_info: dict = pdf_data[db_entry_request_id]
         db_article_id: str = str( db_dict_entry['articleid'] )
-        file_info_article_id: str = file_info['articleid']
+        assert type(db_article_id) == str
+        log.debug( f'looking for match on db_article_id, ``{db_article_id}``' )
+        log.debug( f'file_info, ``{pprint.pformat(file_info)}``' )
+        file_info_article_id: str = str( file_info['articleid'] )
+        assert type( file_info_article_id) == str
+        log.debug( f'checking file-info-article-id, ``{file_info_article_id}``' )
         if db_article_id == file_info_article_id:
             log.debug( '...and match on article-id!' )
             pfid = str( file_info['pdfid'] )
@@ -532,6 +540,8 @@ def check_pdfs( db_dict_entry: dict, pdf_data: dict, course_code: str ) -> str:
             possible_matches.append( file_url )
         else:
             log.debug( '...but no match on article-id' ) 
+    else:
+        log.debug( 'no match on db request-id' )
     if len( possible_matches ) > 0:
         if len( possible_matches ) == 1:
             pdf_check_result = possible_matches[0]
@@ -611,8 +621,8 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: 
     mapped_excerpt_data['citation_source1'] = run_article_cdl_check( initial_excerpt_data['facnotes'], initial_excerpt_data['atitle'], cdl_checker )
     mapped_excerpt_data['citation_source2'] = initial_excerpt_data['art_url']  
     mapped_excerpt_data['citation_source3'] = map_bruknow_openurl( initial_excerpt_data.get('sfxlink', '') )  
-    # mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA )
-    mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA, course_id )
+    # mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, CSV_DATA, course_id )
+    mapped_excerpt_data['citation_source4'] = check_pdfs( initial_excerpt_data, PDF_DATA, course_id )
     mapped_excerpt_data['citation_start_page'] = str(initial_excerpt_data['spage']) if initial_excerpt_data['spage'] else parse_start_page_from_ourl( ourl_parts )
     mapped_excerpt_data['citation_title'] = f'(EXCERPT) %s' % initial_excerpt_data['atitle'].strip()
     mapped_excerpt_data['citation_journal_title'] = initial_excerpt_data['title']
