@@ -23,8 +23,9 @@ CDL_USERNAME = os.environ['LGNT__CDL_DB_USERNAME']
 CDL_PASSWORD = os.environ['LGNT__CDL_DB_PASSWORD']
 CDL_DB = os.environ['LGNT__CDL_DB_DATABASE_NAME']
 
-MATCHER_URL = os.environ['LGNT__MATCHER_URL']
-MATCHER_TOKEN = os.environ['LGNT__MATCHER_TOKEN']
+## originally for updating reserves webapp
+# MATCHER_URL = os.environ['LGNT__MATCHER_URL']  
+# MATCHER_TOKEN = os.environ['LGNT__MATCHER_TOKEN']
 
 FILES_URL_PATTERN = os.environ['LGNT__FILES_URL_PATTERN']
 
