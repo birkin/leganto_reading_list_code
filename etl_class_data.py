@@ -36,12 +36,23 @@ SPREADSHEET_NAME = os.environ['LGNT__SHEET_NAME']
 
 LAST_CHECKED_PATH: str = os.environ['LGNT__LAST_CHECKED_JSON_PATH']
 
-SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
+SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']  # old PDF-data
+PDF_JSON_PATH: str = os.environ['LGNT__PDF_JSON_PATH']  # new PDF-data
+
+
+## load pdf-data ----------------------------------------------------
 
 CSV_DATA = {}
 with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
     jsn: str = file_handler.read()
     CSV_DATA = json.loads( jsn )
+log.debug( f'CSV_DATA (partial), ``{pprint.pformat(CSV_DATA)[0:1000]}``' )
+#
+PDF_DATA = {}
+with open( PDF_JSON_PATH, encoding='utf-8' ) as f_reader:
+    jsn: str = f_reader.read()
+    PDF_DATA = json.loads( jsn )
+log.debug( f'PDF_DATA (partial), ``{pprint.pformat(PDF_DATA)[0:1000]}``' )
 
 
 ## other constants --------------------------------------------------
@@ -490,45 +501,37 @@ def map_article( initial_article_data: dict, course_id: str, leganto_course_id: 
     return mapped_article_data
 
 
-def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> str:
+#   "20031212132657": {  # requestid
+#     "articleid": 38,
+#     "atitle": "Cultural practices: Towards an integration",
+#     "filename": "goodnow_towards_integration.pdf",
+#     "pdfid": 140,
+#     "title": ""
+#   },
+
+
+def check_pdfs( db_dict_entry: dict, pdf_data: dict, course_code: str ) -> str:
     """ Check and return the pdf for the given ocra article or excerpt. 
         Called by map_article() and map_excerpt() 
         Note: course_code does not separate out subject from code; rather, it is like `HIST1234`. """
     pdf_check_result = 'no_pdf_found'
     possible_matches = []
-    for key, val in CSV_DATA.items():
-        file_name: str = key.strip()
-        file_info: dict = val
-        db_entry_request_id: str = db_dict_entry['requests.requestid']
-        file_info_request_id: str = file_info['requestid']
-        if db_entry_request_id == file_info_request_id:
-            log.debug( f'file_name, ``{file_name}``' )
-            log.debug( f'file_info, ``{file_info}``' )
-            log.debug( 'match on request-id' )
-            log.debug( f'db_entry_request_id, ``{db_entry_request_id}``' )
-            db_article_id: str = str( db_dict_entry['articleid'] )
-            file_info_article_id: str = file_info['articleid']
-            if db_article_id == file_info_article_id:
-                log.debug( '...and match on article-id!' )
-                updated_course_code: str = f'{course_code[0:4]}-{course_code[4:]}'
-                pfid = str( file_info['pdfid'] )
-                full_file_name: str = f'{pfid}_{file_name}'
-                ## post match ---------------------------------------
-                # post_params = { 
-                #     'course_code': updated_course_code,
-                #     'file_name': full_file_name,
-                #     'token': MATCHER_TOKEN
-                #     }
-                # r = requests.post( MATCHER_URL, data=post_params )
-                # log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
-                ## build file-url -----------------------------------
-                file_url = f'{FILES_URL_PATTERN}'.replace( '{FILENAME}', full_file_name )
-                log.debug( f'file_url, ``{file_url}``' )
-                possible_matches.append( file_url )
-            else:
-                log.debug( '...but no match on article-id' ) 
-                log.debug( f'db_article_id, ``{db_article_id}``' )
-                log.debug( f'file_info_article_id, ``{file_info_article_id}``' )
+    db_entry_request_id: str = db_dict_entry['requests.requestid']
+    if db_entry_request_id in pdf_data.keys():
+        log.debug( 'match on request-id' )
+        file_info: dict = pdf_data[db_entry_request_id]
+        db_article_id: str = str( db_dict_entry['articleid'] )
+        file_info_article_id: str = file_info['articleid']
+        if db_article_id == file_info_article_id:
+            log.debug( '...and match on article-id!' )
+            pfid = str( file_info['pdfid'] )
+            file_name = file_info['filename']
+            full_file_name: str = f'{pfid}_{file_name}'
+            file_url = f'{FILES_URL_PATTERN}'.replace( '{FILENAME}', full_file_name )
+            log.debug( f'file_url, ``{file_url}``' )
+            possible_matches.append( file_url )
+        else:
+            log.debug( '...but no match on article-id' ) 
     if len( possible_matches ) > 0:
         if len( possible_matches ) == 1:
             pdf_check_result = possible_matches[0]
@@ -562,13 +565,13 @@ def check_pdfs( db_dict_entry: dict, scanned_data: dict, course_code: str ) -> s
 #                 pfid = str( file_info['pdfid'] )
 #                 full_file_name: str = f'{pfid}_{file_name}'
 #                 ## post match ---------------------------------------
-#                 post_params = { 
-#                     'course_code': updated_course_code,
-#                     'file_name': full_file_name,
-#                     'token': MATCHER_TOKEN
-#                     }
-#                 r = requests.post( MATCHER_URL, data=post_params )
-#                 log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
+#                 # post_params = { 
+#                 #     'course_code': updated_course_code,
+#                 #     'file_name': full_file_name,
+#                 #     'token': MATCHER_TOKEN
+#                 #     }
+#                 # r = requests.post( MATCHER_URL, data=post_params )
+#                 # log.debug( f'r.status_code, ``{r.status_code}``; r.content, ``{r.content}``' )
 #                 ## build file-url -----------------------------------
 #                 file_url = f'{FILES_URL_PATTERN}'.replace( '{FILENAME}', full_file_name )
 #                 log.debug( f'file_url, ``{file_url}``' )
