@@ -1,3 +1,9 @@
+"""
+Archived.
+- Took an exported CSV of a google-sheet showing PDF file info and created a json-file.
+- Replaced by `make_pdf_json-data.py`, which queries the database directly.
+"""
+
 import csv, json, logging, os, pprint
 
 CSV_PATH: str = os.environ['LGNT__SCANNED_DATA_CSV_PATH']

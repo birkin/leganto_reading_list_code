@@ -1,3 +1,9 @@
+"""
+Archived.
+- Created shib-protection for each course, allowing only members of that course to access the file.
+- Archived because decision was made not to use the reserves-file webapp.
+"""
+
 import logging, os, pathlib
 
 ## setup ------------------------------------------------------------
