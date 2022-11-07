@@ -81,14 +81,14 @@ def rebuild_pdf_data_if_necessary( days: dict ) -> dict:
     update: bool = determine_update( num_days, PDF_JSON_PATH, datetime.datetime.now()  )
     if update:
         log.debug( 'gonna update the pdf-data -- TODO' )
-        from lib import make_pdf_json_data
+        from lib import make_pdf_json_data  # the import actually runs the code
     else:
         log.debug( 'pdf_data is new enough; not updating' )
     return {}
 
 
 def determine_update( days: int, fpath: str, now_time: datetime.datetime ) -> bool:
-    """ Determines whether to update file. 
+    """ Determines whether to update given file. 
         Called by rebuild_pdf_data_if_necessary() """
     log.debug( f'days, ``{days}``' )
     log.debug( f'now_time, ``{now_time}``' )
@@ -101,13 +101,3 @@ def determine_update( days: int, fpath: str, now_time: datetime.datetime ) -> bo
         return_val = True
     log.debug( f'return_val, ``{return_val}``' )
     return return_val
-
-
-# >>> 
-# >>> fpath = '/Users/birkin/Desktop/test.txt'
-# >>> 
-# >>> import pathlib
-# >>> 
-# >>> pathlib.Path( fpath ).stat().st_mtime
-# 1667817871.818973
-# >>> 
