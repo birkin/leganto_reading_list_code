@@ -44,14 +44,13 @@ def load_initial_settings() -> dict:
     """ Loads envar settings.
         Called by manage_build_reading_list() """
     settings = {
-        'COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],
-        'PDF_OLDER_THAN_DAYS': 30,
-        ## gspread settings ---------------------
-        'CREDENTIALS': json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] ),
-        'SPREADSHEET_NAME': os.environ['LGNT__SHEET_NAME']
+        'COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],                   # path to OIT course-data
+        'PDF_OLDER_THAN_DAYS': 30,                                                  # to ascertain whether to requery OCRA for pdf-data
+        'CREDENTIALS': json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] ),    # gspread setting
+        'SPREADSHEET_NAME': os.environ['LGNT__SHEET_NAME'],                         # gspread setting
+        'LAST_CHECKED_PATH': os.environ['LGNT__LAST_CHECKED_JSON_PATH']             # contains last-run spreadsheet course-IDs
     }
-    settings_keys: list = list( settings.keys() )  # just for logging
-    log.debug( f'settings-keys, ``{pprint.pformat( settings_keys )}``' )
+    log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
 
 
@@ -91,11 +90,39 @@ def get_list_from_spreadsheet( settings: dict ) -> list:
         # course_id: str = dct['course_id']
         course_id: str = str( dct.get('course_id', '') )
         course_id_list.append( course_id )
+    course_id_list.sort()
     log.debug( f'course_id_list from spreadsheet, ``{pprint.pformat(course_id_list)}``' )
     return course_id_list
 
 
+def check_for_updates( course_id_list: list, settings: dict ) -> bool:
+    """ Checks if there have been new updates.
+        Can't calculate this by checking `sheet.lastUpdateTime`, because any run _will_ create a recent spreadsheet update.
+        So, plan is to look at the root-page columns and compare it agains a saved json file.
+        Called by prep_course_id_list() """
+    log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
+    last_saved_list = []
+    new_updates_exist = False
+    ## load last-saved file -----------------------------------------
+    last_saved_list = []
+    with open( settings['LAST_CHECKED_PATH'], 'r' ) as f_reader:
+        jsn_list = f_reader.read()
+        last_saved_list: list = json.loads( jsn_list )
+        log.debug( f'last_saved_list, ``{last_saved_list}``' )
 
+        last_saved_list: list = sorted( json.loads(jsn_list) )
+        log.debug( f'sorted-last_saved_list, ``{last_saved_list}``' )
+        # log.debug( f'last_saved_list from disk, ``{pprint.pformat( sorted(last_saved_list) )}``' )
+    if last_saved_list == course_id_list:
+        log.debug( f'was _not_ recently updated')
+    else:
+        new_updates_exist = True
+        jsn = json.dumps( course_id_list, indent=2 )
+        with open( settings['LAST_CHECKED_PATH'], 'w' ) as f_writer:
+            f_writer.write( jsn )
+        log.debug( 'new updates found and saved' )
+    log.debug( f'new_updates_exist, ``{new_updates_exist}``' )
+    return new_updates_exist
 
 
 ## -- script-caller helpers -----------------------------------------
