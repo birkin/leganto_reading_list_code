@@ -1,4 +1,10 @@
+"""
+Main manager file to produce reading lists.
+"""
+
 import argparse, datetime, json, logging, os, pprint, sys
+
+from lib import loaders
 
 
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -16,8 +22,15 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
         Called by if...main: """
     log.debug( f'raw course_id, ``{raw_course_id}``; update_ss, ``{update_ss}``; force, ``{force}``')
     ## update dependencies if necessary -----------------------------
-    rebuild_pdf_data_if_necessary( {'days': 30} )  
-    update_OIT_course_data_if_necessary( {'days': 30} )
+    err: dict = loaders.rebuild_pdf_data_if_necessary( {'days': 30} )  
+    # update_OIT_course_data_if_necessary( {'days': 30} )
+    # prepare_data_for_staff()
+    # prepare_data_for_leganto()
+    # update_spreadsheet()
+    # output_csv()
+
+    ## end manage_build_reading_list()
+
 
 
 
