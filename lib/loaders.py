@@ -76,15 +76,20 @@ def rebuild_pdf_data_if_necessary( days: dict ) -> dict:
         Called by build_reading_list.manage_build_reading_list() """
     log.debug( f'days, ``{days}``' )
     num_days: int = days['days']
+    return_val = {}
     PDF_JSON_PATH: str = os.environ['LGNT__PDF_JSON_PATH']
     log.debug( f'PDF_JSON_PATH, ``{PDF_JSON_PATH}``' )
     update: bool = determine_update( num_days, PDF_JSON_PATH, datetime.datetime.now()  )
     if update:
         log.debug( 'gonna update the pdf-data -- TODO' )
-        from lib import make_pdf_json_data  # the import actually runs the code
+        try:
+            from lib import make_pdf_json_data  # the import actually runs the code
+        except Exception as e:
+            log.exception( 'problem running pdf-json script' )
+            return_val = { 'err': repr(e) }
     else:
         log.debug( 'pdf_data is new enough; not updating' )
-    return {}
+    return return_val
 
 
 def determine_update( days: int, fpath: str, now_time: datetime.datetime ) -> bool:

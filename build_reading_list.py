@@ -21,15 +21,29 @@ def manage_build_reading_list( raw_course_id: str, update_ss: bool, force: bool 
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
     log.debug( f'raw course_id, ``{raw_course_id}``; update_ss, ``{update_ss}``; force, ``{force}``')
-    ## update dependencies if necessary -----------------------------
-    err: dict = loaders.rebuild_pdf_data_if_necessary( {'days': 30} )  
-    # update_OIT_course_data_if_necessary( {'days': 30} )
-    # prepare_data_for_staff()
+    ## settings -----------------------------------------------------
+    settings: dict = load_initial_settings()
+    ## load/prep necessary data -------------------------------------
+    err: dict = loaders.rebuild_pdf_data_if_necessary( {'days': settings["PDF_OLDER_THAN_DAYS"]} )
+    if err:
+        raise Exception( f'problem rebuilding pdf-json, error-logged, ``{err["err"]}``' )  
+    # oit_course_loader = OIT_Course_Loader( COURSES_FILEPATH )
+    # prepare_data_for_staff() 
     # prepare_data_for_leganto()
     # update_spreadsheet()
     # output_csv()
 
     ## end manage_build_reading_list()
+
+
+def load_initial_settings() -> dict:
+    settings = {
+        'COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],
+        'PDF_OLDER_THAN_DAYS': 30
+    }
+    log.debug( f'settings, ``{pprint.pformat(settings)}``' )
+    return settings
+
 
 
 
