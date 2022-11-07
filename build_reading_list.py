@@ -5,6 +5,7 @@ Main manager file to produce reading lists.
 import argparse, datetime, json, logging, os, pprint, sys
 
 import gspread, pymysql
+from lib import db_stuff
 from lib import loaders
 from lib.loaders import OIT_Course_Loader
 
@@ -32,12 +33,78 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )
     ## prep course_id_list ------------------------------------------
     course_id_list: list = prep_course_id_list( course_id_input, settings )
+    ## prep class-info-dicts ----------------------------------------
+    classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
     # prepare_data_for_staff() 
     # prepare_data_for_leganto()
     # update_spreadsheet()
     # output_csv()
 
     ## end manage_build_reading_list()
+
+
+
+
+def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
+    """ Takes list of course_ids and adds required minimal info using OIT data.
+        Called by manage_build_reading_list() """
+    log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
+    classes_info = []
+    for course_id_entry in course_id_list:  # now that we have the spreadsheet course_id_list, get necessary OIT data
+        course_id_entry: str = course_id_entry
+        log.debug( f'course_id_entry, ``{course_id_entry}``' )
+        oit_course_data: dict = oit_course_loader.grab_oit_course_data( course_id_entry )
+        log.debug( f'oit_course_data, ``{oit_course_data}``' )
+        leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else f'oit_course_code_not_found_for__{course_id_entry}'
+        leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
+        leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
+        class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
+        class_info_dict: dict = { 
+            'course_id': course_id_entry, 
+            'class_id': class_id, 
+            'leganto_course_id': leganto_course_id,
+            'leganto_course_title': leganto_course_title,
+            'leganto_section_code': leganto_section_code }
+        classes_info.append( class_info_dict )
+        log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
+    return classes_info
+
+def get_class_id( course_id: str ) -> str:
+    """ Finds class_id from given course_id.
+        Called by manage_build_reading_list() -> prep_classes_info() """
+    class_id: str = 'init'
+    ## split the id -------------------------------------------------
+    # db_connection = get_db_connection()
+    db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
+    split_position: int = 0
+    for ( i, character ) in enumerate( course_id ): 
+        if character.isalpha():
+            pass
+        else:
+            split_position = i
+            break
+    ( subject_code, course_code ) = ( course_id[0:split_position], course_id[split_position:] ) 
+    log.debug( f'subject_code, ``{subject_code}``; course_code, ``{course_code}``' )
+    ## run query to get class_id ------------------------------------
+    sql = f"SELECT * FROM `banner_courses` WHERE `subject` LIKE '{subject_code}' AND `course` LIKE '{course_code}' ORDER BY `banner_courses`.`term` DESC"
+    log.debug( f'sql, ``{sql}``' )
+    result_set: list = []
+    with db_connection:
+        with db_connection.cursor() as db_cursor:
+            db_cursor.execute( sql )
+            result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
+            assert type(result_set) == list
+    log.debug( f'result_set, ``{result_set}``' )
+    if result_set:
+        recent_row = result_set[0]
+        class_id = str( recent_row['classid'] )
+    else:
+        class_id = ''
+    log.debug( f'class_id, ``{class_id}``' )
+    return class_id
+
+
+
 
 
 def load_initial_settings() -> dict:
