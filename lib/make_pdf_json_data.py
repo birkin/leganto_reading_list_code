@@ -1,3 +1,8 @@
+"""
+Queries the reserves database for past PDF file-data.
+Can be run as stand-alone file, or is also called by loaders.rebuild_pdf_data_if_necessary()
+"""
+
 import datetime, json, logging, os, pprint
 
 import pymysql
