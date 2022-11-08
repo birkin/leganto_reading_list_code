@@ -22,7 +22,7 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     ## process leganto worksheet ------------------------------------
     process_leganto_worksheet( sheet, leganto_ss_data )
     ## process staff worksheet --------------------------------------
-    # process_staff_worksheet( sheet, all_results )
+    process_staff_worksheet( sheet, all_results )
     return
 
 
@@ -59,6 +59,8 @@ def process_leganto_worksheet( sheet, all_results: list ):
     leganto_worksheet.format( f'A1:{end_range_column}1', {'textFormat': {'bold': True}} )
     # leganto_worksheet.freeze( rows=1, cols=None )
     leganto_worksheet.freeze( rows=1, cols=2 )
+
+    
     ## make leganto-sheet the 2nd sheet -----------------------------
     wrkshts: list = sheet.worksheets()
     log.debug( f'wrkshts, ``{wrkshts}``' )
