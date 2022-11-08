@@ -40,8 +40,8 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
     ## prep basic data ----------------------------------------------
     basic_data: list = prep_basic_data( classes_info, settings )
-    # prepare_data_for_staff() 
-    # prepare_data_for_leganto()
+    ## prep leganto data --------------------------------------------
+    leganto_data: list = prep_leganto_data( basic_data, settings )
     # update_spreadsheet()
     # output_csv()
 
