@@ -11,16 +11,18 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     """ Writes data to gsheet, then...
         - sorts the worksheets so the most recent check appears first in the worksheet list.
         - deletes checks older than the curent and previous checks.
-        Called by check_bibs() """
+        Called by manage_build_reading_list() """
+    ## reformat data
+    leganto_ss_data: list = leganto_final_processor.reformat_for_leganto_sheet( all_results )
     ## access spreadsheet -------------------------------------------
     log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
     credentialed_connection = gspread.service_account_from_dict( CREDENTIALS )
     sheet = credentialed_connection.open( SPREADSHEET_NAME )
     log.debug( f'last-updated, ``{sheet.lastUpdateTime}``' )  # not needed now, but will use it later
     ## process leganto worksheet ------------------------------------
-    process_leganto_worksheet( sheet, all_results )
+    process_leganto_worksheet( sheet, leganto_ss_data )
     ## process staff worksheet --------------------------------------
-    process_staff_worksheet( sheet, all_results )
+    # process_staff_worksheet( sheet, all_results )
     return
 
 

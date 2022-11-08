@@ -1,4 +1,4 @@
-import logging
+import logging, pprint
 
 
 log = logging.getLogger(__name__)
@@ -175,3 +175,15 @@ def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str
                     message = ourl_message
     log.debug( f'staff-message, ``{message}``' )
     return message
+
+
+def reformat_for_leganto_sheet( leganto_data: list ) -> list:
+    """ Reformats data for leganto-spreadsheet post.
+        Called by manage_build_reading_list() -> leganto_final_processor.py update_gsheet() """
+    data_values: list = []
+    for entry in leganto_data:
+        row_dict: dict = entry
+        row_values: list = list( row_dict.values() )
+        data_values.append( row_values )
+    log.debug( f'data_values, ``{pprint.pformat(data_values)}``' )
+    return data_values
