@@ -1,4 +1,4 @@
-import logging, pprint
+import datetime, logging, pprint
 
 import gspread
 from lib import leganto_final_processor
@@ -24,7 +24,9 @@ def update_gsheet( all_results: list, CREDENTIALS: dict, SPREADSHEET_NAME: str )
     return
 
 
-def process_leganto_worksheet( sheet, all_results: list ) -> list:
+def process_leganto_worksheet( sheet, all_results: list ):
+    """ Prepares some final data for the spreadsheet. 
+        Called by manage_build_reading_list() -> update_gsheet() """
     ## create leganto worksheet -------------------------------------
     dt_stamp: str = datetime.datetime.now().isoformat().split( '.' )[0]
     title: str = f'for_leganto_{dt_stamp}'
@@ -33,60 +35,9 @@ def process_leganto_worksheet( sheet, all_results: list ) -> list:
     headers: list = leganto_final_processor.get_headers()
     log.debug( f'headers, ``{headers}``' )
     ## prepare values -----------------------------------------------
-    data_values = []  # for gsheet
-    csv_rows = []     # for csv output
-    # row_dict = {}
-    # for header in headers:
-    #     header: str = header
-    #     row_dict[header] = ''
-    # log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
-    for result in all_results:
-        log.debug( f'result-dict-entry, ``{pprint.pformat(result)}``' )
-        result: dict = result
-
-        row_dict = {}
-        for header in headers:
-            header: str = header
-            row_dict[header] = ''
-        log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
-        
-        course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
-
-        # row_dict['citation_author'] = result['citation_author']
-        row_dict['citation_author'] = clean_citation_author( result['citation_author'] ) 
-        row_dict['citation_doi'] = result['citation_doi']
-        row_dict['citation_end_page'] = result['citation_end_page']
-        row_dict['citation_isbn'] = result['citation_isbn']
-        row_dict['citation_issn'] = result['citation_issn']
-        row_dict['citation_issue'] = result['citation_issue']
-        row_dict['citation_journal_title'] = result['citation_journal_title']
-        row_dict['citation_publication_date'] = result['citation_publication_date']
-        row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if result['external_system_id'] else ''
-        row_dict['citation_secondary_type'] = calculate_leganto_type( result['citation_secondary_type'] )
-        row_dict['citation_source'] = calculate_leganto_citation_source( result )
-        row_dict['citation_start_page'] = result['citation_start_page']
-        row_dict['citation_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-        # row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
-        row_dict['citation_title'] = clean_citation_title( result['citation_title'] )
-        row_dict['citation_volume'] = result['citation_volume']
-        row_dict['coursecode'] = calculate_leganto_course_code( result['coursecode'] )
-        row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
-        # row_dict['reading_list_library_note'] = f'Possible full-text link: <{result["citation_source2"]}>.' if result["citation_source2"] else ''
-        # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
-        row_dict['reading_list_library_note'] = calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
-        row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
-        row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-        # row_dict['section_id'] = result['section_id']
-        row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
-        row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
-        row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
-        log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
-        csv_rows.append( row_dict )
-        row_values: list = list( row_dict.values() )
-        data_values.append( row_values )
-    log.debug( f'csv_rows, ``{pprint.pformat(csv_rows)}``' )
-    log.debug( f'data_values, ``{data_values}``' )
-    ## finalize leganto data ----------------------------------------
+    # data_values = []  # for gsheet
+    data_values: list = all_results
+    ## finalize spreadsheet data ------------------------------------
     end_range_column = calculate_end_column( len(headers) )
     num_entries = len( all_results )
     data_end_range: str = f'{end_range_column}{num_entries + 1}'  # the plus-1 is for the header-row
@@ -122,7 +73,7 @@ def process_leganto_worksheet( sheet, all_results: list ) -> list:
             sheet.del_worksheet( wrksht )
     wrkshts: list = sheet.worksheets()
     log.debug( f'wrkshts after deletion, ``{wrkshts}``' )
-    return csv_rows
+    return
 
     # end def process_leganto_worksheet()
 
@@ -206,3 +157,25 @@ def process_staff_worksheet( sheet, all_results: list ):
     return
 
     # end def process_staff_worksheet()
+
+
+## helpers ----------------------------------------------------------
+
+
+def calculate_end_column( number_of_columns: int ) -> str:
+    """ Calculates end-column string from number-of-columns. """
+    alphabet: list = list( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' )
+    result = ''
+    if number_of_columns <= 26:
+        zero_length = number_of_columns - 1
+        result: str = alphabet[zero_length]
+    else:
+        ( multiple, remainder ) = divmod( number_of_columns, 26 )
+        log.debug( f'multiple, ``{multiple}``; remainder, ``{remainder}``' )
+        zero_multiple: int = multiple - 1
+        zero_remainder: int = remainder - 1
+        char_one: str = alphabet[zero_multiple]
+        char_two: str = alphabet[zero_remainder]
+        result = f'{char_one}{char_two}'
+    log.debug( f'result, ``{result}``' )
+    return result

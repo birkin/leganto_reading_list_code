@@ -13,7 +13,7 @@ headers = [
     'coursecode', 'section_id', 'searchable_id1', 'searchable_id2', 'searchable_id3', 'reading_list_code', 
     'reading_list_name', 'reading_list_description', 'reading_list_subject', 'reading_list_status', 'RLStatus', 
     'visibility', 'reading_list_assigned_to', 'reading_list_library_note', 'reading_list_instructor_note', 
-    'owner_user_name', 'creativecommon', 'section_name', 'section_description', 'section_start_date', 
+    'owner_user_name', 'creati vecommon', 'section_name', 'section_description', 'section_start_date', 
     'section_end_date', 'section_tags', 'citation_secondary_type', 'citation_status', 'citation_tags', 
     'citation_mms_id', 'citation_original_system_id', 'citation_title', 'citation_journal_title', 'citation_author', 
     'citation_publication_date', 'citation_edition', 'citation_isbn', 'citation_issn', 
