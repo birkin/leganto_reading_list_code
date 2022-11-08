@@ -1,3 +1,7 @@
+"""
+PRE-REFACTOR: will be moved to `archived` dir soon.
+"""
+
 import datetime, logging, os, pprint
 
 import gspread
