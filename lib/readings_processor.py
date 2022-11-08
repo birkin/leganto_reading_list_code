@@ -266,3 +266,8 @@ def check_pdfs( db_dict_entry: dict, pdf_data: dict, course_code: str, settings:
             pdf_check_result = repr( possible_matches )
     log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
     return pdf_check_result
+
+
+## for prep_leganto_data() ------------------------------------------
+
+
