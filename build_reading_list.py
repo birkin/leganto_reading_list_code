@@ -48,8 +48,8 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     ## post to google-sheet -----------------------------------------
     if update_ss:
         log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
-        # gsheet_prepper.update_gsheet( leganto_data, CREDENTIALS, SPREADSHEET_NAME )
-        gsheet_prepper.update_gsheet( leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
+        # gsheet_prepper.update_gsheet( leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
+        gsheet_prepper.update_gsheet( basic_data, leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
     else:
         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
 
