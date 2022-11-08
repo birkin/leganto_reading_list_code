@@ -5,6 +5,7 @@ Main manager file to produce reading lists.
 import argparse, datetime, json, logging, os, pprint, sys
 
 import gspread, pymysql
+from lib import csv_maker
 from lib import db_stuff
 from lib import gsheet_prepper
 from lib import leganto_final_processor
@@ -52,8 +53,9 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
         gsheet_prepper.update_gsheet( basic_data, leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
     else:
         log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
-
-    ## output_csv()
+    ## create .csv file ---------------------------------------------
+    csv_maker.create_csv( leganto_data, leganto_final_processor.get_headers() )
+    log.info( 'csv produced' )
 
     ## end def manage_build_reading_list()
 
