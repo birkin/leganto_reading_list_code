@@ -43,10 +43,17 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     basic_data: list = prep_basic_data( classes_info, settings )
     ## prep leganto data --------------------------------------------
     leganto_data: list = prep_leganto_data( basic_data, settings )
-    # update_spreadsheet()
-    # output_csv()
+    ## update spreadsheet if necessary ------------------------------
+    ## post to google-sheet -----------------------------------------
+    if update_ss:
+        log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
+        gsheet_prepper.update_gsheet( leganto_data, CREDENTIALS, SPREADSHEET_NAME )
+    else:
+        log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
 
-    ## end manage_build_reading_list()
+    ## output_csv()
+
+    ## end def manage_build_reading_list()
 
 
 
@@ -55,21 +62,16 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
     """ Enhances basic data for spreadsheet and CSV-files. 
         Called by manage_build_reading_list() """
     leganto_data: list = []
-
     for entry in basic_data:
         log.debug( f'result-dict-entry, ``{pprint.pformat(entry)}``' )
         result: dict = entry
-
         row_dict = {}
         headers: list = leganto_final_processor.get_headers()
-        for header in headers:
-            header: str = header
+        for entry in headers:
+            header: str = entry
             row_dict[header] = ''
         log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
-        
         course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
-
-        # row_dict['citation_author'] = result['citation_author']
         row_dict['citation_author'] = leganto_final_processor.clean_citation_author( result['citation_author'] ) 
         row_dict['citation_doi'] = result['citation_doi']
         row_dict['citation_end_page'] = result['citation_end_page']
@@ -93,7 +95,6 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
         row_dict['reading_list_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
         row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
         row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-        # row_dict['section_id'] = result['section_id']
         row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
         row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
         row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
@@ -106,6 +107,8 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
     # log.debug( f'data_values, ``{data_values}``' )
     log.debug( f'leganto_data, ``{pprint.pformat(leganto_data)}``' )
     return leganto_data
+
+    ## end def prep_leganto_data()
 
 
 
