@@ -49,46 +49,16 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
 
 
 
-def prep_basic_data( classes_info: list, settings: dict ) -> list:
-    """ Queries OCRA and builds initial data.
-        Called by manage_build_reading_list() """
-    all_results: list = []
-    cdl_checker = CDL_Checker()
-    for class_info_entry in classes_info:
-        assert type(class_info_entry) == dict
-        log.debug( f'class_info_entry, ``{class_info_entry}``' )
-        class_id: str = class_info_entry['class_id']
-        course_id: str = class_info_entry['course_id']
-        leganto_course_id: str = class_info_entry['leganto_course_id']
-        leganto_section_id: str = class_info_entry['leganto_section_code']
-        leganto_course_title: str = class_info_entry['leganto_course_title']
-        if class_id:
-            ## ocra book data ---------------------------------------
-            # book_results: list = get_book_readings( class_id )
-            book_results: list = readings_extractor.get_book_readings( class_id )
-            ## ocra article data ------------------------------------
-            article_results: list = readings_extractor.get_article_readings( class_id )
-            ## ocra excerpt data ------------------------------------
-            excerpt_results: list = readings_extractor.get_excerpt_readings( class_id )
-            ## leganto book data ------------------------------------            
-            leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
-            ## leganto article data ---------------------------------
-            leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            ## leganto excerpt data ---------------------------------
-            leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            ## leganto combined data --------------------------------
-            all_course_results: list = leg_books + leg_articles + leg_excerpts
-            if all_course_results == []:
-                all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
-        else:
-            all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
-        log.debug( f'all_course_results, ``{all_course_results}``' )
-        all_results = all_results + all_course_results
-        log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
-    log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
-    return all_results
 
-    ## end def prep_basic_data()
+def prep_leganto_data( basic_data: list, settings: dict ) -> list:
+    """ Enhances basic data for spreadsheet and CSV-files. 
+        Called by manage_build_reading_list() """
+    leganto_data: list = []
+    log.debug( f'leganto_data, ``{pprint.pformat(leganto_data)}``' )
+    return leganto_data
+
+
+
 
 
 def load_initial_settings() -> dict:
@@ -242,6 +212,50 @@ def get_class_id( course_id: str ) -> str:
         class_id = ''
     log.debug( f'class_id, ``{class_id}``' )
     return class_id
+
+    ## end def get_class_id()
+
+
+def prep_basic_data( classes_info: list, settings: dict ) -> list:
+    """ Queries OCRA and builds initial data.
+        Called by manage_build_reading_list() """
+    all_results: list = []
+    cdl_checker = CDL_Checker()
+    for class_info_entry in classes_info:
+        assert type(class_info_entry) == dict
+        log.debug( f'class_info_entry, ``{class_info_entry}``' )
+        class_id: str = class_info_entry['class_id']
+        course_id: str = class_info_entry['course_id']
+        leganto_course_id: str = class_info_entry['leganto_course_id']
+        leganto_section_id: str = class_info_entry['leganto_section_code']
+        leganto_course_title: str = class_info_entry['leganto_course_title']
+        if class_id:
+            ## ocra book data ---------------------------------------
+            # book_results: list = get_book_readings( class_id )
+            book_results: list = readings_extractor.get_book_readings( class_id )
+            ## ocra article data ------------------------------------
+            article_results: list = readings_extractor.get_article_readings( class_id )
+            ## ocra excerpt data ------------------------------------
+            excerpt_results: list = readings_extractor.get_excerpt_readings( class_id )
+            ## leganto book data ------------------------------------            
+            leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+            ## leganto article data ---------------------------------
+            leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto excerpt data ---------------------------------
+            leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto combined data --------------------------------
+            all_course_results: list = leg_books + leg_articles + leg_excerpts
+            if all_course_results == []:
+                all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+        else:
+            all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+        log.debug( f'all_course_results, ``{all_course_results}``' )
+        all_results = all_results + all_course_results
+        log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
+    log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
+    return all_results
+
+    ## end def prep_basic_data()
 
 
 ## -- script-caller helpers -----------------------------------------
