@@ -8,6 +8,8 @@ import gspread, pymysql
 from lib import db_stuff
 from lib import loaders
 from lib import readings_extractor
+from lib import readings_processor
+from lib.cdl import CDL_Checker
 from lib.loaders import OIT_Course_Loader
 
 
@@ -37,7 +39,7 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     ## prep class-info-dicts ----------------------------------------
     classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
     ## prep basic data ----------------------------------------------
-    basic_data: list = prep_basic_data( classes_info )
+    basic_data: list = prep_basic_data( classes_info, settings )
     # prepare_data_for_staff() 
     # prepare_data_for_leganto()
     # update_spreadsheet()
@@ -47,9 +49,11 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
 
 
 
-def prep_basic_data( classes_info: list ) -> list:
+def prep_basic_data( classes_info: list, settings: dict ) -> list:
     """ Queries OCRA and builds initial data.
         Called by manage_build_reading_list() """
+    all_results: list = []
+    cdl_checker = CDL_Checker()
     for class_info_entry in classes_info:
         assert type(class_info_entry) == dict
         log.debug( f'class_info_entry, ``{class_info_entry}``' )
@@ -67,26 +71,24 @@ def prep_basic_data( classes_info: list ) -> list:
             ## ocra excerpt data ------------------------------------
             excerpt_results: list = readings_extractor.get_excerpt_readings( class_id )
             ## leganto book data ------------------------------------            
-            leg_books: list = map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+            leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
             ## leganto article data ---------------------------------
-            leg_articles: list = map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title )
+            leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto excerpt data ---------------------------------
-            leg_excerpts: list = map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title )
+            leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto combined data --------------------------------
             all_course_results: list = leg_books + leg_articles + leg_excerpts
             if all_course_results == []:
-                all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+                all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         else:
-            all_course_results: list = [ map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+            all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
         log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
     log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
     return all_results
 
-
-
-
+    ## end def prep_basic_data()
 
 
 def load_initial_settings() -> dict:
@@ -97,8 +99,16 @@ def load_initial_settings() -> dict:
         'PDF_OLDER_THAN_DAYS': 30,                                                  # to ascertain whether to requery OCRA for pdf-data
         'CREDENTIALS': json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] ),    # gspread setting
         'SPREADSHEET_NAME': os.environ['LGNT__SHEET_NAME'],                         # gspread setting
-        'LAST_CHECKED_PATH': os.environ['LGNT__LAST_CHECKED_JSON_PATH']             # contains last-run spreadsheet course-IDs
+        'LAST_CHECKED_PATH': os.environ['LGNT__LAST_CHECKED_JSON_PATH'],            # contains last-run spreadsheet course-IDs
+        'PDF_JSON_PATH': os.environ['LGNT__PDF_JSON_PATH'],                         # pre-extracted pdf data
+        'FILES_URL_PATTERN': os.environ['LGNT__FILES_URL_PATTERN'],                 # pdf-url
     }
+    PDF_DATA = {}
+    with open( settings['PDF_JSON_PATH'], encoding='utf-8' ) as f_reader:
+        jsn: str = f_reader.read()
+        PDF_DATA = json.loads( jsn )
+    log.debug( f'PDF_DATA (partial), ``{pprint.pformat(PDF_DATA)[0:1000]}``' )
+    settings['PDF_DATA'] = PDF_DATA
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
 
