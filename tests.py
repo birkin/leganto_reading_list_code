@@ -10,8 +10,14 @@ Usage:
 
 import datetime, json, logging, os, unittest
 
-import etl_class_data
-from etl_class_data import CDL_Checker, check_pdfs
+# import etl_class_data
+# from etl_class_data import CDL_Checker
+from lib.cdl import CDL_Checker
+
+# from etl_class_data import check_pdfs
+from lib.readings_processor import check_pdfs
+
+from lib import readings_processor
 from lib import worksheet_prepper
 
 
@@ -134,7 +140,7 @@ class CDL_Checker_Test( unittest.TestCase ):
     """ Checks cdl-link prep. """
 
     def setUp(self) -> None:
-        self.cdl_checker = etl_class_data.CDL_Checker()
+        self.cdl_checker = CDL_Checker()
 
     def test_search_cdl(self):
         """ Checks good fuzzy search-result. """
@@ -282,22 +288,22 @@ class OpenUrlParserTest( unittest.TestCase ):
             {'sid': ['sfx:citation'], 'genre': ['article'], 'atitle': ['The Plot of her Undoing'], 'title': ['Feminist Art Coalition'], 'date': ['2020-12-28'], 'aulast': ['Hartman'], 'aufirst': ['Saidiya'], '__char_set': ['utf8']},
             ]
         for (i, ourl) in enumerate(self.ourls):
-            parts: dict = etl_class_data.parse_openurl( ourl )
+            parts: dict = readings_processor.parse_openurl( ourl )
             log.debug( f'parts, ``{parts}``' )
             self.assertEqual( expected[i], parts )
         
     def test_parse_start_page_from_ourl(self):
         expected = [ '607', '' ]
         for (i, ourl) in enumerate(self.ourls):
-            parts: dict = etl_class_data.parse_openurl( ourl )
-            spage: str = etl_class_data.parse_start_page_from_ourl( parts )
+            parts: dict = readings_processor.parse_openurl( ourl )
+            spage: str = readings_processor.parse_start_page_from_ourl( parts )
             self.assertEqual( expected[i], spage )
 
     def test_parse_end_page_from_ourl(self):
         expected = [ '621', '' ]
         for (i, ourl) in enumerate(self.ourls):
-            parts: dict = etl_class_data.parse_openurl( ourl )
-            epage: str = etl_class_data.parse_end_page_from_ourl( parts )
+            parts: dict = readings_processor.parse_openurl( ourl )
+            epage: str = readings_processor.parse_end_page_from_ourl( parts )
             self.assertEqual( expected[i], epage )
 
     ## end class OpenUrlParserTest()
@@ -526,7 +532,7 @@ class MapperTest( unittest.TestCase ):
         'sfxlink': '//library.brown.edu/easyarticle/?genre=article&atitle=Introduction: Rhizome &title=A Thousand Plateaus&date=1980-01-01&volume=&issue=&spage=1&epage=25&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8', 
         'ereserve': 'has pdf', 'status': 'on reserve', 'volume': '', 'issue': '', 'publisher': '', 'date': datetime.date(1980, 1, 1), 'issn': '', 'isbn': '', 'spage': None, 'epage': None, 'assignment': '', 'art_url': '', 'url_desc': '', 'doi': '', 'publicdomain': 'none', 'fairuse': 'none', 'classuse': 'y', 'nature': 'y', 'amount': 'y', 'original': 'y', 'notice': None, 'sequence': '', 'date_due': datetime.date(1969, 12, 31), 'facnotes': '', 'staffnotes': '', 'art_updated': datetime.datetime(2022, 4, 4, 17, 45, 2), 'injosiah': 'dont know', 'jcallno': '', 'bibno': '', 'printed': 'n', 'date_printed': None, 'pmid': None, 'fullcit': '', 'fulltext_url': '', 'copied_from_id': None, 'staff_intervention_needed': None, 'requests.requestid': '20220404173710jdelleca', 'classid': 10488, 'request_date': datetime.datetime(2022, 4, 4, 17, 37, 10) }
         expected = 'Felix Guattari, Gilles Deleuze'
-        self.assertEqual( expected, etl_class_data.parse_excerpt_author(excerpt_db_data) )
+        self.assertEqual( expected, readings_processor.parse_excerpt_author(excerpt_db_data) )
 
     def test_map_bruknow_openurl_a(self):
         """ Checks transformed bruknow openurl from domain-start. """
@@ -534,7 +540,7 @@ class MapperTest( unittest.TestCase ):
         expected = 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&genre=article&atitle=3,+4,+6,+14,+16&title=The+Senses+in+Performance&date=2006-01-01&__char_set=utf8'
         self.assertEqual( 
             expected, 
-            etl_class_data.map_bruknow_openurl( initial_ourl_a ) 
+            readings_processor.map_bruknow_openurl( initial_ourl_a ) 
             )
 
     def test_map_bruknow_openurl_b(self):
@@ -543,7 +549,7 @@ class MapperTest( unittest.TestCase ):
         expected = 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&genre=article&atitle=The+Plot+of+her+Undoing&title=Feminist+Art+Coalition&date=2020-12-28&aulast=Hartman&aufirst=Saidiya&__char_set=utf8'
         self.assertEqual( 
             expected, 
-            etl_class_data.map_bruknow_openurl( initial_ourl_b ) 
+            readings_processor.map_bruknow_openurl( initial_ourl_b ) 
             )
 
     ## end class MapperTest()
