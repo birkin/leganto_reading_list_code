@@ -31,6 +31,10 @@ class OIT_Course_Loader( object ):
 
     def grab_oit_course_data( self, ss_course_id: str ) -> dict:
         """ Returns the OIT info for the spreadsheet course-id. """
+
+        log.debug( f'OIT_course_data, ``{pprint.pformat(self.OIT_course_data)}``' )
+        1/0
+
         log.debug( f'preparing oit-data for ss_course_id, ``{ss_course_id}``' )
         ss_subject: str = ss_course_id[0:4]
         ss_code: str = ss_course_id[4:]    

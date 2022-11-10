@@ -36,7 +36,7 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     err: dict = loaders.rebuild_pdf_data_if_necessary( {'days': settings["PDF_OLDER_THAN_DAYS"]} )
     if err:
         raise Exception( f'problem rebuilding pdf-json, error-logged, ``{err["err"]}``' )  
-    oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )
+    oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )  # instatiation loads data from file into list of dicts
     ## prep course_id_list ------------------------------------------
     course_id_list: list = prep_course_id_list( course_id_input, settings )
     ## prep class-info-dicts ----------------------------------------
@@ -164,7 +164,7 @@ def check_for_updates( course_id_list: list, settings: dict ) -> bool:
 def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
     """ Takes list of course_ids and adds required minimal info using OIT data.
         Called by manage_build_reading_list() """
-    log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
+    # log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
     classes_info = []
     for course_id_entry in course_id_list:  # now that we have the spreadsheet course_id_list, get necessary OIT data
         course_id_entry: str = course_id_entry
