@@ -1,3 +1,9 @@
+"""
+Archived.
+- Was manager module. Replaced by `build_reading_list.py` in refactor 
+    to better separate data-prep from spreadsheet-display.
+"""
+
 import argparse, datetime, json, logging, os, pprint, sys
 import urllib.parse
 
