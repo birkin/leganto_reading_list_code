@@ -10,15 +10,11 @@ Usage:
 
 import datetime, json, logging, os, unittest
 
-# import etl_class_data
-# from etl_class_data import CDL_Checker
-from lib.cdl import CDL_Checker
-
-# from etl_class_data import check_pdfs
-from lib.readings_processor import check_pdfs
-
+from lib import gsheet_prepper
+from lib import leganto_final_processor
 from lib import readings_processor
-from lib import worksheet_prepper
+from lib.cdl import CDL_Checker
+from lib.readings_processor import check_pdfs
 
 
 SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
@@ -48,24 +44,24 @@ class Misc_Test( unittest.TestCase ):
 
     def test_column_math(self):
         """ Checks calculated end-column. """
-        self.assertEqual( 'B', worksheet_prepper.calculate_end_column(2) )
-        self.assertEqual( 'AA', worksheet_prepper.calculate_end_column(27) )
-        self.assertEqual( 'BO', worksheet_prepper.calculate_end_column( 67 ) )
+        self.assertEqual( 'B', gsheet_prepper.calculate_end_column(2) )
+        self.assertEqual( 'AA', gsheet_prepper.calculate_end_column(27) )
+        self.assertEqual( 'BO', gsheet_prepper.calculate_end_column( 67 ) )
 
 
     def test_clean_citation_title(self):
         """ Checks cleaned leganto title. """
         self.assertEqual( 'Bharatha Natyam-What Are You?', 
-            worksheet_prepper.clean_citation_title( '(EXCERPT) "Bharatha Natyam-What Are You?.' ) 
+            leganto_final_processor.clean_citation_title( '(EXCERPT) "Bharatha Natyam-What Are You?.' ) 
             )
         self.assertEqual( 'Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama', 
-            worksheet_prepper.clean_citation_title( '“Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama”' ) 
+            leganto_final_processor.clean_citation_title( '“Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama”' ) 
             )
         self.assertEqual( 'Ritual', 
-            worksheet_prepper.clean_citation_title( '"Ritual"' ) 
+            leganto_final_processor.clean_citation_title( '"Ritual"' ) 
             )
         self.assertEqual( 'Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg',
-            worksheet_prepper.clean_citation_title( '“Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg' ) 
+            leganto_final_processor.clean_citation_title( '“Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg' ) 
             )
 
 
