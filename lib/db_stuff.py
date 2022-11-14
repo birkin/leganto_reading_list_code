@@ -49,8 +49,8 @@ def get_mysqlclient_db_connection():
 
     try:
         import MySQLdb.cursors
-        from MySQLdb import _mysql
-        db_connection = _mysql.connect(  ## the with auto-closes the connection on any problem
+        from MySQLdb import mdb
+        db_connection = mdb.connect(  ## the with auto-closes the connection on any problem
             host=HOST,
             user=USERNAME,
             password=PASSWORD,
