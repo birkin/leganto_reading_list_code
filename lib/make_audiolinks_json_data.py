@@ -25,13 +25,10 @@ log = logging.getLogger(__name__)
 log.debug( 'make_audiolinks_json_data logging ready' )
 
 
-
-## get db connection ------------------------------------------------
-db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
-
-## make initial query
+## make initial query -----------------------------------------------
 INITIAL_SQL = os.environ['LGNT__AUDIO_LINKS_INITIAL_QUERY_SQL']
 result_set: list = []
+db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
 with db_connection:
     with db_connection.cursor() as db_cursor:
         db_cursor.execute( INITIAL_SQL )
@@ -39,7 +36,7 @@ with db_connection:
         assert type(result_set) == list
 log.debug( f'result_set[0:20], ``{pprint.pformat(result_set[0:20])}``' )
 
-
+## add course_id ----------------------------------------------------
 AUDIO_LINKS_SQL2 = os.environ['LGNT__AUDIO_LINKS_SQL2']
 db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()
 with db_connection.cursor() as db_cursor:
@@ -48,19 +45,20 @@ with db_connection.cursor() as db_cursor:
         classid = row['requests__classid']
         log.debug( f'classid, ``{classid}``' )
         if classid == None:
-            row['course_id'] = None
+            row['courseid'] = None
         else:
             q2 = AUDIO_LINKS_SQL2.replace( '{classid}', str(classid) )
-            # q2 = AUDIO_LINKS_SQL2
             log.debug( f'q2, ``{q2}``' )
             r_set2: list = []
             db_cursor.execute( q2 )
             r_set2 = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
-            assert type(result_set) == list
+            assert type(r_set2) == list
             log.debug( f'len(r_set2), ``{len(r_set2)}``' )
             r_set2_entry: dict = r_set2[0]
-            row['course_id'] = r_set2_entry['courseid']
+            # row['courseid'] = r_set2_entry['courseid']
+            row['courseid'] = f'multiple tables may have course info for `courseid`, ``{r_set2_entry["courseid"]}``' 
 log.debug( f'result_set[0:20], after course_id lookup, ``{pprint.pformat(result_set[0:20])}``' )
+
 
 
 1/0
