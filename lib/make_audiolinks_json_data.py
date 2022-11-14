@@ -6,6 +6,9 @@ Can be run as stand-alone file, or called `import make_audiolinks_json_data`
 
 import logging, os, sys
 
+import pymysql  # for type-checking
+
+
 PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
 
@@ -22,24 +25,9 @@ log = logging.getLogger(__name__)
 log.debug( 'make_audiolinks_json_data logging ready' )
 
 
-## setup paths ------------------------------------------------------
-
-
-# # fast-reconcile
-# PROJECT_DIR = os.path.dirname( CONFIG_DIR )  
-# #print "PROJECT_DIR =" + PROJECT_DIR
-
-# # dir enclosing fast-reconcile
-# PROJECT_STUFF_DIR = os.path.dirname( PROJECT_DIR )  
-# #print "PROJECT_STUFF_DIR =" + PROJECT_STUFF_DIR
-
-# # allows statements like `from fast-reconcile.the_app import...`
-# sys.path.append( PROJECT_DIR )
-
 
 ## get db connection ------------------------------------------------
-# db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
-db_connection = db_stuff.get_mysqlclient_db_connection()  # connection configured to return rows in dictionary format
+db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
 
 
 1/0

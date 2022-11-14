@@ -34,36 +34,36 @@ def get_db_connection() -> pymysql.connections.Connection:
 
 
 
-def get_mysqlclient_db_connection():
-    """ Returns a mysqlclient connection to the database. """
-    # _mysql = 'init'
-    # try:
-    #     from MySQLdb import _mysql  # type: ignore
-    #     log.debug( 'using mysqlclient')
-    # except:
-    #     log.exception( f'mysqlclient-connection import failure; traceback follows; will use pymysql' )
-    #     import pymysql as _mysql
-    #     log.debug( 'using pymysql' )
-    # log.debug( f'type(_mysql), ``{type(_mysql)}``' )
-    # log.debug( f'dir(_mysql), ``{dir(_mysql)}``' )
+# def get_mysqlclient_db_connection():
+#     """ Returns a mysqlclient connection to the database. """
+#     # _mysql = 'init'
+#     # try:
+#     #     from MySQLdb import _mysql  # type: ignore
+#     #     log.debug( 'using mysqlclient')
+#     # except:
+#     #     log.exception( f'mysqlclient-connection import failure; traceback follows; will use pymysql' )
+#     #     import pymysql as _mysql
+#     #     log.debug( 'using pymysql' )
+#     # log.debug( f'type(_mysql), ``{type(_mysql)}``' )
+#     # log.debug( f'dir(_mysql), ``{dir(_mysql)}``' )
 
-    try:
-        import MySQLdb.cursors
-        from MySQLdb import _mysql
-        db_connection = _mysql.connect(  ## the with auto-closes the connection on any problem
-            host=HOST,
-            user=USERNAME,
-            password=PASSWORD,
-            database=DB,
-            charset='utf8mb4')
-            # cursorclass=MySQLdb.cursors.DictCursor )  # type: ignore -- # DictCursor means results will be dictionaries (yay!)
-        log.debug( f'have db-connection' )
-        cursor = db_connection.cursor( MySQLdb.cursors.DictCursor )
-        log.debug( 'have cursor' )
-    except:
-        log.exception( f'db-connection failed; traceback follows...' )
-        raise   ## re-raise the exception
-    return db_connection
+#     try:
+#         import MySQLdb.cursors
+#         from MySQLdb import _mysql
+#         db_connection = _mysql.connect(  ## the with auto-closes the connection on any problem
+#             host=HOST,
+#             user=USERNAME,
+#             password=PASSWORD,
+#             database=DB,
+#             charset='utf8mb4')
+#             # cursorclass=MySQLdb.cursors.DictCursor )  # type: ignore -- # DictCursor means results will be dictionaries (yay!)
+#         log.debug( f'have db-connection' )
+#         cursor = db_connection.cursor( MySQLdb.cursors.DictCursor )
+#         log.debug( 'have cursor' )
+#     except:
+#         log.exception( f'db-connection failed; traceback follows...' )
+#         raise   ## re-raise the exception
+#     return db_connection
 
 
 
