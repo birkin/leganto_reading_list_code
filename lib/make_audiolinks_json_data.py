@@ -86,6 +86,18 @@ with db_connection.cursor() as db_cursor:
             row['banner_courses__course'] = r_set3_entry['course']
 log.debug( f'result_set[0:20], after course lookup, ``{pprint.pformat(result_set[0:20])}``' )
 
+## re-arrange list into dict ----------------------------------------
+audiolinks_data: dict = {}
+for entry in result_set:
+    row: dict = entry
+    classid_key = row.get( 'requests__classid', 'empty' )
+    if classid_key not in audiolinks_data.keys():
+        audiolinks_data[classid_key] = []
+    audiolinks_data[classid_key].append( row )
+log.debug( f'audiolinks_data, ``{pprint.pformat(audiolinks_data)}``' )
+    
+
+
 
 1/0
 
