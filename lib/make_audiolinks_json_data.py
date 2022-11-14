@@ -4,10 +4,9 @@ Queries the reserves database for `audiolinks` data,
 Can be run as stand-alone file, or called `import make_audiolinks_json_data`
 """
 
-import logging, os, pprint, sys
+import json, logging, os, pprint, sys
 
 import pymysql  # for type-checking
-
 
 PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
@@ -25,19 +24,23 @@ log = logging.getLogger(__name__)
 log.debug( 'make_audiolinks_json_data logging ready' )
 
 
+AUDIOLINKS_INITIAL_SQL = os.environ['LGNT__AUDIOLINKS_INITIAL_QUERY_SQL']
+AUDIOLINKS_SQL2 = os.environ['LGNT__AUDIOLINKS_SQL2']
+AUDIOLINKS_SQL3 = os.environ['LGNT__AUDIOLINKS_SQL3']
+AUDIOLINKS_JSON_PATH = os.environ['LGNT__AUDIOLINKS_JSON_PATH']
+
+
 ## make initial query -----------------------------------------------
-INITIAL_SQL = os.environ['LGNT__AUDIO_LINKS_INITIAL_QUERY_SQL']
 result_set: list = []
 db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
 with db_connection:
     with db_connection.cursor() as db_cursor:
-        db_cursor.execute( INITIAL_SQL )
+        db_cursor.execute( AUDIOLINKS_INITIAL_SQL )
         result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
         assert type(result_set) == list
 log.debug( f'result_set[0:20], ``{pprint.pformat(result_set[0:20])}``' )
 
 ## add course_id ----------------------------------------------------
-AUDIO_LINKS_SQL2 = os.environ['LGNT__AUDIO_LINKS_SQL2']
 db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()
 with db_connection.cursor() as db_cursor:
     for entry in result_set:
@@ -47,7 +50,7 @@ with db_connection.cursor() as db_cursor:
         if classid == None:
             row['classes__courseid'] = None
         else:
-            q2 = AUDIO_LINKS_SQL2.replace( '{classid}', str(classid) )
+            q2 = AUDIOLINKS_SQL2.replace( '{classid}', str(classid) )
             log.debug( f'q2, ``{q2}``' )
             r_set2: list = []
             db_cursor.execute( q2 )
@@ -59,7 +62,6 @@ with db_connection.cursor() as db_cursor:
 log.debug( f'result_set[0:20], after course_id lookup, ``{pprint.pformat(result_set[0:20])}``' )
 
 ## add course_info --------------------------------------------------
-AUDIO_LINKS_SQL3 = os.environ['LGNT__AUDIO_LINKS_SQL3']
 db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()
 with db_connection.cursor() as db_cursor:
     for entry in result_set:
@@ -73,7 +75,7 @@ with db_connection.cursor() as db_cursor:
             row['banner_courses__subject'] = None
             row['banner_courses__course'] = None
         else:
-            q3 = AUDIO_LINKS_SQL3.replace( '{courseid}', str(courseid) ).replace( '{classid}', str(classid) )
+            q3 = AUDIOLINKS_SQL3.replace( '{courseid}', str(courseid) ).replace( '{classid}', str(classid) )
             log.debug( f'q3, ``{q3}``' )
             r_set3: list = []
             db_cursor.execute( q3 )
@@ -93,86 +95,17 @@ for entry in result_set:
     classid_key = row['requests__classid']
     if classid_key == None:
         classid_key = 'no_classid'
+    else: 
+        classid_key: str = str(classid_key)
     if classid_key not in audiolinks_data.keys():
         audiolinks_data[classid_key] = []
     audiolinks_data[classid_key].append( row )
 log.debug( f'audiolinks_data, ``{pprint.pformat(audiolinks_data)}``' )
     
+## output json ------------------------------------------------------
+jsn: str = json.dumps( audiolinks_data, sort_keys=True, indent=2 )
+log.debug( f'type(jsn), ``{type(jsn)}``' )
+with open( AUDIOLINKS_JSON_PATH, 'w' ) as f_writer:
+    f_writer.write( jsn )
 
-
-
-1/0
-
-
-
-
-
-
-# """
-# Queries the reserves database for past PDF file-data.
-# Can be run as stand-alone file, or is also called by loaders.rebuild_pdf_data_if_necessary()
-# """
-
-# import datetime, json, logging, os, pprint
-
-# import pymysql
-# from lib import db_stuff
-
-# PDF_SQL: str = os.environ['LGNT__PDF_SQL']
-# PDF_JSON_PATH: str = os.environ['LGNT__PDF_JSON_PATH']
-# LOG_PATH: str = os.environ['LGNT__LOG_PATH']
-
-# logging.basicConfig(
-#     filename=LOG_PATH,
-#     level=logging.DEBUG,
-#     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
-#     datefmt='%d/%b/%Y %H:%M:%S' )
-# log = logging.getLogger(__name__)
-# log.debug( 'logging ready' )
-
-
-# ## get db connection ------------------------------------------------
-# db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
-
-# ## run query --------------------------------------------------------
-# start_time = datetime.datetime.now()
-# result_set: list = []
-# with db_connection:
-#     with db_connection.cursor() as db_cursor:
-#         db_cursor.execute( PDF_SQL )
-#         result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
-#         assert type(result_set) == list
-# record: dict = result_set[0]
-# assert type(record) == dict
-# log.debug( f'record, ``{record}``' )
-# log.debug( f'result_set, ``{pprint.pformat(result_set[0:5])}``' )
-# end_time = datetime.datetime.now()
-# elapsed: str = str( end_time - start_time )
-# log.debug( f'query took, ``{elapsed}``' )
-
-# ## parse results ----------------------------------------------------
-
-
-# pdf_data: dict = {}
-# for entry in result_set:
-#     result: dict = entry
-#     rqst_id = result.get( 'requestid', '' )
-#     if rqst_id:
-#         key = result['requestid']
-#         val = {
-#             'articleid': result.get( 'articleid', '' ),
-#             'atitle': result.get( 'atitle', '' ),
-#             'filename': result.get( 'filename', '' ),
-#             'pdfid': result.get( 'pdfid', '' ),
-#             'title': result.get( 'title', '' )
-#         }
-#         pdf_data[key] = val 
-
-# ## save data --------------------------------------------------------
-# # jsn: str = json.dumps( result_set, sort_keys=True, indent=2 )
-# jsn: str = json.dumps( pdf_data, sort_keys=True, indent=2 )
-# log.debug( f'type(jsn), ``{type(jsn)}``' )
-# with open( PDF_JSON_PATH, 'w' ) as f_writer:
-#     f_writer.write( jsn )
-
-# ## EOF
+## EOF
