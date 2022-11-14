@@ -44,6 +44,9 @@ def get_mysqlclient_db_connection():
         log.exception( f'mysqlclient-connection import failure; traceback follows; will use pymysql' )
         import pymysql as _mysql
         log.debug( 'using pymysql' )
+    log.debug( f'type(_mysql), ``{type(_mysql)}``' )
+    log.debug( f'dir(_mysql), ``{dir(_mysql)}``' )
+
     try:
         db_connection = _mysql.connect(  ## the with auto-closes the connection on any problem
             host=HOST,
