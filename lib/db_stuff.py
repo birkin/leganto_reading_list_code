@@ -1,4 +1,4 @@
-import logging, os
+import logging, os, sys
 
 import pymysql
 import pymysql.cursors
@@ -33,6 +33,33 @@ def get_db_connection() -> pymysql.connections.Connection:
     return db_connection
 
 
+
+def get_mysqlclient_db_connection():
+    """ Returns a mysqlclient connection to the database. """
+    _mysql = 'init'
+    try:
+        from MySQLdb import _mysql  # type: ignore
+        log.debug( 'using mysqlclient')
+    except:
+        log.exception( f'mysqlclient-connection import failure; traceback follows; will use pymysql' )
+        import pymysql as _mysql
+        log.debug( 'using pymysql' )
+    try:
+        db_connection = _mysql.connect(  ## the with auto-closes the connection on any problem
+            host=HOST,
+            user=USERNAME,
+            password=PASSWORD,
+            database=DB,
+            charset='utf8mb4',
+            cursorclass=_mysql.cursors.DictCursor )  # type: ignore -- # DictCursor means results will be dictionaries (yay!)
+        log.debug( f'made db-connection' )
+    except:
+        log.exception( f'db-connection failed; traceback follows...' )
+        raise   ## re-raise the exception
+    return db_connection
+
+
+
 def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
     db_connection = pymysql.connect(  ## the with auto-closes the connection on any problem
             host=HOST,
@@ -43,3 +70,5 @@ def get_CDL_db_connection():  # yes, yes, i should obviously refactor these two
             cursorclass=pymysql.cursors.DictCursor )  # DictCursor means results will be dictionaries (yay!)
     log.debug( f'made db_connection with PyMySQL.connect(), ``{db_connection}``' )
     return db_connection
+
+
