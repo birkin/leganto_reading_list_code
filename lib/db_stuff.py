@@ -48,6 +48,7 @@ def get_mysqlclient_db_connection():
     # log.debug( f'dir(_mysql), ``{dir(_mysql)}``' )
 
     try:
+        import MySQLdb.cursors
         from MySQLdb import _mysql
         db_connection = _mysql.connect(  ## the with auto-closes the connection on any problem
             host=HOST,
@@ -55,7 +56,7 @@ def get_mysqlclient_db_connection():
             password=PASSWORD,
             database=DB,
             charset='utf8mb4',
-            cursorclass=_mysql.cursors.DictCursor )  # type: ignore -- # DictCursor means results will be dictionaries (yay!)
+            cursorclass=MySQLdb.cursors.DictCursor )  # type: ignore -- # DictCursor means results will be dictionaries (yay!)
         log.debug( f'made db-connection' )
     except:
         log.exception( f'db-connection failed; traceback follows...' )
