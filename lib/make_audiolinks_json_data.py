@@ -4,7 +4,7 @@ Queries the reserves database for `audiolinks` data,
 Can be run as stand-alone file, or called `import make_audiolinks_json_data`
 """
 
-import logging, os, sys
+import logging, os, pprint, sys
 
 import pymysql  # for type-checking
 
@@ -28,6 +28,39 @@ log.debug( 'make_audiolinks_json_data logging ready' )
 
 ## get db connection ------------------------------------------------
 db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
+
+## make initial query
+INITIAL_SQL = os.environ['LGNT__AUDIO_LINKS_INITIAL_QUERY_SQL']
+result_set: list = []
+with db_connection:
+    with db_connection.cursor() as db_cursor:
+        db_cursor.execute( INITIAL_SQL )
+        result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
+        assert type(result_set) == list
+log.debug( f'result_set[0:20], ``{pprint.pformat(result_set[0:20])}``' )
+
+
+AUDIO_LINKS_SQL2 = os.environ['LGNT__AUDIO_LINKS_SQL2']
+db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()
+with db_connection.cursor() as db_cursor:
+    for entry in result_set:
+        row: dict = entry
+        classid = row['requests__classid']
+        log.debug( f'classid, ``{classid}``' )
+        if classid == None:
+            row['course_id'] = None
+        else:
+            q2 = AUDIO_LINKS_SQL2.replace( '{classid}', str(classid) )
+            # q2 = AUDIO_LINKS_SQL2
+            log.debug( f'q2, ``{q2}``' )
+            r_set2: list = []
+            db_cursor.execute( q2 )
+            r_set2 = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
+            assert type(result_set) == list
+            log.debug( f'len(r_set2), ``{len(r_set2)}``' )
+            r_set2_entry: dict = r_set2[0]
+            row['course_id'] = r_set2_entry['courseid']
+log.debug( f'result_set[0:20], after course_id lookup, ``{pprint.pformat(result_set[0:20])}``' )
 
 
 1/0
