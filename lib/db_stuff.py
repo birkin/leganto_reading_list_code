@@ -56,7 +56,7 @@ def get_mysqlclient_db_connection():
             password=PASSWORD,
             database=DB,
             charset='utf8mb4',
-            cursor=MySQLdb.cursors.DictCursor )  # type: ignore -- # DictCursor means results will be dictionaries (yay!)
+            cursorclass=MySQLdb.cursors.DictCursor )  # type: ignore -- # DictCursor means results will be dictionaries (yay!)
         log.debug( f'made db-connection' )
     except:
         log.exception( f'db-connection failed; traceback follows...' )
