@@ -90,7 +90,9 @@ log.debug( f'result_set[0:20], after course lookup, ``{pprint.pformat(result_set
 audiolinks_data: dict = {}
 for entry in result_set:
     row: dict = entry
-    classid_key = row.get( 'requests__classid', 'empty' )
+    classid_key = row['requests__classid']
+    if classid_key == None:
+        classid_key = 'no_classid'
     if classid_key not in audiolinks_data.keys():
         audiolinks_data[classid_key] = []
     audiolinks_data[classid_key].append( row )
