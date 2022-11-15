@@ -321,15 +321,58 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
 ## -- script-caller helpers -----------------------------------------
 
 
+# def parse_args() -> dict:
+#     """ Parses arguments when module called via __main__ """
+#     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
+#     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
+#     parser.add_argument( '-update_ss', help='(required) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=True )
+#     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
+#     args: dict = vars( parser.parse_args() )
+#     log.info( f'\n\nSTARTING script; perceived args, ```{args}```' )
+#     ## do a bit of validation ---------------------------------------
+#     fail_check = False
+#     if args['course_id'] == None or len(args['course_id']) < 8:
+#         fail_check = True
+#     if args['update_ss'] == None:
+#         fail_check = True
+#     try: 
+#         json.loads( args['update_ss'] )
+#     except:
+#         log.exception( 'json-load of `update_ss` failed' )
+#         fail_check = True
+#     if args['force']:
+#         try:
+#             json.loads( args['force'] )
+#         except:
+#             log.exception( 'json-load of `force` failed' )
+#     if fail_check == True:
+#         parser.print_help()
+#         sys.exit()
+#     return args
+
+
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
+    log.debug( 'starting parse_args()' )
     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-    parser.add_argument( '-update_ss', help='(required) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=True )
+    parser.add_argument( '-update_ss', help='(required) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=False )
     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
+    parser.add_argument( '-count', help='(optional) used only with `-course_id oit_file' )
     args: dict = vars( parser.parse_args() )
     log.info( f'\n\nSTARTING script; perceived args, ```{args}```' )
     ## do a bit of validation ---------------------------------------
+    fail_check: bool = check_args( args )
+    if fail_check == True:
+        parser.print_help()
+        sys.exit()
+    return args
+
+
+def check_args( args ) -> bool:
+    """ Validates args.
+        Called by parse_args() """
+    log.debug( f'type(args), type(args)' )
     fail_check = False
     if args['course_id'] == None or len(args['course_id']) < 8:
         fail_check = True
@@ -345,13 +388,12 @@ def parse_args() -> dict:
             json.loads( args['force'] )
         except:
             log.exception( 'json-load of `force` failed' )
-    if fail_check == True:
-        parser.print_help()
-        sys.exit()
-    return args
+    log.debug( f'fail_check, ``{fail_check}``' )
+    return fail_check
 
 
 if __name__ == '__main__':
+    log.debug( 'starting if()' )
     args: dict = parse_args()
     course_id: str  = args['course_id']
     update_ss: bool = json.loads( args['update_ss'] )
