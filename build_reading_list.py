@@ -107,10 +107,37 @@ def prep_course_id_list( course_id_input: str, settings: dict ) -> list:
                 course_id_list = []
             else:
                 log.info( 'recent updates found' )
+    elif course_id_input == 'oit_file':
+        log.debug( 'list from oit-file coming' )
+        raise Exception( 'stopping here; oit-file handling coming' )
+        course_id_list: list = get_list_from_oit_file( count_arg )
     else:
         course_id_list: list = course_id_input.split( ',' )
     log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
     return course_id_list
+
+
+# def prep_course_id_list( course_id_input: str, settings: dict ) -> list:
+#     """ Prepares list of courses to process from course_id_input.
+#         Called by manage_build_reading_list() """
+#     log.debug( f'course_id_input, ``{course_id_input}``' )
+#     course_id_list = []
+#     if course_id_input == 'SPREADSHEET':
+#         course_id_list: list = get_list_from_spreadsheet( settings )
+#         if force:
+#             log.info( 'skipping recent-updates check' )
+#         else:
+#             ## check for recent updates -----------------------------
+#             recent_updates: bool = check_for_updates( course_id_list, settings )
+#             if recent_updates == False:
+#                 log.info( 'no recent updates' )
+#                 course_id_list = []
+#             else:
+#                 log.info( 'recent updates found' )
+#     else:
+#         course_id_list: list = course_id_input.split( ',' )
+#     log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
+#     return course_id_list
 
 
 def get_list_from_spreadsheet( settings: dict ) -> list:
@@ -354,9 +381,18 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
 def parse_args() -> dict:
     """ Parses arguments when module called via __main__ """
     log.debug( 'starting parse_args()' )
-    parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
+    # parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
+    parser = argparse.ArgumentParser( description='''Example usage...
+    ## processes first 5 courses in oit_file ------------------------
+    python3 ./build_reading_list.py -course_id oit_file -count 5
+    ## processes two courses and updates the google-sheet -----------
+    python3 ./build_reading_list.py -course_id EAST0402,TAPS1600 -update_ss true
+    ## processes the google-sheet's worksheet-1 courses ------------- 
+    python3 ./build_reading_list.py -course_id SPREADSHEET -update_ss true -force true 
+    ''', 
+        formatter_class=argparse.RawTextHelpFormatter )
     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-    parser.add_argument( '-update_ss', help='(required) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=False )
+    parser.add_argument( '-update_ss', help='(required if course_id is `spreadsheet` or a course-listing) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=False )
     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
     parser.add_argument( '-count', help='(optional) used only with `-course_id oit_file' )
     args: dict = vars( parser.parse_args() )
@@ -376,13 +412,18 @@ def check_args( args ) -> bool:
     fail_check = False
     if args['course_id'] == None or len(args['course_id']) < 8:
         fail_check = True
-    if args['update_ss'] == None:
+    if args['course_id'] == 'oit_file' and args['count'] == None:
+        log.debug( 'oit_file requires a count' )
         fail_check = True
-    try: 
-        json.loads( args['update_ss'] )
-    except:
-        log.exception( 'json-load of `update_ss` failed' )
+    if args['update_ss'] == None and args['course_id'] != 'oit_file':
+        log.debug( 'update_ss must be specified if course_id is not `oit_file`' )
         fail_check = True
+    if args['update_ss']:
+        try: 
+            json.loads( args['update_ss'] )
+        except:
+            log.exception( 'json-load of `update_ss` failed' )
+            fail_check = True
     if args['force']:
         try:
             json.loads( args['force'] )
@@ -396,6 +437,9 @@ if __name__ == '__main__':
     log.debug( 'starting if()' )
     args: dict = parse_args()
     course_id: str  = args['course_id']
-    update_ss: bool = json.loads( args['update_ss'] )
+    if args['update_ss'] == None:
+        update_ss = False
+    else:
+        update_ss: bool = json.loads( args['update_ss'] )
     force: bool = json.loads( args['force'] ) if args['force'] else False
     manage_build_reading_list( course_id, update_ss, force )
