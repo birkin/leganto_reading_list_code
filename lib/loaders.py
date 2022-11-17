@@ -51,26 +51,6 @@ class OIT_Course_Loader( object ):
         log.debug( f'found_oit_course_data, ``{found_oit_course_data}``' )
         return found_oit_course_data
 
-    # def grab_oit_course_data( self, ss_course_id: str ) -> dict:
-    #     """ Returns the OIT info for the spreadsheet course-id. """
-    #     log.debug( f'OIT_course_data - partial, ``{pprint.pformat(self.OIT_course_data)[0:1000]}...``' )
-    #     log.debug( f'preparing oit-data for ss_course_id, ``{ss_course_id}``' )
-    #     ss_subject: str = ss_course_id[0:4]
-    #     ss_code: str = ss_course_id[4:]    
-    #     log.debug( f'ss_subject, ``{ss_subject}``; ss_code, ``{ss_code}``' )
-    #     matcher: str = f'{ss_subject} {ss_code}'
-    #     found_oit_course_data: dict = {}
-    #     for entry in self.OIT_course_data:
-    #         course_entry: dict = entry
-    #         # log.debug( f'course_entry, ``{course_entry}``' )
-    #         oit_course_code = course_entry['COURSE_CODE']
-    #         if matcher in oit_course_code:
-    #             found_oit_course_data = course_entry
-    #             log.debug( 'match found; breaking' )
-    #             break
-    #     log.debug( f'found_oit_course_data, ``{found_oit_course_data}``' )
-    #     return found_oit_course_data
-
     ## end class OIT_Course_Loader()
 
 

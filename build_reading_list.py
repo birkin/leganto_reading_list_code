@@ -60,14 +60,6 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     ## end def manage_build_reading_list()
 
 
-
-
-
-
-
-
-
-
 def load_initial_settings() -> dict:
     """ Loads envar settings.
         Called by manage_build_reading_list() """
