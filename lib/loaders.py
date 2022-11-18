@@ -29,6 +29,24 @@ class OIT_Course_Loader( object ):
             rows = list(reader)
         return rows
 
+    def grab_course_list( self, count: int ) -> list:
+        """ Returns a list of the OIT courses.
+            Called by manage_build_reading_list -> prep_course_id_list(),
+            ...when the script is run to specify getting the course-list from the OIT file.  """
+        log.debug( f'count, ``{count}``' )
+        course_codes: list = []
+        for entry in self.OIT_course_data:
+            course_entry: dict = entry
+            oit_course_code = course_entry['COURSE_CODE']
+            course_codes.append( oit_course_code )
+        if count == 0:
+            pass
+        else:
+            course_codes = course_codes[0:count]
+        log.debug( f'course_codes count, ``{len(course_codes)}; partial, ``{pprint.pformat(course_codes[0:100])}````' )
+        return course_codes
+
+
     def grab_oit_course_data( self, ss_course_id: str ) -> dict:
         """ Returns the OIT info for the spreadsheet course-id. 
             Called by manage_build_reading_list -> prep_classes_info() """

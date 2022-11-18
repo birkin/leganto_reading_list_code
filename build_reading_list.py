@@ -26,10 +26,11 @@ log = logging.getLogger(__name__)
 log.debug( 'logging ready' )
 
 
-def manage_build_reading_list( course_id_input: str, update_ss: bool, force: bool ):
+def manage_build_reading_list( course_id_input: str, update_ss: bool, force: bool, count: int ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
-    log.debug( f'raw course_id, ``{course_id_input}``; update_ss, ``{update_ss}``; force, ``{force}``')
+    log.debug( f'raw course_id, ``{course_id_input}``; update_ss, ``{update_ss}``; force, ``{force}``; count, ``{count}``')
+    assert type(count) == int, type(count)
     ## settings -----------------------------------------------------
     settings: dict = load_initial_settings()
     ## load/prep necessary data -------------------------------------
@@ -38,7 +39,7 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
         raise Exception( f'problem rebuilding pdf-json, error-logged, ``{err["err"]}``' )  
     oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )  # instatiation loads data from file into list of dicts
     ## prep course_id_list ------------------------------------------
-    course_id_list: list = prep_course_id_list( course_id_input, settings )
+    course_id_list: list = prep_course_id_list( course_id_input, settings, oit_course_loader, count )
     ## prep class-info-dicts ----------------------------------------
     classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
     ## prep basic data ----------------------------------------------
@@ -82,10 +83,12 @@ def load_initial_settings() -> dict:
     return settings
 
 
-def prep_course_id_list( course_id_input: str, settings: dict ) -> list:
+def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader: OIT_Course_Loader, count: int ) -> list:
     """ Prepares list of courses to process from course_id_input.
-        Called by manage_build_reading_list() """
+        Called by manage_build_reading_list() 
+        (count only used for building course-list from oit-file) """
     log.debug( f'course_id_input, ``{course_id_input}``' )
+    # assert type(count) == int, type(count)
     course_id_list = []
     if course_id_input == 'SPREADSHEET':
         course_id_list: list = get_list_from_spreadsheet( settings )
@@ -100,9 +103,9 @@ def prep_course_id_list( course_id_input: str, settings: dict ) -> list:
             else:
                 log.info( 'recent updates found' )
     elif course_id_input == 'oit_file':
-        log.debug( 'list from oit-file coming' )
+        course_id_list: list = oit_course_loader.grab_course_list( count )
+        log.debug( 'course-code list built from oit_file' )
         raise Exception( 'stopping here; oit-file handling coming' )
-        course_id_list: list = get_list_from_oit_file( count_arg )
     else:
         course_id_list: list = course_id_input.split( ',' )
     log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
@@ -434,4 +437,6 @@ if __name__ == '__main__':
     else:
         update_ss: bool = json.loads( args['update_ss'] )
     force: bool = json.loads( args['force'] ) if args['force'] else False
-    manage_build_reading_list( course_id, update_ss, force )
+    count: int = args['count'] if args['count'] else 0
+    count: int = int(args['count']) if args['count'] else 0
+    manage_build_reading_list( course_id, update_ss, force, count )
