@@ -93,6 +93,18 @@ class Misc_Test( unittest.TestCase ):
             leganto_final_processor.clean_citation_title( '“Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg' ) 
             )
 
+    def test_clean_citation_author(self):
+        """ Checks cleaned leganto author. """
+        self.assertEqual( 'Last, First', 
+            leganto_final_processor.clean_citation_title( 'Last, First' ) 
+            )
+        self.assertEqual( 'aaName', 
+            leganto_final_processor.clean_citation_title( ',Name' ) 
+            )
+        self.assertEqual( 'bbName', 
+            leganto_final_processor.clean_citation_title( 'Name,' ) 
+            )
+
 
     # def test_check_pdfs_A(self):
     #     """ Checks for accurate file-name find. """
