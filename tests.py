@@ -201,6 +201,13 @@ class CDL_Checker_Test( unittest.TestCase ):
         self.assertEqual( expected, result )
         ## end def test_search_cdl__multiple_results()
 
+    def test_search_cdl_empty_title(self):
+        """ Checks that empty search is handled properly. """
+        ocra_search_term = ''
+        expected: list = []
+        result: list = self.cdl_checker.search_cdl( ocra_search_term )
+        self.assertEqual( expected, result )
+
     def test_prep_cdl_field_text(self):
         source_list = [
             {'alma_item_pid': None,
@@ -221,7 +228,6 @@ class CDL_Checker_Test( unittest.TestCase ):
         expected = 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/b90794643>'
         result: str = self.cdl_checker.prep_cdl_field_text( source_list )
         self.assertEqual( expected, result )
-
 
     def test_prep_cdl_field_text__multiple_results(self):
         source_list = [
