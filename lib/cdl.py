@@ -33,18 +33,21 @@ class CDL_Checker(object):
 
     def search_cdl( self, search_title: str ) -> list:
         """ Fuzzy-searches cdl-titles, returns back score and file_name. """
-        if self.CDL_TITLES == []:
-            log.debug( 'populating CDL_TITLES' )
-            self.CDL_TITLES = self.populate_cdl_titles()
-            # log.debug( f'CDL_TITLES, ``{pprint.pformat(CDL_TITLES)}``' )
-            log.debug( f'len(self.CDL_TITLES), ``{len(self.CDL_TITLES)}``' )
+        log.debug( f'search_title, ``{search_title}``' )
+        assert type(search_title) == str
         matches = []
-        for entry in self.CDL_TITLES:
-            assert type(entry) == dict
-            score: int = fuzz.ratio( search_title, entry['title'] )
-            if score > 80:
-                entry['fuzzy_score'] = score
-                matches.append( entry )
+        if len( search_title.strip() ) > 0:
+            if self.CDL_TITLES == []:
+                log.debug( 'populating CDL_TITLES' )
+                self.CDL_TITLES = self.populate_cdl_titles()
+                # log.debug( f'CDL_TITLES, ``{pprint.pformat(CDL_TITLES)}``' )
+                log.debug( f'len(self.CDL_TITLES), ``{len(self.CDL_TITLES)}``' )
+            for entry in self.CDL_TITLES:
+                assert type(entry) == dict
+                score: int = fuzz.ratio( search_title, entry['title'] )
+                if score > 80:
+                    entry['fuzzy_score'] = score
+                    matches.append( entry )
         log.debug( f'matches, ``{pprint.pformat(matches)}``' )
         return matches
 
@@ -74,7 +77,8 @@ class CDL_Checker(object):
 
 def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
     """ Sees if data contains a CDL reference, and, if so, see if I can find one.
-        Called by map_book() and map_article(). """
+        Called by map_book() and map_article(). 
+        TODO -- the same code is run regardless of the if-statement; why?! """
     field_text: str = ocra_facnotes_data
     if 'cdl' in ocra_facnotes_data.lower():
         results: list = cdl_checker.search_cdl( ocra_title )
