@@ -14,9 +14,11 @@ from lib import gsheet_prepper
 from lib import leganto_final_processor
 from lib import readings_processor
 from lib.cdl import CDL_Checker
+from lib.loaders import OIT_Course_Loader
 from lib.readings_processor import check_pdfs
 
 
+COURSES_FILEPATH: str =  os.environ['LGNT__COURSES_FILEPATH']
 SCANNED_DATA_PATH: str = os.environ['LGNT__SCANNED_DATA_JSON_PATH']
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 
@@ -26,6 +28,24 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
+
+oit_course_loader = OIT_Course_Loader( COURSES_FILEPATH )  # instantiation loads data from file into list of dicts
+
+
+class OitCourseCodeTest( unittest.TestCase ):
+
+    """ Checks oit-loader functions. """
+
+    def setUp( self ):
+        pass
+
+    def test_grab_oit_course_data_all_good(self):
+        """ Checks lookup for known good item. """
+        course_id = 'EAST0402'
+        expected = 'brown.east.0402.2022-fall.s01'
+        data: dict = oit_course_loader.grab_oit_course_data( course_id )
+        assert type(data) == dict
+        self.assertEqual( expected, data['COURSE_CODE'] )
 
 
 class Misc_Test( unittest.TestCase ):

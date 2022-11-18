@@ -37,7 +37,7 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     err: dict = loaders.rebuild_pdf_data_if_necessary( {'days': settings["PDF_OLDER_THAN_DAYS"]} )
     if err:
         raise Exception( f'problem rebuilding pdf-json, error-logged, ``{err["err"]}``' )  
-    oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )  # instatiation loads data from file into list of dicts
+    oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )  # instantiation loads data from file into list of dicts
     ## prep course_id_list ------------------------------------------
     course_id_list: list = prep_course_id_list( course_id_input, settings, oit_course_loader, count )
     ## prep class-info-dicts ----------------------------------------
