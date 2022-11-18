@@ -55,7 +55,7 @@ class OIT_Course_Loader( object ):
         ss_subject: str = ss_course_id[0:4]
         ss_code: str = ss_course_id[4:]    
         log.debug( f'ss_subject, ``{ss_subject}``; ss_code, ``{ss_code}``' )
-        matcher: str = f'.{ss_subject.lower()}.{ss_code}.'
+        matcher: str = f'.{ss_subject.lower()}.{ss_code.lower()}.'
         log.debug( f'matcher, ``{matcher}``' )
         found_oit_course_data: dict = {}
         for entry in self.OIT_course_data:
