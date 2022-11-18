@@ -96,13 +96,16 @@ class Misc_Test( unittest.TestCase ):
     def test_clean_citation_author(self):
         """ Checks cleaned leganto author. """
         self.assertEqual( 'Last, First', 
-            leganto_final_processor.clean_citation_title( 'Last, First' ) 
+            leganto_final_processor.clean_citation_author( 'Last, First' ) 
             )
-        self.assertEqual( 'aaName', 
-            leganto_final_processor.clean_citation_title( ',Name' ) 
+        self.assertEqual( 'Name', 
+            leganto_final_processor.clean_citation_author( ',Name' ) 
             )
-        self.assertEqual( 'bbName', 
-            leganto_final_processor.clean_citation_title( 'Name,' ) 
+        self.assertEqual( 'Name', 
+            leganto_final_processor.clean_citation_author( 'Name,' ) 
+            )
+        self.assertEqual( '', 
+            leganto_final_processor.clean_citation_author( ', ' ) 
             )
 
 
