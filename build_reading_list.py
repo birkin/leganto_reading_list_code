@@ -26,11 +26,14 @@ log = logging.getLogger(__name__)
 log.debug( 'logging ready' )
 
 
-def manage_build_reading_list( course_id_input: str, update_ss: bool, force: bool, count: int ):
+def manage_build_reading_list( course_id_input: str, update_ss: bool, force: bool, range_arg: dict ):
     """ Manages db-querying, assembling, and posting to gsheet. 
         Called by if...main: """
-    log.debug( f'raw course_id, ``{course_id_input}``; update_ss, ``{update_ss}``; force, ``{force}``; count, ``{count}``')
-    assert type(count) == int, type(count)
+    log.debug( f'raw course_id, ``{course_id_input}``; update_ss, ``{update_ss}``; force, ``{force}``; range_arg, ``{range_arg}``')
+    assert type(course_id_input) == str, type(course_id_input)
+    assert type(update_ss) == bool, type(update_ss)
+    assert type(force) == bool, type(force)
+    assert type(range_arg) == dict, type(range_arg)
     ## settings -----------------------------------------------------
     settings: dict = load_initial_settings()
     ## load/prep necessary data -------------------------------------
@@ -39,7 +42,7 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
         raise Exception( f'problem rebuilding pdf-json, error-logged, ``{err["err"]}``' )  
     oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )  # instantiation loads data from file into list of dicts
     ## prep course_id_list ------------------------------------------
-    course_id_list: list = prep_course_id_list( course_id_input, settings, oit_course_loader, count )
+    course_id_list: list = prep_course_id_list( course_id_input, settings, oit_course_loader, range_arg )
     ## prep class-info-dicts ----------------------------------------
     classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
     ## prep basic data ----------------------------------------------
@@ -83,7 +86,7 @@ def load_initial_settings() -> dict:
     return settings
 
 
-def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader: OIT_Course_Loader, count: int ) -> list:
+def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader: OIT_Course_Loader, range_arg: dict ) -> list:
     """ Prepares list of courses to process from course_id_input.
         Called by manage_build_reading_list() 
         (count only used for building course-list from oit-file) """
@@ -103,9 +106,14 @@ def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader
             else:
                 log.info( 'recent updates found' )
     elif course_id_input == 'oit_file':
-        course_id_list: list = oit_course_loader.grab_course_list( count )
+        oit_course_id_list: list = oit_course_loader.grab_course_list( range_arg )
+        oit_course_loader.populate_tracker( oit_course_id_list )
+        course_id_list = []
+        for entry in oit_course_id_list:
+            oit_course_id: str = entry
+            plain_course_code: str = oit_course_loader.convert_oit_course_code_to_plain_course_code( oit_course_id )
+            course_id_list.append( plain_course_code )
         log.debug( 'course-code list built from oit_file' )
-        raise Exception( 'stopping here; oit-file handling coming' )
     else:
         course_id_list: list = course_id_input.split( ',' )
     log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
@@ -379,7 +387,7 @@ def parse_args() -> dict:
     # parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
     parser = argparse.ArgumentParser( description='''Example usage...
     ## processes first 5 courses in oit_file ------------------------
-    python3 ./build_reading_list.py -course_id oit_file -count 5
+    python3 ./build_reading_list.py -course_id oit_file -range '{"start": 5, "end": 10}'
     ## processes two courses and updates the google-sheet -----------
     python3 ./build_reading_list.py -course_id EAST0402,TAPS1600 -update_ss true
     ## processes the google-sheet's worksheet-1 courses ------------- 
@@ -389,7 +397,7 @@ def parse_args() -> dict:
     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
     parser.add_argument( '-update_ss', help='(required if course_id is `spreadsheet` or a course-listing) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=False )
     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
-    parser.add_argument( '-count', help='(optional) used only with `-course_id oit_file' )
+    parser.add_argument( '-range', help='(optional) used only with `-course_id oit_file' )
     args: dict = vars( parser.parse_args() )
     log.info( f'\n\nSTARTING script; perceived args, ```{args}```' )
     ## do a bit of validation ---------------------------------------
@@ -407,9 +415,18 @@ def check_args( args ) -> bool:
     fail_check = False
     if args['course_id'] == None or len(args['course_id']) < 8:
         fail_check = True
-    if args['course_id'] == 'oit_file' and args['count'] == None:
-        log.debug( 'oit_file requires a count' )
-        fail_check = True
+    if args['course_id'] == 'oit_file' and args['range']:
+        range_arg = {}
+        try:
+            range_arg = json.loads( args['range'] )
+        except:
+            log.exception( 'json-load of `range` failed' )
+            fail_check = True
+        try:
+            assert range_arg['start'] < range_arg['end']
+        except:
+            log.exception( 'range arg validation failed' )
+            fail_check = True
     if args['update_ss'] == None and args['course_id'] != 'oit_file':
         log.debug( 'update_ss must be specified if course_id is not `oit_file`' )
         fail_check = True
@@ -437,6 +454,5 @@ if __name__ == '__main__':
     else:
         update_ss: bool = json.loads( args['update_ss'] )
     force: bool = json.loads( args['force'] ) if args['force'] else False
-    count: int = args['count'] if args['count'] else 0
-    count: int = int(args['count']) if args['count'] else 0
-    manage_build_reading_list( course_id, update_ss, force, count )
+    range_arg: dict = json.loads(args['range']) if args['range'] else {}
+    manage_build_reading_list( course_id, update_ss, force, range_arg )

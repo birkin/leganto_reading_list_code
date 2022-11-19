@@ -1,4 +1,5 @@
 import csv, datetime, logging, os, pathlib, pprint
+from collections import OrderedDict
 
 
 ## logging ----------------------------------------------------------
@@ -20,6 +21,11 @@ class OIT_Course_Loader( object ):
 
     def __init__(self, COURSES_FILEPATH: str) -> None:
         self.OIT_course_data: list = self.load_OIT_course_data( COURSES_FILEPATH )
+        self.tracker: dict = { 
+            'total_course_count': len(self.OIT_course_data),
+            'courses_to_process': {},
+            'recent_course_code_data': OrderedDict(),
+            }
 
     def load_OIT_course_data( self, COURSES_FILEPATH: str ) -> list:
         """ On instantiation, loads courses CSV file into a list of dictionaries. """
@@ -27,25 +33,42 @@ class OIT_Course_Loader( object ):
         with open( COURSES_FILEPATH ) as f:
             reader = csv.DictReader( f, delimiter = '\t' )
             rows = list(reader)
+        log.debug( f'first 5 rows, ``{pprint.pformat(rows[0:5])}``' )
         return rows
 
-    def grab_course_list( self, count: int ) -> list:
+    def grab_course_list( self, range_arg: dict ) -> list:
         """ Returns a list of the OIT courses.
             Called by manage_build_reading_list -> prep_course_id_list(),
             ...when the script is run to specify getting the course-list from the OIT file.  """
-        log.debug( f'count, ``{count}``' )
+        log.debug( f'range_arg, ``{range_arg}``' )
         course_codes: list = []
         for entry in self.OIT_course_data:
             course_entry: dict = entry
             oit_course_code = course_entry['COURSE_CODE']
             course_codes.append( oit_course_code )
-        if count == 0:
-            pass
-        else:
-            course_codes = course_codes[0:count]
-        log.debug( f'course_codes count, ``{len(course_codes)}; partial, ``{pprint.pformat(course_codes[0:100])}````' )
+        log.debug( f'course_codes total count, ``{len(course_codes)}``' )
+        if range_arg:
+            start = range_arg['start']
+            end = range_arg['end']
+            course_codes = course_codes[start:end]
+        log.debug( f'course_codes retrieved count, ``{len(course_codes)}; partial, ``{pprint.pformat(course_codes[0:100])}````' )
         return course_codes
 
+    def populate_tracker( self, course_id_list: list ) -> None:
+        """ Populates the tracker dict with the oit_course-id list. """
+        for course_id in course_id_list:
+            self.tracker['courses_to_process'][course_id] = {}
+        log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
+        return
+
+    def convert_oit_course_code_to_plain_course_code( self, oit_course_code: str ) -> str:
+        """ Returns the plain course-code.
+            Called by manage_build_reading_list -> prep_classes_info() """
+        log.debug( f'oit_course_code, ``{oit_course_code}``' )
+        parts: list = oit_course_code.split('.')
+        plain_course_code: str = parts[1].upper() + parts[2].upper()
+        log.debug( f'plain_course_code, ``{plain_course_code}``' )
+        return plain_course_code
 
     def grab_oit_course_data( self, ss_course_id: str ) -> dict:
         """ Returns the OIT info for the spreadsheet course-id. 
