@@ -182,6 +182,27 @@ def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str
     return message
 
 
+# def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str ) -> str:
+#     """ Returns possibly-helpful info for staff. """
+#     log.debug( f'possible_full_text, ``{possible_full_text}``' )
+#     log.debug( f'possible_openurl, ``{possible_openurl}``' )
+#     message = ''
+#     if possible_full_text:
+#         message = f'Possible full-text link: <{possible_full_text}>.'
+#     if possible_openurl:
+#         if 'https' in possible_openurl:
+#             params: str = possible_openurl.split( 'openurl?' )[1]  # sometimes there's a link, but with no parameters.
+#             if params:
+#                 log.debug( 'params exist' )
+#                 ourl_message: str = f'Occasionally-helpful link: <{possible_openurl}>.'
+#                 if message:
+#                     message = f'{message} {ourl_message}'
+#                 else:
+#                     message = ourl_message
+#     log.debug( f'staff-message, ``{message}``' )
+#     return message
+
+
 def reformat_for_leganto_sheet( leganto_data: list ) -> list:
     """ Reformats data for leganto-spreadsheet post.
         Called by manage_build_reading_list() -> leganto_final_processor.py update_gsheet() """

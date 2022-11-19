@@ -300,7 +300,6 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
         row_dict['citation_source'] = leganto_final_processor.calculate_leganto_citation_source( result )
         row_dict['citation_start_page'] = result['citation_start_page']
         row_dict['citation_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-        # row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
         row_dict['citation_title'] = leganto_final_processor.clean_citation_title( result['citation_title'] )
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = leganto_final_processor.calculate_leganto_course_code( result['coursecode'] )
@@ -310,18 +309,60 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
         row_dict['reading_list_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
         row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
         row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-        row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
+        # row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
+        row_dict['section_id'] = result['section_id']
         row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
         row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
         leganto_data.append( row_dict )
-        # csv_rows.append( row_dict )
-        # row_values: list = list( row_dict.values() )
-        # data_values.append( row_values )
-    # log.debug( f'csv_rows, ``{pprint.pformat(csv_rows)}``' )
-    # log.debug( f'data_values, ``{data_values}``' )
     log.debug( f'leganto_data, ``{pprint.pformat(leganto_data)}``' )
     return leganto_data
+
+
+# def prep_leganto_data( basic_data: list, settings: dict ) -> list:
+#     """ Enhances basic data for spreadsheet and CSV-files. 
+#         Called by manage_build_reading_list() """
+#     leganto_data: list = []
+#     for entry in basic_data:
+#         log.debug( f'result-dict-entry, ``{pprint.pformat(entry)}``' )
+#         result: dict = entry
+#         row_dict = {}
+#         headers: list = leganto_final_processor.get_headers()
+#         for entry in headers:
+#             header: str = entry
+#             row_dict[header] = ''
+#         log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
+#         course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
+#         row_dict['citation_author'] = leganto_final_processor.clean_citation_author( result['citation_author'] ) 
+#         row_dict['citation_doi'] = result['citation_doi']
+#         row_dict['citation_end_page'] = result['citation_end_page']
+#         row_dict['citation_isbn'] = result['citation_isbn']
+#         row_dict['citation_issn'] = result['citation_issn']
+#         row_dict['citation_issue'] = result['citation_issue']
+#         row_dict['citation_journal_title'] = result['citation_journal_title']
+#         row_dict['citation_publication_date'] = result['citation_publication_date']
+#         row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if result['external_system_id'] else ''
+#         row_dict['citation_secondary_type'] = leganto_final_processor.calculate_leganto_type( result['citation_secondary_type'] )
+#         row_dict['citation_source'] = leganto_final_processor.calculate_leganto_citation_source( result )
+#         row_dict['citation_start_page'] = result['citation_start_page']
+#         row_dict['citation_status'] = 'BeingPrepared' if result['external_system_id'] else ''
+#         # row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
+#         row_dict['citation_title'] = leganto_final_processor.clean_citation_title( result['citation_title'] )
+#         row_dict['citation_volume'] = result['citation_volume']
+#         row_dict['coursecode'] = leganto_final_processor.calculate_leganto_course_code( result['coursecode'] )
+#         row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
+#         # row_dict['reading_list_library_note'] = f'Possible full-text link: <{result["citation_source2"]}>.' if result["citation_source2"] else ''
+#         # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
+#         row_dict['reading_list_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
+#         row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
+#         row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
+#         row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
+#         row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
+#         row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
+#         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
+#         leganto_data.append( row_dict )
+#     log.debug( f'leganto_data, ``{pprint.pformat(leganto_data)}``' )
+#     return leganto_data
 
     ## end def prep_leganto_data()
 
