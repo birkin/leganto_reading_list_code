@@ -120,29 +120,6 @@ def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader
     return course_id_list
 
 
-# def prep_course_id_list( course_id_input: str, settings: dict ) -> list:
-#     """ Prepares list of courses to process from course_id_input.
-#         Called by manage_build_reading_list() """
-#     log.debug( f'course_id_input, ``{course_id_input}``' )
-#     course_id_list = []
-#     if course_id_input == 'SPREADSHEET':
-#         course_id_list: list = get_list_from_spreadsheet( settings )
-#         if force:
-#             log.info( 'skipping recent-updates check' )
-#         else:
-#             ## check for recent updates -----------------------------
-#             recent_updates: bool = check_for_updates( course_id_list, settings )
-#             if recent_updates == False:
-#                 log.info( 'no recent updates' )
-#                 course_id_list = []
-#             else:
-#                 log.info( 'recent updates found' )
-#     else:
-#         course_id_list: list = course_id_input.split( ',' )
-#     log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
-#     return course_id_list
-
-
 def get_list_from_spreadsheet( settings: dict ) -> list:
     """ Builds course-id-list from spreadsheet.
         Called by prep_course_id_list() """
@@ -285,10 +262,11 @@ def prep_basic_data( classes_info: list, settings: dict ) -> list:
             if all_course_results == []:
                 all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         else:
+            log.debug( f'no class_id found for class_info_entry, ``{class_info_entry}``' )
             all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         log.debug( f'all_course_results, ``{all_course_results}``' )
         all_results = all_results + all_course_results
-        log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
+        # log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
     log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
     return all_results
 
@@ -349,36 +327,6 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
 
 
 ## -- script-caller helpers -----------------------------------------
-
-
-# def parse_args() -> dict:
-#     """ Parses arguments when module called via __main__ """
-#     parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
-#     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
-#     parser.add_argument( '-update_ss', help='(required) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=True )
-#     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
-#     args: dict = vars( parser.parse_args() )
-#     log.info( f'\n\nSTARTING script; perceived args, ```{args}```' )
-#     ## do a bit of validation ---------------------------------------
-#     fail_check = False
-#     if args['course_id'] == None or len(args['course_id']) < 8:
-#         fail_check = True
-#     if args['update_ss'] == None:
-#         fail_check = True
-#     try: 
-#         json.loads( args['update_ss'] )
-#     except:
-#         log.exception( 'json-load of `update_ss` failed' )
-#         fail_check = True
-#     if args['force']:
-#         try:
-#             json.loads( args['force'] )
-#         except:
-#             log.exception( 'json-load of `force` failed' )
-#     if fail_check == True:
-#         parser.print_help()
-#         sys.exit()
-#     return args
 
 
 def parse_args() -> dict:
