@@ -174,7 +174,7 @@ def check_for_updates( course_id_list: list, settings: dict ) -> bool:
 def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
     """ Takes list of course_ids and adds required minimal info using OIT data.
         Called by manage_build_reading_list() """
-    # log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
+    log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
     classes_info = []
     for course_id_entry in course_id_list:  # now that we have the spreadsheet course_id_list, get necessary OIT data
         course_id_entry: str = course_id_entry

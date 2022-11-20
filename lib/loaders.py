@@ -55,7 +55,8 @@ class OIT_Course_Loader( object ):
         return course_codes
 
     def populate_tracker( self, course_id_list: list ) -> None:
-        """ Populates the tracker dict with the oit_course-id list. """
+        """ Populates the tracker dict with the oit_course-id list. 
+            Called by manage_build_reading_list -> prep_course_id_list() """
         for course_id in course_id_list:
             self.tracker['courses_to_process'][course_id] = {}
         log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
@@ -95,6 +96,7 @@ class OIT_Course_Loader( object ):
     def update_tracker( self, leganto_data: list, settings: dict ) -> None:
         """ Updates the tracker dict with course-status.
             Called by manage_build_reading_list() """
+        log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
         for entry in leganto_data:
             leganto_entry: dict = entry
             log.debug( f'leganto_entry, ``{leganto_entry}``' )
@@ -105,6 +107,22 @@ class OIT_Course_Loader( object ):
                 self.tracker['courses_to_process'][oit_coursecode]['status'] = 'processed'
         log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
         ## update tracker-json --------------------------------------
+        self.write_tracker_data( leganto_data, settings )
+        # if not os.path.isfile( settings['TRACKER_JSON_FILEPATH'] ):
+        #     with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+        #         json.dump( self.tracker, f, indent=2 )
+        # else:
+        #     with open( settings['TRACKER_JSON_FILEPATH'], 'r' ) as f:
+        #         existing_tracker_data: dict = json.load( f )
+        #     for oit_coursecode in self.tracker['courses_to_process'].keys():
+        #         existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
+        #     with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+        #         json.dump( existing_tracker_data, f, indent=2 )        
+        return
+
+    def write_tracker_data( self, leganto_data: list, settings: dict ) -> None:
+        """ Updates the tracker json file.
+            Called by update_tracker() """
         if not os.path.isfile( settings['TRACKER_JSON_FILEPATH'] ):
             with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
                 json.dump( self.tracker, f, indent=2 )
@@ -114,8 +132,9 @@ class OIT_Course_Loader( object ):
             for oit_coursecode in self.tracker['courses_to_process'].keys():
                 existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
             with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
-                json.dump( existing_tracker_data, f, indent=2 )        
+                json.dump( existing_tracker_data, f, indent=2 )    
         return
+
     ## end class OIT_Course_Loader()
 
 
