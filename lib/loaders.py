@@ -22,9 +22,19 @@ class OIT_Course_Loader( object ):
     def __init__(self, COURSES_FILEPATH: str) -> None:
         self.OIT_course_data: list = self.load_OIT_course_data( COURSES_FILEPATH )
         self.tracker: dict = { 
-            'total_course_count': len(self.OIT_course_data),
+            'meta': {
+                'total_oit_course_count': len(self.OIT_course_data),
+                'processed_oit_course_count': 0,
+            },
             'oit_courses_processed': {},
             }
+
+    # def __init__(self, COURSES_FILEPATH: str) -> None:
+    #     self.OIT_course_data: list = self.load_OIT_course_data( COURSES_FILEPATH )
+    #     self.tracker: dict = { 
+    #         'total_course_count': len(self.OIT_course_data),
+    #         'oit_courses_processed': {},
+    #         }
 
     def load_OIT_course_data( self, COURSES_FILEPATH: str ) -> list:
         """ On instantiation, loads courses CSV file into a list of dictionaries. """
@@ -216,15 +226,21 @@ class OIT_Course_Loader( object ):
     def write_tracker_data( self, leganto_data: list, settings: dict ) -> None:
         """ Updates the tracker json file.
             Called by update_tracker() """
+        self.tracker['meta']['processed_oit_course_count'] = len( self.tracker['oit_courses_processed'] )
         if not os.path.isfile( settings['TRACKER_JSON_FILEPATH'] ):         # create file if it doesn't exist
+            log.debug( 'creating tracker file' )
             with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
                 json.dump( self.tracker, f, indent=2 )
         else:
+            log.debug( 'updating tracker file' )    
             with open( settings['TRACKER_JSON_FILEPATH'], 'r' ) as f:
                 try:                                                        # try to read and update the file; could be empty
                     existing_tracker_data: dict = json.load( f )
-                    for oit_coursecode in self.tracker['courses_to_process'].keys():
-                        existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
+                    log.debug( f'existing_tracker_data, ``{pprint.pformat(existing_tracker_data)}``' )  
+                    for oit_coursecode in self.tracker['oit_courses_processed'].keys():
+                        existing_tracker_data['oit_courses_processed'][oit_coursecode] = self.tracker['oit_courses_processed'][oit_coursecode]
+                    log.debug( f'existing_tracker_data after update, ``{pprint.pformat(existing_tracker_data)}``' )  
+                    existing_tracker_data['meta']['processed_oit_course_count'] = len( existing_tracker_data['oit_courses_processed'] )
                     with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
                         json.dump( existing_tracker_data, f, indent=2 )    
                 except:                                                     # if file is empty, just write the data
