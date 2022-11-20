@@ -230,7 +230,7 @@ class OIT_Course_Loader( object ):
         if not os.path.isfile( settings['TRACKER_JSON_FILEPATH'] ):         # create file if it doesn't exist
             log.debug( 'creating tracker file' )
             with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
-                json.dump( self.tracker, f, indent=2 )
+                json.dump( self.tracker, f, sort_keys=True, indent=2 )
         else:
             log.debug( 'updating tracker file' )    
             with open( settings['TRACKER_JSON_FILEPATH'], 'r' ) as f:
@@ -242,11 +242,11 @@ class OIT_Course_Loader( object ):
                     log.debug( f'existing_tracker_data after update, ``{pprint.pformat(existing_tracker_data)}``' )  
                     existing_tracker_data['meta']['processed_oit_course_count'] = len( existing_tracker_data['oit_courses_processed'] )
                     with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
-                        json.dump( existing_tracker_data, f, indent=2 )    
+                        json.dump( existing_tracker_data, f, sort_keys=True, indent=2 )    
                 except:                                                     # if file is empty, just write the data
                     log.debug( 'tracker file is empty' )
                     with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
-                        json.dump( self.tracker, f, indent=2 )
+                        json.dump( self.tracker, f, sort_keys=True, indent=2 )
         return
 
     ## end class OIT_Course_Loader()
