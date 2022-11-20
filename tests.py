@@ -43,18 +43,18 @@ class OitCourseCodeTest( unittest.TestCase ):
         """ Checks lookup for known good item. """
         course_id = 'EAST0402'
         expected = 'brown.east.0402.2022-fall.s01'
-        data: dict = oit_course_loader.grab_oit_course_data( course_id )
-        assert type(data) == dict
-        self.assertEqual( expected, data['COURSE_CODE'] )
+        data: list = oit_course_loader.grab_oit_course_data( course_id )
+        assert type(data) == list
+        self.assertEqual( expected, data[0]['COURSE_CODE'] )
 
     def test_grab_oit_course_data__code_part_contains_letter(self):
         """ Checks lookup for item with code-part containing a letter. 
             (Had to lowercase the code-part.) """
         course_id = 'ANTH0066X'
         expected = 'brown.anth.0066x.2023-spring.s01'
-        data: dict = oit_course_loader.grab_oit_course_data( course_id )
-        assert type(data) == dict
-        self.assertEqual( expected, data['COURSE_CODE'] )
+        data: list = oit_course_loader.grab_oit_course_data( course_id )
+        assert type(data) == list
+        self.assertEqual( expected, data[0]['COURSE_CODE'] )
 
 
 class Misc_Test( unittest.TestCase ):
