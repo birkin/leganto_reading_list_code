@@ -198,16 +198,34 @@ def parse_openurl( raw_ourl: str ) -> dict:
         Called by map_article() """
     log.debug( f'raw_ourl, ``{raw_ourl}``' )
     ourl_dct = {}
-    if raw_ourl[0:43] == 'https://login.revproxy.brown.edu/login?url=':
-        log.debug( 'removing proxy ' )
-        ourl = raw_ourl[43:]
-        log.debug( f'updated ourl, ``{ourl}``' )
-    else:
-        ourl = raw_ourl
-    ourl_section: str = ourl.split( '?' )[1]
-    ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
+    if raw_ourl:
+        if raw_ourl[0:43] == 'https://login.revproxy.brown.edu/login?url=':
+            log.debug( 'removing proxy ' )
+            ourl = raw_ourl[43:]
+            log.debug( f'updated ourl, ``{ourl}``' )
+        else:
+            ourl = raw_ourl
+        ourl_section: str = ourl.split( '?' )[1]
+        ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
     log.debug( f'ourl_dct, ``{pprint.pformat(ourl_dct)}``' )
     return ourl_dct
+
+
+# def parse_openurl( raw_ourl: str ) -> dict:
+#     """ Returns fielded openurl elements.
+#         Called by map_article() """
+#     log.debug( f'raw_ourl, ``{raw_ourl}``' )
+#     ourl_dct = {}
+#     if raw_ourl[0:43] == 'https://login.revproxy.brown.edu/login?url=':
+#         log.debug( 'removing proxy ' )
+#         ourl = raw_ourl[43:]
+#         log.debug( f'updated ourl, ``{ourl}``' )
+#     else:
+#         ourl = raw_ourl
+#     ourl_section: str = ourl.split( '?' )[1]
+#     ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
+#     log.debug( f'ourl_dct, ``{pprint.pformat(ourl_dct)}``' )
+#     return ourl_dct
 
 
 def parse_start_page_from_ourl( parts: dict ):

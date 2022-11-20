@@ -326,32 +326,66 @@ class OpenUrlParserTest( unittest.TestCase ):
         self.ourls: list = [
             '//library.brown.edu/easyarticle/?genre=article&atitle="If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines&title=Theatre Journal&date=2011&volume=63&issue=4&spage=607&epage=621&issn=&doi=&aulast=J. Lorenzo&aufirst=Perillo&auinit=&__char_set=utf8',
             'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8',
+            None
             ]
+
+    # def setUp( self ):
+    #     self.maxDiff = None
+    #     self.ourls: list = [
+    #         '//library.brown.edu/easyarticle/?genre=article&atitle="If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines&title=Theatre Journal&date=2011&volume=63&issue=4&spage=607&epage=621&issn=&doi=&aulast=J. Lorenzo&aufirst=Perillo&auinit=&__char_set=utf8',
+    #         'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8',
+    #         ]
 
     def test_parse_openurl(self):
         """ Checks parsing of openurl, including revproxied urls. """
         expected = [
             {'genre': ['article'], 'atitle': ['"If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines'], 'title': ['Theatre Journal'], 'date': ['2011'], 'volume': ['63'], 'issue': ['4'], 'spage': ['607'], 'epage': ['621'], 'aulast': ['J. Lorenzo'], 'aufirst': ['Perillo'], '__char_set': ['utf8']},
             {'sid': ['sfx:citation'], 'genre': ['article'], 'atitle': ['The Plot of her Undoing'], 'title': ['Feminist Art Coalition'], 'date': ['2020-12-28'], 'aulast': ['Hartman'], 'aufirst': ['Saidiya'], '__char_set': ['utf8']},
+            {},
             ]
         for (i, ourl) in enumerate(self.ourls):
             parts: dict = readings_processor.parse_openurl( ourl )
             log.debug( f'parts, ``{parts}``' )
             self.assertEqual( expected[i], parts )
-        
+
+    # def test_parse_openurl(self):
+    #     """ Checks parsing of openurl, including revproxied urls. """
+    #     expected = [
+    #         {'genre': ['article'], 'atitle': ['"If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines'], 'title': ['Theatre Journal'], 'date': ['2011'], 'volume': ['63'], 'issue': ['4'], 'spage': ['607'], 'epage': ['621'], 'aulast': ['J. Lorenzo'], 'aufirst': ['Perillo'], '__char_set': ['utf8']},
+    #         {'sid': ['sfx:citation'], 'genre': ['article'], 'atitle': ['The Plot of her Undoing'], 'title': ['Feminist Art Coalition'], 'date': ['2020-12-28'], 'aulast': ['Hartman'], 'aufirst': ['Saidiya'], '__char_set': ['utf8']},
+    #         ]
+    #     for (i, ourl) in enumerate(self.ourls):
+    #         parts: dict = readings_processor.parse_openurl( ourl )
+    #         log.debug( f'parts, ``{parts}``' )
+    #         self.assertEqual( expected[i], parts )
+
     def test_parse_start_page_from_ourl(self):
-        expected = [ '607', '' ]
+        expected = [ '607', '', '']
         for (i, ourl) in enumerate(self.ourls):
             parts: dict = readings_processor.parse_openurl( ourl )
             spage: str = readings_processor.parse_start_page_from_ourl( parts )
             self.assertEqual( expected[i], spage )
 
+    # def test_parse_start_page_from_ourl(self):
+    #     expected = [ '607', '' ]
+    #     for (i, ourl) in enumerate(self.ourls):
+    #         parts: dict = readings_processor.parse_openurl( ourl )
+    #         spage: str = readings_processor.parse_start_page_from_ourl( parts )
+    #         self.assertEqual( expected[i], spage )
+
     def test_parse_end_page_from_ourl(self):
-        expected = [ '621', '' ]
+        expected = [ '621', '', '' ]
         for (i, ourl) in enumerate(self.ourls):
             parts: dict = readings_processor.parse_openurl( ourl )
             epage: str = readings_processor.parse_end_page_from_ourl( parts )
             self.assertEqual( expected[i], epage )
+
+    # def test_parse_end_page_from_ourl(self):
+    #     expected = [ '621', '' ]
+    #     for (i, ourl) in enumerate(self.ourls):
+    #         parts: dict = readings_processor.parse_openurl( ourl )
+    #         epage: str = readings_processor.parse_end_page_from_ourl( parts )
+    #         self.assertEqual( expected[i], epage )
 
     ## end class OpenUrlParserTest()
 
