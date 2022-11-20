@@ -88,6 +88,7 @@ def load_initial_settings() -> dict:
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
 
+
 def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader: OIT_Course_Loader, range_arg: dict ) -> list:
     """ Prepares list of oit-coursecodes from course_id_input.
         Simplistic coursecodes come from command-line specification, i.e. HIST1234, or from spreadsheet.
@@ -118,39 +119,6 @@ def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader
     all_coursecodes: list = simplistic_coursecode_list + oit_coursecode_list
     log.debug( f'all_coursecodes, ``{pprint.pformat(all_coursecodes)}``' )
     return all_coursecodes
-
-
-# def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader: OIT_Course_Loader, range_arg: dict ) -> list:
-#     """ Prepares list of courses to process from course_id_input.
-#         Called by manage_build_reading_list() """
-#     log.debug( f'course_id_input, ``{course_id_input}``' )
-#     # assert type(count) == int, type(count)
-#     course_id_list = []
-#     if course_id_input == 'SPREADSHEET':
-#         course_id_list: list = get_list_from_spreadsheet( settings )
-#         if force:
-#             log.info( 'skipping recent-updates check' )
-#         else:
-#             ## check for recent updates -----------------------------
-#             recent_updates: bool = check_for_updates( course_id_list, settings )
-#             if recent_updates == False:
-#                 log.info( 'no recent updates' )
-#                 course_id_list = []
-#             else:
-#                 log.info( 'recent updates found' )
-#     elif course_id_input == 'oit_file':
-#         oit_course_id_list: list = oit_course_loader.grab_course_list( range_arg )
-#         oit_course_loader.populate_tracker( oit_course_id_list )
-#         course_id_list = []
-#         for entry in oit_course_id_list:
-#             oit_course_id: str = entry
-#             plain_course_code: str = oit_course_loader.convert_oit_course_code_to_plain_course_code( oit_course_id )
-#             course_id_list.append( plain_course_code )
-#         log.debug( 'course-code list built from oit_file' )
-#     else:
-#         course_id_list: list = course_id_input.split( ',' )
-#     log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
-#     return course_id_list
 
 
 def get_list_from_spreadsheet( settings: dict ) -> list:
@@ -185,7 +153,6 @@ def check_for_updates( course_id_list: list, settings: dict ) -> bool:
         jsn_list = f_reader.read()
         last_saved_list: list = json.loads( jsn_list )
         log.debug( f'last_saved_list, ``{last_saved_list}``' )
-
         last_saved_list: list = sorted( json.loads(jsn_list) )
         log.debug( f'sorted-last_saved_list, ``{last_saved_list}``' )
         # log.debug( f'last_saved_list from disk, ``{pprint.pformat( sorted(last_saved_list) )}``' )
@@ -217,12 +184,8 @@ def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loade
             leganto_course_id: str = oit_course_data_entry['COURSE_CODE'] if oit_course_data_entry else f'oit_course_code_not_found_for__{course_id_entry}'
             leganto_course_title: str = oit_course_data_entry['COURSE_TITLE'] if oit_course_data_entry else ''
             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
-            
-            # class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
-            # simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( course_id_entry )
             simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
             class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
-            
             class_info_dict: dict = { 
                 'course_id': course_id_entry, 
                 'class_id': class_id, 
@@ -230,45 +193,8 @@ def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loade
                 'leganto_course_title': leganto_course_title,
                 'leganto_section_code': leganto_section_code }
             classes_info.append( class_info_dict )
-
-        # leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else f'oit_course_code_not_found_for__{course_id_entry}'
-        # leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
-        # leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
-        # class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
-        # class_info_dict: dict = { 
-        #     'course_id': course_id_entry, 
-        #     'class_id': class_id, 
-        #     'leganto_course_id': leganto_course_id,
-        #     'leganto_course_title': leganto_course_title,
-        #     'leganto_section_code': leganto_section_code }
-        # classes_info.append( class_info_dict )
     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
     return classes_info
-
-
-# def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
-#     """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
-#         Called by manage_build_reading_list() """
-#     log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
-#     classes_info = []
-#     for entry in course_id_list:  # now that we have the spreadsheet course_id_list, get necessary OIT data
-#         course_id_entry: str = entry
-#         log.debug( f'course_id_entry, ``{course_id_entry}``' )
-#         oit_course_data: dict = oit_course_loader.grab_oit_course_data( course_id_entry )
-#         log.debug( f'oit_course_data, ``{oit_course_data}``' )
-#         leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else f'oit_course_code_not_found_for__{course_id_entry}'
-#         leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
-#         leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
-#         class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
-#         class_info_dict: dict = { 
-#             'course_id': course_id_entry, 
-#             'class_id': class_id, 
-#             'leganto_course_id': leganto_course_id,
-#             'leganto_course_title': leganto_course_title,
-#             'leganto_section_code': leganto_section_code }
-#         classes_info.append( class_info_dict )
-#     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
-#     return classes_info
 
 
 def get_class_id( course_id: str ) -> str:
@@ -276,7 +202,6 @@ def get_class_id( course_id: str ) -> str:
         Called by manage_build_reading_list() -> prep_classes_info() """
     class_id: str = 'init'
     ## split the id -------------------------------------------------
-    # db_connection = get_db_connection()
     db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
     split_position: int = 0
     for ( i, character ) in enumerate( course_id ): 
@@ -398,52 +323,6 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
     log.debug( f'leganto_data, ``{pprint.pformat(leganto_data)}``' )
     return leganto_data
 
-
-# def prep_leganto_data( basic_data: list, settings: dict ) -> list:
-#     """ Enhances basic data for spreadsheet and CSV-files. 
-#         Called by manage_build_reading_list() """
-#     leganto_data: list = []
-#     for entry in basic_data:
-#         log.debug( f'result-dict-entry, ``{pprint.pformat(entry)}``' )
-#         result: dict = entry
-#         row_dict = {}
-#         headers: list = leganto_final_processor.get_headers()
-#         for entry in headers:
-#             header: str = entry
-#             row_dict[header] = ''
-#         log.debug( f'default row_dict, ``{pprint.pformat(row_dict)}``' )
-#         course_code_found: bool = False if 'oit_course_code_not_found' in result['coursecode'] else True
-#         row_dict['citation_author'] = leganto_final_processor.clean_citation_author( result['citation_author'] ) 
-#         row_dict['citation_doi'] = result['citation_doi']
-#         row_dict['citation_end_page'] = result['citation_end_page']
-#         row_dict['citation_isbn'] = result['citation_isbn']
-#         row_dict['citation_issn'] = result['citation_issn']
-#         row_dict['citation_issue'] = result['citation_issue']
-#         row_dict['citation_journal_title'] = result['citation_journal_title']
-#         row_dict['citation_publication_date'] = result['citation_publication_date']
-#         row_dict['citation_public_note'] = 'Please contact rock-reserves@brown.edu if you have problem accessing the course-reserves material.' if result['external_system_id'] else ''
-#         row_dict['citation_secondary_type'] = leganto_final_processor.calculate_leganto_type( result['citation_secondary_type'] )
-#         row_dict['citation_source'] = leganto_final_processor.calculate_leganto_citation_source( result )
-#         row_dict['citation_start_page'] = result['citation_start_page']
-#         row_dict['citation_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-#         # row_dict['citation_title'] = calculate_leganto_title( result['citation_title'] )
-#         row_dict['citation_title'] = leganto_final_processor.clean_citation_title( result['citation_title'] )
-#         row_dict['citation_volume'] = result['citation_volume']
-#         row_dict['coursecode'] = leganto_final_processor.calculate_leganto_course_code( result['coursecode'] )
-#         row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
-#         # row_dict['reading_list_library_note'] = f'Possible full-text link: <{result["citation_source2"]}>.' if result["citation_source2"] else ''
-#         # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
-#         row_dict['reading_list_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
-#         row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
-#         row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-#         row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
-#         row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
-#         row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''
-#         log.debug( f'updated row_dict, ``{pprint.pformat(row_dict)}``' )
-#         leganto_data.append( row_dict )
-#     log.debug( f'leganto_data, ``{pprint.pformat(leganto_data)}``' )
-#     return leganto_data
-
     ## end def prep_leganto_data()
 
 
@@ -512,6 +391,8 @@ def check_args( args ) -> bool:
             log.exception( 'json-load of `force` failed' )
     log.debug( f'fail_check, ``{fail_check}``' )
     return fail_check
+
+    ## end def check_args()
 
 
 if __name__ == '__main__':
