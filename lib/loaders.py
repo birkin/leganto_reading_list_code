@@ -110,13 +110,34 @@ class OIT_Course_Loader( object ):
             log.debug( f'leganto_entry, ``{leganto_entry}``' )
             oit_coursecode = leganto_entry['coursecode']
             if leganto_entry['reading_list_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
-                self.tracker['courses_to_process'][oit_coursecode]['status'] = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
+                status: str = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
             else:
-                self.tracker['courses_to_process'][oit_coursecode]['status'] = 'processed'
+                status: str = 'processed'
+            self.tracker['courses_to_process'][oit_coursecode] = {
+                'status': status,
+                'datetime_stamp': datetime.datetime.now().isoformat(),
+            }
         log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
         ## update tracker-json --------------------------------------
         self.write_tracker_data( leganto_data, settings )
         return
+
+    # def update_tracker( self, leganto_data: list, settings: dict ) -> None:
+    #     """ Updates the tracker dict with course-status.
+    #         Called by manage_build_reading_list() """
+    #     log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
+    #     for entry in leganto_data:
+    #         leganto_entry: dict = entry
+    #         log.debug( f'leganto_entry, ``{leganto_entry}``' )
+    #         oit_coursecode = leganto_entry['coursecode']
+    #         if leganto_entry['reading_list_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
+    #             self.tracker['courses_to_process'][oit_coursecode]['status'] = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
+    #         else:
+    #             self.tracker['courses_to_process'][oit_coursecode]['status'] = 'processed'
+    #     log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
+    #     ## update tracker-json --------------------------------------
+    #     self.write_tracker_data( leganto_data, settings )
+    #     return
 
     def write_tracker_data( self, leganto_data: list, settings: dict ) -> None:
         """ Updates the tracker json file.
