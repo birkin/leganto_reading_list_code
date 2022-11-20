@@ -77,9 +77,11 @@ class Misc_Test( unittest.TestCase ):
         self.assertEqual( 'AA', gsheet_prepper.calculate_end_column(27) )
         self.assertEqual( 'BO', gsheet_prepper.calculate_end_column( 67 ) )
 
-
     def test_clean_citation_title(self):
         """ Checks cleaned leganto title. """
+        self.assertEqual( '(EXCERPT)', 
+            leganto_final_processor.clean_citation_title( '(EXCERPT) ' ) 
+            )
         self.assertEqual( 'Bharatha Natyam-What Are You?', 
             leganto_final_processor.clean_citation_title( '(EXCERPT) "Bharatha Natyam-What Are You?.' ) 
             )
@@ -107,7 +109,6 @@ class Misc_Test( unittest.TestCase ):
         self.assertEqual( '', 
             leganto_final_processor.clean_citation_author( ', ' ) 
             )
-
 
     # def test_check_pdfs_A(self):
     #     """ Checks for accurate file-name find. """

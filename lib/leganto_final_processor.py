@@ -26,14 +26,16 @@ def get_headers() -> list:
     log.debug( f'header-count, ``{len(headers)}``' )
     return headers
 
-
 def clean_citation_title( db_title: str ) -> str:
     log.debug( f'db_title initially, ``{db_title}``' )
     if db_title:
         db_title = db_title.strip()
-        if '(EXCERPT)' in db_title:
+        log.debug( f'db_title after strip, ``{db_title}``' )
+        if db_title == '(EXCERPT)':
+            pass
+        elif '(EXCERPT)' in db_title:
             db_title = db_title.replace( '(EXCERPT)', '' )
-        db_title = db_title.strip()
+            db_title = db_title.strip()
         if db_title[-1] == ':':
             db_title = db_title[0:-1]
         if db_title[-1] == '.':
@@ -66,6 +68,51 @@ def clean_citation_title( db_title: str ) -> str:
         db_title = db_title.strip()
     log.debug( f'db_title cleaned, ``{db_title}``' )
     return db_title
+
+    ## end def clean_citation_title()
+
+
+# def clean_citation_title( db_title: str ) -> str:
+#     log.debug( f'db_title initially, ``{db_title}``' )
+#     if db_title:
+#         db_title = db_title.strip()
+#         if '(EXCERPT)' in db_title:
+#             db_title = db_title.replace( '(EXCERPT)', '' )
+#         db_title = db_title.strip()
+#         if db_title[-1] == ':':
+#             db_title = db_title[0:-1]
+#         if db_title[-1] == '.':
+#             log.debug( 'found period' )
+#             db_title = db_title[0:-1]
+#         if db_title[0] == '“':  # starting smart-quotes
+#             ## remove initial-smart-quotes if there's only one, and only one end-smart-quotes, and it's at the end.
+#             log.debug( 'found starting smart-quotes' )
+#             count_start: int = db_title.count( '“' )
+#             if count_start == 1:
+#                 count_end: int = db_title.count( '”' )
+#                 if count_end == 1:
+#                     if db_title[-1] == '”':  # ok, remove both
+#                         db_title = db_title[1:-1]
+#         if db_title[0] == '“':
+#             count_quotes: int = db_title.count( '“' )
+#             if count_quotes == 1:
+#                 db_title = db_title[1:] 
+#         if db_title[0] == '"':
+#             ## remove initial-quotes if there are two, and the other is at the end.
+#             log.debug( 'found starting simple-quotes' )
+#             count_quotes: int = db_title.count( '"' )
+#             if count_quotes == 2:
+#                 if db_title[-1] == '"':  # ok, remove both
+#                     db_title = db_title[1:-1]
+#         if db_title[0] == '"':
+#             count_quotes: int = db_title.count( '"' )
+#             if count_quotes == 1:
+#                 db_title = db_title[1:]
+#         db_title = db_title.strip()
+#     log.debug( f'db_title cleaned, ``{db_title}``' )
+#     return db_title
+
+#     ## end def clean_citation_title()
 
 
 def clean_citation_author( db_author: str ) -> str:
