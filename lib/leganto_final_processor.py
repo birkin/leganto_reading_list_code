@@ -161,10 +161,11 @@ def calculate_leganto_citation_source( result: dict ) -> str:
     return link
 
 
-def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str ) -> str:
+def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
     """ Returns possibly-helpful info for staff. """
     log.debug( f'possible_full_text, ``{possible_full_text}``' )
     log.debug( f'possible_openurl, ``{possible_openurl}``' )
+    log.debug( f'external_system_id, ``{external_system_id}``' )
     message = ''
     if possible_full_text:
         message = f'Possible full-text link: <{possible_full_text}>.'
@@ -178,6 +179,9 @@ def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str
                     message = f'{message} {ourl_message}'
                 else:
                     message = ourl_message
+    if message == '':
+        if not external_system_id:
+            message = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
     log.debug( f'staff-message, ``{message}``' )
     return message
 

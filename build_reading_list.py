@@ -50,7 +50,6 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     ## prep leganto data --------------------------------------------
     leganto_data: list = prep_leganto_data( basic_data, settings )
     ## update spreadsheet if necessary ------------------------------
-    ## post to google-sheet -----------------------------------------
     if update_ss:
         log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
         # gsheet_prepper.update_gsheet( leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
@@ -306,7 +305,9 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
         row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
         # row_dict['reading_list_library_note'] = f'Possible full-text link: <{result["citation_source2"]}>.' if result["citation_source2"] else ''
         # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
-        row_dict['reading_list_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'] )
+        row_dict['reading_list_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'], result['external_system_id'] )
+        if row_dict['reading_list_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
+            result['external_system_id'] = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'  # so this will appear in the staff spreadsheet
         row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
         row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
         # row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
