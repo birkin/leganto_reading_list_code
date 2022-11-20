@@ -111,6 +111,9 @@ def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader
                 log.info( 'recent updates found' )
     elif course_id_input == 'oit_file':
         oit_coursecode_list: list = oit_course_loader.grab_course_list( range_arg )
+
+        oit_coursecode_list = oit_course_loader.remove_already_processed_courses( oit_coursecode_list )  # i know I don't really have to return this; just being explicit
+
         oit_course_loader.populate_tracker( oit_coursecode_list )
     else:
         simplistic_coursecode_list: list = course_id_input.split( ',' )

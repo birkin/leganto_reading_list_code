@@ -54,6 +54,22 @@ class OIT_Course_Loader( object ):
         log.debug( f'course_codes retrieved count, ``{len(course_codes)}; partial, ``{pprint.pformat(course_codes[0:100])}````' )
         return course_codes
 
+    def remove_already_processed_courses( self, oit_coursecode_list: list ) -> list:
+        """ Removes courses already processed from the list.
+            Called by manage_build_reading_list -> prep_course_id_list() """
+        log.debug( f'oit_coursecode_list, ``{oit_coursecode_list}``' )
+        updated_oit_coursecode_list: list = []
+        for oit_coursecode in oit_coursecode_list:
+            if oit_coursecode in self.tracker['courses_to_process']:
+                self.tracker['courses_to_process'][oit_coursecode] = {
+                    'status': 'already_processed',
+                    'datetime_stamp': datetime.datetime.now().isoformat()
+                }
+            else:
+                updated_oit_coursecode_list.append( oit_coursecode )
+        log.debug( f'updated oit_coursecode_list, ``{oit_coursecode_list}``' )
+        return updated_oit_coursecode_list
+
     def populate_tracker( self, course_id_list: list ) -> None:
         """ Populates the tracker dict with the oit_course-id list. 
             Called by manage_build_reading_list -> prep_course_id_list() """
