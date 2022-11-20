@@ -27,6 +27,7 @@ class OIT_Course_Loader( object ):
                 'processed_oit_course_count': 0,
             },
             'oit_courses_processed': {},
+            'recent_course_data': {}
             }
 
     # def __init__(self, COURSES_FILEPATH: str) -> None:
