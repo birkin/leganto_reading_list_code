@@ -54,7 +54,7 @@ class OIT_Course_Loader( object ):
         return course_codes
 
     def remove_already_processed_courses( self, oit_coursecode_list: list, settings: dict ) -> list:
-        """ Removes courses already processed from the list.
+        """ Removes courses already processed from the list, and updates the tracker.
             Called by manage_build_reading_list -> prep_course_id_list() """
         log.debug( f'oit_coursecode_list, ``{oit_coursecode_list}``' )
         updated_oit_coursecode_list: list = []
@@ -70,8 +70,17 @@ class OIT_Course_Loader( object ):
             log.debug( f'oit_coursecode, ``{oit_coursecode}``' )
             if oit_coursecode in processed_keys:
                 log.debug( f'course already processed' )
+                existing_file_tracker_coursecode_status = temp_tracker_data['oit_courses_processed'][oit_coursecode]['status']
+                log.debug( f'existing_file_tracker_coursecode_status, ``{existing_file_tracker_coursecode_status}``' )
+                # if 'NO-OCRA' in existing_file_tracker_coursecode_status:
+                if existing_file_tracker_coursecode_status == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
+                    updated_status = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND_already_processed'
+                elif existing_file_tracker_coursecode_status =='NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND_already_processed':
+                    updated_status = existing_file_tracker_coursecode_status
+                else:
+                    updated_status = 'already_processed'
                 self.tracker['oit_courses_processed'][oit_coursecode] = {
-                    'status': 'already_processed',
+                    'status': updated_status,
                     'datetime_stamp': datetime.datetime.now().isoformat()
                 }
             else:
@@ -79,6 +88,33 @@ class OIT_Course_Loader( object ):
                 updated_oit_coursecode_list.append( oit_coursecode )
         log.debug( f'updated oit_coursecode_list, ``{oit_coursecode_list}``' )
         return updated_oit_coursecode_list
+
+    # def remove_already_processed_courses( self, oit_coursecode_list: list, settings: dict ) -> list:
+    #     """ Removes courses already processed from the list.
+    #         Called by manage_build_reading_list -> prep_course_id_list() """
+    #     log.debug( f'oit_coursecode_list, ``{oit_coursecode_list}``' )
+    #     updated_oit_coursecode_list: list = []
+    #     ## load tracker-json ----------------------------------------
+    #     processed_keys: list = []
+    #     temp_tracker_data: dict = self.load_tracker_data( settings )
+    #     try:
+    #         processed_keys = list( temp_tracker_data['oit_courses_processed'].keys() )
+    #     except:
+    #         log.exception( 'problem loading tracker-data or getting oit_courses_processed keys' )
+    #     log.debug( f'processed_keys, ``{processed_keys}``' )
+    #     for oit_coursecode in oit_coursecode_list:
+    #         log.debug( f'oit_coursecode, ``{oit_coursecode}``' )
+    #         if oit_coursecode in processed_keys:
+    #             log.debug( f'course already processed' )
+    #             self.tracker['oit_courses_processed'][oit_coursecode] = {
+    #                 'status': 'already_processed',
+    #                 'datetime_stamp': datetime.datetime.now().isoformat()
+    #             }
+    #         else:
+    #             log.debug( f'course not yet processed' )
+    #             updated_oit_coursecode_list.append( oit_coursecode )
+    #     log.debug( f'updated oit_coursecode_list, ``{oit_coursecode_list}``' )
+    #     return updated_oit_coursecode_list
 
     def load_tracker_data( self, settings: dict ) -> dict:
         """ Loads tracker-data from json file.
