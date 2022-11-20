@@ -1,4 +1,4 @@
-import csv, datetime, logging, os, pathlib, pprint
+import csv, datetime, json, logging, os, pathlib, pprint
 from collections import OrderedDict
 
 
@@ -92,7 +92,7 @@ class OIT_Course_Loader( object ):
         log.debug( f'found_oit_course_data, ``{found_oit_course_data}``' )
         return found_oit_course_data
 
-    def update_tracker( self, leganto_data: list ):
+    def update_tracker( self, leganto_data: list, settings: dict ) -> None:
         """ Updates the tracker dict with course-status.
             Called by manage_build_reading_list() """
         for entry in leganto_data:
@@ -104,6 +104,17 @@ class OIT_Course_Loader( object ):
             else:
                 self.tracker['courses_to_process'][oit_coursecode]['status'] = 'processed'
         log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
+        ## update tracker-json --------------------------------------
+        if not os.path.isfile( settings['TRACKER_JSON_FILEPATH'] ):
+            with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+                json.dump( self.tracker, f, indent=2 )
+        else:
+            with open( settings['TRACKER_JSON_FILEPATH'], 'r' ) as f:
+                existing_tracker_data: dict = json.load( f )
+            for oit_coursecode in self.tracker['courses_to_process'].keys():
+                existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
+            with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+                json.dump( existing_tracker_data, f, indent=2 )        
         return
     ## end class OIT_Course_Loader()
 

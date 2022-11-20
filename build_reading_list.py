@@ -51,7 +51,7 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     leganto_data: list = prep_leganto_data( basic_data, settings )
     ## update tracker if necessary ----------------------------------
     if course_id_input == 'oit_file':
-        oit_course_loader.update_tracker( leganto_data )
+        oit_course_loader.update_tracker( leganto_data, settings )
     ## update spreadsheet if necessary ------------------------------
     if update_ss:
         log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
@@ -77,6 +77,7 @@ def load_initial_settings() -> dict:
         'LAST_CHECKED_PATH': os.environ['LGNT__LAST_CHECKED_JSON_PATH'],            # contains last-run spreadsheet course-IDs
         'PDF_JSON_PATH': os.environ['LGNT__PDF_JSON_PATH'],                         # pre-extracted pdf data
         'FILES_URL_PATTERN': os.environ['LGNT__FILES_URL_PATTERN'],                 # pdf-url
+        'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_JSON_FILEPATH'],         # json-tracker filepath
     }
     PDF_DATA = {}
     with open( settings['PDF_JSON_PATH'], encoding='utf-8' ) as f_reader:
