@@ -49,6 +49,9 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     basic_data: list = prep_basic_data( classes_info, settings )
     ## prep leganto data --------------------------------------------
     leganto_data: list = prep_leganto_data( basic_data, settings )
+    ## update tracker if necessary ----------------------------------
+    if course_id_input == 'oit_file':
+        oit_course_loader.update_tracker( leganto_data )
     ## update spreadsheet if necessary ------------------------------
     if update_ss:
         log.info( f'update_ss is ``{update_ss}``; will update gsheet' )

@@ -92,6 +92,19 @@ class OIT_Course_Loader( object ):
         log.debug( f'found_oit_course_data, ``{found_oit_course_data}``' )
         return found_oit_course_data
 
+    def update_tracker( self, leganto_data: list ):
+        """ Updates the tracker dict with course-status.
+            Called by manage_build_reading_list() """
+        for entry in leganto_data:
+            leganto_entry: dict = entry
+            log.debug( f'leganto_entry, ``{leganto_entry}``' )
+            oit_coursecode = leganto_entry['coursecode']
+            if leganto_entry['reading_list_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
+                self.tracker['courses_to_process'][oit_coursecode]['status'] = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
+            else:
+                self.tracker['courses_to_process'][oit_coursecode]['status'] = 'processed'
+        log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
+        return
     ## end class OIT_Course_Loader()
 
 
