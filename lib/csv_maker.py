@@ -25,13 +25,13 @@ def create_csv( data: list, headers: list ) -> None:
     log.debug( f'data, ``{pprint.pformat(data)}``' )
     log.debug( f'headers, ``{pprint.pformat(headers)}``' )
 
-    # cleaned_data: list = []
-    # for entry in data:
-    #     entry: dict = entry
-    #     if 'NO-OCRA-DATA-FOUND' in entry['section_id']:
-    #         pass
-    #     else:
-    #         cleaned_data.append( entry )
+    cleaned_data: list = []
+    for entry in data:
+        entry: dict = entry
+        if 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND' in entry['reading_list_library_note']:
+            pass
+        else:
+            cleaned_data.append( entry )
     
     output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.csv'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469`
     log.debug( f'output_filename, ``{output_filename}``' ) 
@@ -49,7 +49,7 @@ def create_csv( data: list, headers: list ) -> None:
 
     ## write all rows from list to file
     # c.writerows( cleaned_data )
-    c.writerows( data )
+    c.writerows( cleaned_data )
 
     # save and close file
     csvfile.close()
