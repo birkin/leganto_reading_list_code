@@ -219,7 +219,8 @@ def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loade
             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
             
             # class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
-            simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( course_id_entry )
+            # simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( course_id_entry )
+            simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
             class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
             
             class_info_dict: dict = { 

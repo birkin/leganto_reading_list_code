@@ -65,10 +65,13 @@ class OIT_Course_Loader( object ):
     def convert_oit_course_code_to_plain_course_code( self, oit_course_code: str ) -> str:
         """ Returns the plain course-code.
             Called by manage_build_reading_list -> prep_classes_info() """
-        log.debug( f'oit_course_code, ``{oit_course_code}``' )
+        # log.debug( f'oit_course_code, ``{oit_course_code}``' )
         parts: list = oit_course_code.split('.')
-        plain_course_code: str = parts[1].upper() + parts[2].upper()
-        log.debug( f'plain_course_code, ``{plain_course_code}``' )
+        try:
+            plain_course_code: str = parts[1].upper() + parts[2].upper()
+        except:
+            log.exception( f'problem converting oit_course_code to plain_course_code for oit_course_code, ``{oit_course_code}``' )
+            plain_course_code = ''
         return plain_course_code
 
     def grab_oit_course_data( self, coursecode: str ) -> list:
