@@ -88,39 +88,69 @@ def load_initial_settings() -> dict:
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
 
-
 def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader: OIT_Course_Loader, range_arg: dict ) -> list:
-    """ Prepares list of courses to process from course_id_input.
-        Called by manage_build_reading_list() 
-        (count only used for building course-list from oit-file) """
+    """ Prepares list of oit-coursecodes from course_id_input.
+        Simplistic coursecodes come from command-line specification, i.e. HIST1234, or from spreadsheet.
+        OIT coursecodes come from the course_id_input == 'oit_file' case.
+        Called by manage_build_reading_list() """
     log.debug( f'course_id_input, ``{course_id_input}``' )
-    # assert type(count) == int, type(count)
-    course_id_list = []
+    oit_coursecode_list = []
+    simplistic_coursecode_list = []
     if course_id_input == 'SPREADSHEET':
-        course_id_list: list = get_list_from_spreadsheet( settings )
+        simplistic_coursecode_list: list = get_list_from_spreadsheet( settings )
         if force:
             log.info( 'skipping recent-updates check' )
         else:
             ## check for recent updates -----------------------------
-            recent_updates: bool = check_for_updates( course_id_list, settings )
+            recent_updates: bool = check_for_updates( simplistic_coursecode_list, settings )
             if recent_updates == False:
                 log.info( 'no recent updates' )
-                course_id_list = []
+                simplistic_coursecode_list = []
             else:
                 log.info( 'recent updates found' )
     elif course_id_input == 'oit_file':
-        oit_course_id_list: list = oit_course_loader.grab_course_list( range_arg )
-        oit_course_loader.populate_tracker( oit_course_id_list )
-        course_id_list = []
-        for entry in oit_course_id_list:
-            oit_course_id: str = entry
-            plain_course_code: str = oit_course_loader.convert_oit_course_code_to_plain_course_code( oit_course_id )
-            course_id_list.append( plain_course_code )
-        log.debug( 'course-code list built from oit_file' )
+        oit_coursecode_list: list = oit_course_loader.grab_course_list( range_arg )
+        oit_course_loader.populate_tracker( oit_coursecode_list )
     else:
-        course_id_list: list = course_id_input.split( ',' )
-    log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
-    return course_id_list
+        simplistic_coursecode_list: list = course_id_input.split( ',' )
+    log.debug( f'simplistic_coursecode_list, ``{pprint.pformat(simplistic_coursecode_list)}``' )
+    log.debug( f'oit_coursecode_list, ``{pprint.pformat(oit_coursecode_list)}``' )
+    all_coursecodes: list = simplistic_coursecode_list + oit_coursecode_list
+    log.debug( f'all_coursecodes, ``{pprint.pformat(all_coursecodes)}``' )
+    return all_coursecodes
+
+
+# def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader: OIT_Course_Loader, range_arg: dict ) -> list:
+#     """ Prepares list of courses to process from course_id_input.
+#         Called by manage_build_reading_list() """
+#     log.debug( f'course_id_input, ``{course_id_input}``' )
+#     # assert type(count) == int, type(count)
+#     course_id_list = []
+#     if course_id_input == 'SPREADSHEET':
+#         course_id_list: list = get_list_from_spreadsheet( settings )
+#         if force:
+#             log.info( 'skipping recent-updates check' )
+#         else:
+#             ## check for recent updates -----------------------------
+#             recent_updates: bool = check_for_updates( course_id_list, settings )
+#             if recent_updates == False:
+#                 log.info( 'no recent updates' )
+#                 course_id_list = []
+#             else:
+#                 log.info( 'recent updates found' )
+#     elif course_id_input == 'oit_file':
+#         oit_course_id_list: list = oit_course_loader.grab_course_list( range_arg )
+#         oit_course_loader.populate_tracker( oit_course_id_list )
+#         course_id_list = []
+#         for entry in oit_course_id_list:
+#             oit_course_id: str = entry
+#             plain_course_code: str = oit_course_loader.convert_oit_course_code_to_plain_course_code( oit_course_id )
+#             course_id_list.append( plain_course_code )
+#         log.debug( 'course-code list built from oit_file' )
+#     else:
+#         course_id_list: list = course_id_input.split( ',' )
+#     log.debug( f'course_id_list, ``{pprint.pformat(course_id_list)}``' )
+#     return course_id_list
 
 
 def get_list_from_spreadsheet( settings: dict ) -> list:
@@ -172,28 +202,72 @@ def check_for_updates( course_id_list: list, settings: dict ) -> bool:
 
 
 def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
-    """ Takes list of course_ids and adds required minimal info using OIT data.
+    """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
         Called by manage_build_reading_list() """
     log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
     classes_info = []
-    for course_id_entry in course_id_list:  # now that we have the spreadsheet course_id_list, get necessary OIT data
-        course_id_entry: str = course_id_entry
+    for entry in course_id_list:  # with the oit-coursecode, get necessary OIT data
+        course_id_entry: str = entry
         log.debug( f'course_id_entry, ``{course_id_entry}``' )
-        oit_course_data: dict = oit_course_loader.grab_oit_course_data( course_id_entry )
+        oit_course_data: list = oit_course_loader.grab_oit_course_data( course_id_entry )
         log.debug( f'oit_course_data, ``{oit_course_data}``' )
-        leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else f'oit_course_code_not_found_for__{course_id_entry}'
-        leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
-        leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
-        class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
-        class_info_dict: dict = { 
-            'course_id': course_id_entry, 
-            'class_id': class_id, 
-            'leganto_course_id': leganto_course_id,
-            'leganto_course_title': leganto_course_title,
-            'leganto_section_code': leganto_section_code }
-        classes_info.append( class_info_dict )
+        for entry in oit_course_data:
+            oit_course_data_entry: dict = entry
+            log.debug( f'oit_course_data_entry, ``{oit_course_data_entry}``' )
+            leganto_course_id: str = oit_course_data_entry['COURSE_CODE'] if oit_course_data_entry else f'oit_course_code_not_found_for__{course_id_entry}'
+            leganto_course_title: str = oit_course_data_entry['COURSE_TITLE'] if oit_course_data_entry else ''
+            leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
+            
+            # class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
+            simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( course_id_entry )
+            class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
+            
+            class_info_dict: dict = { 
+                'course_id': course_id_entry, 
+                'class_id': class_id, 
+                'leganto_course_id': leganto_course_id,
+                'leganto_course_title': leganto_course_title,
+                'leganto_section_code': leganto_section_code }
+            classes_info.append( class_info_dict )
+
+        # leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else f'oit_course_code_not_found_for__{course_id_entry}'
+        # leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
+        # leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
+        # class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
+        # class_info_dict: dict = { 
+        #     'course_id': course_id_entry, 
+        #     'class_id': class_id, 
+        #     'leganto_course_id': leganto_course_id,
+        #     'leganto_course_title': leganto_course_title,
+        #     'leganto_section_code': leganto_section_code }
+        # classes_info.append( class_info_dict )
     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
     return classes_info
+
+
+# def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
+#     """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
+#         Called by manage_build_reading_list() """
+#     log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
+#     classes_info = []
+#     for entry in course_id_list:  # now that we have the spreadsheet course_id_list, get necessary OIT data
+#         course_id_entry: str = entry
+#         log.debug( f'course_id_entry, ``{course_id_entry}``' )
+#         oit_course_data: dict = oit_course_loader.grab_oit_course_data( course_id_entry )
+#         log.debug( f'oit_course_data, ``{oit_course_data}``' )
+#         leganto_course_id: str = oit_course_data['COURSE_CODE'] if oit_course_data else f'oit_course_code_not_found_for__{course_id_entry}'
+#         leganto_course_title: str = oit_course_data['COURSE_TITLE'] if oit_course_data else ''
+#         leganto_section_code: str = oit_course_data['SECTION_ID'] if oit_course_data else ''
+#         class_id: str = get_class_id( course_id_entry )  # gets class-id used for db lookups.
+#         class_info_dict: dict = { 
+#             'course_id': course_id_entry, 
+#             'class_id': class_id, 
+#             'leganto_course_id': leganto_course_id,
+#             'leganto_course_title': leganto_course_title,
+#             'leganto_section_code': leganto_section_code }
+#         classes_info.append( class_info_dict )
+#     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
+#     return classes_info
 
 
 def get_class_id( course_id: str ) -> str:

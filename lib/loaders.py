@@ -71,27 +71,54 @@ class OIT_Course_Loader( object ):
         log.debug( f'plain_course_code, ``{plain_course_code}``' )
         return plain_course_code
 
-    def grab_oit_course_data( self, ss_course_id: str ) -> dict:
-        """ Returns the OIT info for the spreadsheet course-id. 
+    def grab_oit_course_data( self, coursecode: str ) -> list:
+        """ Returns the OIT info for the simplistic-coursecode, _OR_ for the oit-coursecode.
             Called by manage_build_reading_list -> prep_classes_info() """
         log.debug( f'OIT_course_data - partial, ``{pprint.pformat(self.OIT_course_data)[0:1000]}...``' )
-        log.debug( f'preparing oit-data for ss_course_id, ``{ss_course_id}``' )
-        ss_subject: str = ss_course_id[0:4]
-        ss_code: str = ss_course_id[4:]    
-        log.debug( f'ss_subject, ``{ss_subject}``; ss_code, ``{ss_code}``' )
-        matcher: str = f'.{ss_subject.lower()}.{ss_code.lower()}.'
-        log.debug( f'matcher, ``{matcher}``' )
-        found_oit_course_data: dict = {}
-        for entry in self.OIT_course_data:
-            course_entry: dict = entry
-            # log.debug( f'course_entry, ``{course_entry}``' )
-            oit_course_code = course_entry['COURSE_CODE']
-            if matcher in oit_course_code:
-                found_oit_course_data = course_entry
-                log.debug( 'match found; breaking' )
-                break
+        log.debug( f'preparing oit-data for coursecode, ``{coursecode}``' )
+        found_oit_course_data: list = []
+        if '.' in coursecode:
+            for entry in self.OIT_course_data:
+                course_entry: dict = entry
+                # log.debug( f'course_entry, ``{course_entry}``' )
+                oit_course_code = course_entry['COURSE_CODE']
+                if coursecode == oit_course_code:
+                    found_oit_course_data.append( course_entry )
+                    log.debug( 'match found; breaking' )
+                    break
+        else:
+            for entry in self.OIT_course_data:
+                course_entry: dict = entry
+                # log.debug( f'course_entry, ``{course_entry}``' )
+                oit_course_code = course_entry['COURSE_CODE']
+                plain_course_code = self.convert_oit_course_code_to_plain_course_code( oit_course_code )
+                if coursecode == plain_course_code:
+                    found_oit_course_data.append( course_entry )
+                    log.debug( f'found match on oit_course_code, ``{oit_course_code}``' )
         log.debug( f'found_oit_course_data, ``{found_oit_course_data}``' )
         return found_oit_course_data
+
+    # def grab_oit_course_data( self, ss_course_id: str ) -> dict:
+    #     """ Returns the OIT info for the simplistic course-id. 
+    #         Called by manage_build_reading_list -> prep_classes_info() """
+    #     log.debug( f'OIT_course_data - partial, ``{pprint.pformat(self.OIT_course_data)[0:1000]}...``' )
+    #     log.debug( f'preparing oit-data for ss_course_id, ``{ss_course_id}``' )
+    #     ss_subject: str = ss_course_id[0:4]
+    #     ss_code: str = ss_course_id[4:]    
+    #     log.debug( f'ss_subject, ``{ss_subject}``; ss_code, ``{ss_code}``' )
+    #     matcher: str = f'.{ss_subject.lower()}.{ss_code.lower()}.'
+    #     log.debug( f'matcher, ``{matcher}``' )
+    #     found_oit_course_data: dict = {}
+    #     for entry in self.OIT_course_data:
+    #         course_entry: dict = entry
+    #         # log.debug( f'course_entry, ``{course_entry}``' )
+    #         oit_course_code = course_entry['COURSE_CODE']
+    #         if matcher in oit_course_code:
+    #             found_oit_course_data = course_entry
+    #             log.debug( 'match found; breaking' )
+    #             break
+    #     log.debug( f'found_oit_course_data, ``{found_oit_course_data}``' )
+    #     return found_oit_course_data
 
     def update_tracker( self, leganto_data: list, settings: dict ) -> None:
         """ Updates the tracker dict with course-status.
@@ -108,16 +135,6 @@ class OIT_Course_Loader( object ):
         log.debug( f'self.tracker, ``{pprint.pformat(self.tracker)}``' )
         ## update tracker-json --------------------------------------
         self.write_tracker_data( leganto_data, settings )
-        # if not os.path.isfile( settings['TRACKER_JSON_FILEPATH'] ):
-        #     with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
-        #         json.dump( self.tracker, f, indent=2 )
-        # else:
-        #     with open( settings['TRACKER_JSON_FILEPATH'], 'r' ) as f:
-        #         existing_tracker_data: dict = json.load( f )
-        #     for oit_coursecode in self.tracker['courses_to_process'].keys():
-        #         existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
-        #     with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
-        #         json.dump( existing_tracker_data, f, indent=2 )        
         return
 
     def write_tracker_data( self, leganto_data: list, settings: dict ) -> None:
@@ -128,12 +145,32 @@ class OIT_Course_Loader( object ):
                 json.dump( self.tracker, f, indent=2 )
         else:
             with open( settings['TRACKER_JSON_FILEPATH'], 'r' ) as f:
-                existing_tracker_data: dict = json.load( f )
-            for oit_coursecode in self.tracker['courses_to_process'].keys():
-                existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
-            with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
-                json.dump( existing_tracker_data, f, indent=2 )    
+                try:
+                    existing_tracker_data: dict = json.load( f )
+                    for oit_coursecode in self.tracker['courses_to_process'].keys():
+                        existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
+                    with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+                        json.dump( existing_tracker_data, f, indent=2 )    
+                except:
+                    log.debug( 'tracker file is empty' )
+                    with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+                        json.dump( self.tracker, f, indent=2 )
         return
+
+    # def write_tracker_data( self, leganto_data: list, settings: dict ) -> None:
+    #     """ Updates the tracker json file.
+    #         Called by update_tracker() """
+    #     if not os.path.isfile( settings['TRACKER_JSON_FILEPATH'] ):
+    #         with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+    #             json.dump( self.tracker, f, indent=2 )
+    #     else:
+    #         with open( settings['TRACKER_JSON_FILEPATH'], 'r' ) as f:
+    #             existing_tracker_data: dict = json.load( f )
+    #         for oit_coursecode in self.tracker['courses_to_process'].keys():
+    #             existing_tracker_data['courses_to_process'][oit_coursecode] = self.tracker['courses_to_process'][oit_coursecode]
+    #         with open( settings['TRACKER_JSON_FILEPATH'], 'w' ) as f:
+    #             json.dump( existing_tracker_data, f, indent=2 )    
+    #     return
 
     ## end class OIT_Course_Loader()
 
