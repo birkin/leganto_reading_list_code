@@ -46,7 +46,7 @@ def manage_build_reading_list( course_id_input: str, update_ss: bool, force: boo
     ## prep class-info-dicts ----------------------------------------
     classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
     ## prep basic data ----------------------------------------------
-    basic_data: list = prep_basic_data( classes_info, settings )
+    basic_data: list = prep_basic_data( classes_info, settings, oit_course_loader )
     ## prep leganto data --------------------------------------------
     leganto_data: list = prep_leganto_data( basic_data, settings )
     ## update tracker if necessary ----------------------------------
@@ -189,15 +189,15 @@ def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loade
             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
             simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
             
-            ## check self.tracker on simplistic_courseid to see if we have necessary data
-            class_id = ''
-            recent_simplistic_tracker_keys = list( oit_course_loader.tracker['recent_course_data'].keys() )
-            if simplistic_courseid in recent_simplistic_tracker_keys:
-                log.debug( f'found {simplistic_courseid} in recent_simplistic_tracker_keys' )
-                recent_course_data = oit_course_loader.tracker['recent_course_data'][simplistic_courseid]
-                log.debug( f'recent_course_data, ``{recent_course_data}``' )
-            if class_id == '':
-                class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
+            # ## check self.tracker on simplistic_courseid to see if we have necessary data
+            # class_id = ''
+            # recent_simplistic_tracker_keys = list( oit_course_loader.tracker['recent_course_data'].keys() )
+            # if simplistic_courseid in recent_simplistic_tracker_keys:
+            #     log.debug( f'found {simplistic_courseid} in recent_simplistic_tracker_keys' )
+            #     recent_course_data = oit_course_loader.tracker['recent_course_data'][simplistic_courseid]
+            #     log.debug( f'recent_course_data, ``{recent_course_data}``' )
+            # if class_id == '':
+            #     class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
 
             class_info_dict: dict = { 
                 'course_id': course_id_entry, 
@@ -246,7 +246,7 @@ def get_class_id( course_id: str ) -> str:
     ## end def get_class_id()
 
 
-def prep_basic_data( classes_info: list, settings: dict ) -> list:
+def prep_basic_data( classes_info: list, settings: dict, oit_course_loader: OIT_Course_Loader ) -> list:
     """ Queries OCRA and builds initial data.
         Called by manage_build_reading_list() """
     all_results: list = []
@@ -279,7 +279,12 @@ def prep_basic_data( classes_info: list, settings: dict ) -> list:
             ## leganto combined data --------------------------------
             all_course_results: list = leg_books + leg_articles + leg_excerpts
 
+
             ## TODO: add all_course_results to tracker.recent_course_data() on simplistic_key
+            if all_course_results:
+                simple_course_id = oit_course_loader.convert_oit_course_code_to_plain_course_code( class_info_entry['leganto_course_id'] )
+                oit_course_loader.tracker['recent_course_data'][simple_course_id] = all_course_results
+
 
             if all_course_results == []:
                 all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
