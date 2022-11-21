@@ -309,6 +309,8 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader: OIT_
             all_course_results: list = leg_books + leg_articles + leg_excerpts
 
 
+
+            ## update tracker-cache if necessary --------------------
             if all_course_results:
                 simple_coursecode = oit_course_loader.convert_oit_course_code_to_plain_course_code( class_info_entry['leganto_course_id'] )
                 tracker_simple_coursecode = ''
@@ -326,9 +328,6 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader: OIT_
                     log.debug( 'updating tracker `all_course_results`; tracker_simple_coursecode does not match currently-in-process simple_coursecode' )
                     oit_course_loader.tracker['recent_course_data'][simple_coursecode] = all_course_results
 
-            # if all_course_results:
-            #     simple_course_id = oit_course_loader.convert_oit_course_code_to_plain_course_code( class_info_entry['leganto_course_id'] )
-            #     oit_course_loader.tracker['recent_course_data'][simple_course_id] = all_course_results
 
 
             if all_course_results == []:
