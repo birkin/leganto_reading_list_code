@@ -309,10 +309,26 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader: OIT_
             all_course_results: list = leg_books + leg_articles + leg_excerpts
 
 
-            ## TODO: add all_course_results to tracker.recent_course_data() on simplistic_key
             if all_course_results:
-                simple_course_id = oit_course_loader.convert_oit_course_code_to_plain_course_code( class_info_entry['leganto_course_id'] )
-                oit_course_loader.tracker['recent_course_data'][simple_course_id] = all_course_results
+                simple_coursecode = oit_course_loader.convert_oit_course_code_to_plain_course_code( class_info_entry['leganto_course_id'] )
+                tracker_simple_coursecode = ''
+                try:
+                    tracker_simple_coursecode = list( oit_course_loader.tracker['recent_course_data'].keys() )[0]
+                    log.debug(msg=f'successfully got tracker_simple_coursecode, ``{tracker_simple_coursecode}``')
+                except:
+                    log.exception(msg='problem getting tracker_simple_coursecode')
+                    pass
+                log.debug( f'simple_coursecode, ``{simple_coursecode}``; tracker_simple_coursecode, ``{tracker_simple_coursecode}``' )
+                if simple_coursecode == tracker_simple_coursecode:
+                    log.debug( 'not updating tracker `all_course_results`; tracker_simple_coursecode matches currently-in-process simple_coursecode' )
+                    pass
+                else:
+                    log.debug( 'updating tracker `all_course_results`; tracker_simple_coursecode does not match currently-in-process simple_coursecode' )
+                    oit_course_loader.tracker['recent_course_data'][simple_coursecode] = all_course_results
+
+            # if all_course_results:
+            #     simple_course_id = oit_course_loader.convert_oit_course_code_to_plain_course_code( class_info_entry['leganto_course_id'] )
+            #     oit_course_loader.tracker['recent_course_data'][simple_course_id] = all_course_results
 
 
             if all_course_results == []:
