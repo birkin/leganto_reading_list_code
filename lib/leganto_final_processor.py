@@ -66,6 +66,8 @@ def clean_citation_title( db_title: str ) -> str:
             if count_quotes == 1:
                 db_title = db_title[1:]
         db_title = db_title.strip()
+    else:
+        db_title = 'no-title'
     log.debug( f'db_title cleaned, ``{db_title}``' )
     return db_title
 

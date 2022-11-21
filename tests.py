@@ -79,6 +79,9 @@ class Misc_Test( unittest.TestCase ):
 
     def test_clean_citation_title(self):
         """ Checks cleaned leganto title. """
+        self.assertEqual( 'no-title', 
+            leganto_final_processor.clean_citation_title( '' ) 
+            )
         self.assertEqual( '(EXCERPT)', 
             leganto_final_processor.clean_citation_title( '(EXCERPT) ' ) 
             )
