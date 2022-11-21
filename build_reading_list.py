@@ -188,17 +188,7 @@ def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loade
             leganto_course_title: str = oit_course_data_entry['COURSE_TITLE'] if oit_course_data_entry else ''
             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
             simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
-            
-            # ## check self.tracker on simplistic_courseid to see if we have necessary data
-            # class_id = ''
-            # recent_simplistic_tracker_keys = list( oit_course_loader.tracker['recent_course_data'].keys() )
-            # if simplistic_courseid in recent_simplistic_tracker_keys:
-            #     log.debug( f'found {simplistic_courseid} in recent_simplistic_tracker_keys' )
-            #     recent_course_data = oit_course_loader.tracker['recent_course_data'][simplistic_courseid]
-            #     log.debug( f'recent_course_data, ``{recent_course_data}``' )
-            # if class_id == '':
-            #     class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
-
+            class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
             class_info_dict: dict = { 
                 'course_id': course_id_entry, 
                 'class_id': class_id, 
@@ -208,6 +198,45 @@ def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loade
             classes_info.append( class_info_dict )
     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
     return classes_info
+
+
+# def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
+#     """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
+#         Called by manage_build_reading_list() """
+#     log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
+#     classes_info = []
+#     for entry in course_id_list:  # with the oit-coursecode, get necessary OIT data
+#         course_id_entry: str = entry
+#         log.debug( f'course_id_entry, ``{course_id_entry}``' )
+#         oit_course_data: list = oit_course_loader.grab_oit_course_data( course_id_entry )
+#         log.debug( f'oit_course_data, ``{oit_course_data}``' )
+#         for entry in oit_course_data:
+#             oit_course_data_entry: dict = entry
+#             log.debug( f'oit_course_data_entry, ``{oit_course_data_entry}``' )
+#             leganto_course_id: str = oit_course_data_entry['COURSE_CODE'] if oit_course_data_entry else f'oit_course_code_not_found_for__{course_id_entry}'
+#             leganto_course_title: str = oit_course_data_entry['COURSE_TITLE'] if oit_course_data_entry else ''
+#             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
+#             simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
+            
+#             # ## check self.tracker on simplistic_courseid to see if we have necessary data
+#             # class_id = ''
+#             # recent_simplistic_tracker_keys = list( oit_course_loader.tracker['recent_course_data'].keys() )
+#             # if simplistic_courseid in recent_simplistic_tracker_keys:
+#             #     log.debug( f'found {simplistic_courseid} in recent_simplistic_tracker_keys' )
+#             #     recent_course_data = oit_course_loader.tracker['recent_course_data'][simplistic_courseid]
+#             #     log.debug( f'recent_course_data, ``{recent_course_data}``' )
+#             # if class_id == '':
+#             #     class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
+
+#             class_info_dict: dict = { 
+#                 'course_id': course_id_entry, 
+#                 'class_id': class_id, 
+#                 'leganto_course_id': leganto_course_id,
+#                 'leganto_course_title': leganto_course_title,
+#                 'leganto_section_code': leganto_section_code }
+#             classes_info.append( class_info_dict )
+#     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
+#     return classes_info
 
 
 def get_class_id( course_id: str ) -> str:
