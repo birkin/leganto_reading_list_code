@@ -26,6 +26,36 @@ log = logging.getLogger(__name__)
 log.debug( 'logging ready' )
 
 
+def make_file_of_all_spring_courses() -> None:
+    """ Opens original OIT file, iterates through data, and saves only the spring courses to a new file. 
+        Called by if...main: """
+    log.debug( 'starting make_file_of_all_spring_courses()' )
+    ## settings -----------------------------------------------------
+    settings: dict = load_initial_settings()
+    assert type(settings) == dict
+    ## load OIT course-data -----------------------------------------
+    new_file_lines = []
+    input_filepath = settings['COURSES_FILEPATH']
+    with open( input_filepath, 'r' ) as f:
+        lines = f.readlines()
+        for i, line in enumerate( lines ):
+            if i == 0:
+                new_file_lines.append( line )
+            else:
+                parts = line.split( '\t' )
+                oit_course_code_part = parts[0]
+                if 'spring' in oit_course_code_part:
+                    new_file_lines.append( line )
+    ## save new file ---------------------------------------------
+    output_filepath = f'{settings["SPRING_COURSES_OUTPUT_DIRPATH"]}/spring_courses_ALL.csv'
+    with open( output_filepath, 'w' ) as f:
+        f.writelines( new_file_lines )
+    log.debug( 'new file saved' )
+    return
+    
+    ## end def make_file_of_all_spring_courses()
+
+
 def manage_extract_all_springs() -> list:
     """ Manages extracting all spring-only courses. 
         Called by if...main: """
@@ -55,6 +85,8 @@ def manage_extract_all_springs() -> list:
         if i > 50:
             break
     return spring_courses
+
+    ## end def manage_extract_all_springs() 
 
 
 def manage_extract_initial_springs():
@@ -120,6 +152,8 @@ def manage_extract_initial_springs():
         f.write( jsn )
     return unique_spring_courses
 
+    ## end def manage_extract_initial_springs()
+
 
 def load_initial_settings() -> dict:
     """ Loads envar settings.
@@ -142,4 +176,5 @@ def load_initial_settings() -> dict:
 if __name__ == '__main__':
     log.debug( 'starting if()' )
     # manage_extract_all_springs()
-    manage_extract_initial_springs()
+    # manage_extract_initial_springs()
+    make_file_of_all_spring_courses()
