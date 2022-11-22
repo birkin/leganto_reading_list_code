@@ -43,7 +43,7 @@ class OIT_Course_Loader( object ):
         with open( COURSES_FILEPATH ) as f:
             reader = csv.DictReader( f, delimiter = '\t' )
             rows = list(reader)
-        log.debug( f'first 5 rows, ``{pprint.pformat(rows[0:5])}``' )
+        log.debug( f'first 2 rows, ``{pprint.pformat(rows[0:2])}``' )
         return rows
 
     def grab_course_list( self, range_arg: dict ) -> list:
