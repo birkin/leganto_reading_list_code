@@ -80,15 +80,38 @@ def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  )
         Called by map_book() and map_article(). 
         TODO -- the same code is run regardless of the if-statement; why?! """
     field_text: str = ocra_facnotes_data
-    if 'cdl' in ocra_facnotes_data.lower():
-        results: list = cdl_checker.search_cdl( ocra_title )
-        field_text: str = cdl_checker.prep_cdl_field_text( results )
-    else:
+    if field_text == None:
+        field_text = ''
+    if ocra_facnotes_data:
+        if 'cdl' in ocra_facnotes_data.lower():
+            results: list = cdl_checker.search_cdl( ocra_title )
+            field_text: str = cdl_checker.prep_cdl_field_text( results )
+        else:
+            results: list = cdl_checker.search_cdl( ocra_title )
+            field_text: str = cdl_checker.prep_cdl_field_text( results )
+            log.debug( f'ADDITIONAL BOOK-CDL CHECK WOULD HAVE FOUND..., ``{field_text}``' )
+    else:  ## TODO refactor this duplicate code
         results: list = cdl_checker.search_cdl( ocra_title )
         field_text: str = cdl_checker.prep_cdl_field_text( results )
         log.debug( f'ADDITIONAL BOOK-CDL CHECK WOULD HAVE FOUND..., ``{field_text}``' )
     log.debug( f'field_text, ``{field_text}``' )
     return field_text
+
+
+# def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
+#     """ Sees if data contains a CDL reference, and, if so, see if I can find one.
+#         Called by map_book() and map_article(). 
+#         TODO -- the same code is run regardless of the if-statement; why?! """
+#     field_text: str = ocra_facnotes_data
+#     if 'cdl' in ocra_facnotes_data.lower():
+#         results: list = cdl_checker.search_cdl( ocra_title )
+#         field_text: str = cdl_checker.prep_cdl_field_text( results )
+#     else:
+#         results: list = cdl_checker.search_cdl( ocra_title )
+#         field_text: str = cdl_checker.prep_cdl_field_text( results )
+#         log.debug( f'ADDITIONAL BOOK-CDL CHECK WOULD HAVE FOUND..., ``{field_text}``' )
+#     log.debug( f'field_text, ``{field_text}``' )
+#     return field_text
 
 
 def run_article_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
