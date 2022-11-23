@@ -65,7 +65,6 @@ def filter_article_table_results( all_articles_results ):
     log.debug( f'count of excerpt_results, ``{len(excerpt_results)}``' )
     log.debug( f'count of video_results, ``{len(video_results)}``' )
     log.debug( f'count of website_results, ``{len(website_results)}``' )
-
     filtered_results = {
         'article_results': article_results,
         'audio_results': audio_results,
@@ -74,33 +73,12 @@ def filter_article_table_results( all_articles_results ):
         'video_results': video_results,
         'website_results': website_results }    
     log.debug( f'filtered_results, ``{pprint.pformat(filtered_results)}``' )
-    return filtered_results    
+    return filtered_results  
+
+    ## end def filter_article_table_results()  
 
 
-def map_books( book_results: list, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> list:
-    mapped_books = []
-    for book_result in book_results:
-        mapped_book: dict = map_book( book_result, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
-        mapped_books.append( mapped_book )
-    return mapped_books
-
-
-def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> dict:
-    log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
-    mapped_book_data: dict = MAPPED_CATEGORIES.copy()
-    mapped_book_data['citation_author'] = initial_book_data['bk_author']
-    mapped_book_data['citation_isbn'] = initial_book_data['isbn']
-    mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
-    mapped_book_data['citation_secondary_type'] = 'BK'
-    mapped_book_data['citation_source1'] = cdl.run_book_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
-    mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
-    mapped_book_data['citation_title'] = initial_book_data['bk_title']
-    mapped_book_data['coursecode'] = leganto_course_id
-    mapped_book_data['reading_list_name'] = leganto_course_title
-    mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
-    mapped_book_data['section_id'] = leganto_section_id
-    log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
-    return mapped_book_data
+## articles ---------------------------------------------------------
 
 
 def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
@@ -144,6 +122,79 @@ def map_article( initial_article_data: dict, course_id: str, leganto_course_id: 
     return mapped_article_data
 
 
+## books ------------------------------------------------------------
+
+
+def map_books( book_results: list, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> list:
+    mapped_books = []
+    for book_result in book_results:
+        mapped_book: dict = map_book( book_result, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+        mapped_books.append( mapped_book )
+    return mapped_books
+
+
+def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> dict:
+    log.debug( f'initial_book_data, ``{pprint.pformat(initial_book_data)}``' )
+    mapped_book_data: dict = MAPPED_CATEGORIES.copy()
+    mapped_book_data['citation_author'] = initial_book_data['bk_author']
+    mapped_book_data['citation_isbn'] = initial_book_data['isbn']
+    mapped_book_data['citation_publication_date'] = str(initial_book_data['bk_year']) if initial_book_data['bk_year'] else ''
+    mapped_book_data['citation_secondary_type'] = 'BK'
+    mapped_book_data['citation_source1'] = cdl.run_book_cdl_check( initial_book_data['facnotes'], initial_book_data['bk_title'], cdl_checker )
+    mapped_book_data['citation_source3'] = map_bruknow_openurl( initial_book_data.get('sfxlink', '') )
+    mapped_book_data['citation_title'] = initial_book_data['bk_title']
+    mapped_book_data['coursecode'] = leganto_course_id
+    mapped_book_data['reading_list_name'] = leganto_course_title
+    mapped_book_data['external_system_id'] = initial_book_data['requests.requestid']
+    mapped_book_data['section_id'] = leganto_section_id
+    log.debug( f'mapped_book_data, ``{pprint.pformat(mapped_book_data)}``' )
+    return mapped_book_data
+
+
+## ebooks -----------------------------------------------------------
+
+
+def map_ebooks( ebook_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
+    mapped_ebooks = []
+    for ebook_result in ebook_results:
+        mapped_ebook: dict = map_ebook( ebook_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+        mapped_ebooks.append( mapped_ebook )
+    return mapped_ebooks
+
+
+def map_ebook( initial_ebook_data: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> dict:
+    """ This function maps the data from the database to the format required by the Leganto API. 
+        Notes: 
+        - the `course_id` is used for building the url for the leganto citation_source4 field (the pdf-url).
+        - the `leganto_course_code` is used for the leganto `coursecode` field. """
+    log.debug( f'initial_ebook_data, ``{pprint.pformat(initial_ebook_data)}``' )
+    mapped_ebook_data: dict = MAPPED_CATEGORIES.copy()
+    ourl_parts: dict = parse_openurl( initial_ebook_data['sfxlink'] )
+    mapped_ebook_data['citation_author'] = f'{initial_ebook_data["aulast"]}, {initial_ebook_data["aufirst"]}'
+    mapped_ebook_data['citation_doi'] = initial_ebook_data['doi']
+    mapped_ebook_data['citation_end_page'] = str(initial_ebook_data['epage']) if initial_ebook_data['epage'] else parse_end_page_from_ourl( ourl_parts )
+    mapped_ebook_data['citation_issn'] = initial_ebook_data['issn']
+    mapped_ebook_data['citation_issue'] = initial_ebook_data['issue']
+    mapped_ebook_data['citation_publication_date'] = str( initial_ebook_data['date'] )
+    mapped_ebook_data['citation_secondary_type'] = 'EBOOK'  # guess
+    mapped_ebook_data['citation_source1'] = cdl.run_article_cdl_check( initial_ebook_data['facnotes'], initial_ebook_data['atitle'], cdl_checker )
+    mapped_ebook_data['citation_source2'] = initial_ebook_data['art_url']  
+    mapped_ebook_data['citation_source3'] = map_bruknow_openurl( initial_ebook_data.get('sfxlink', '') )  
+    mapped_ebook_data['citation_source4'] = check_pdfs( initial_ebook_data, settings['PDF_DATA'], course_id, settings )
+    mapped_ebook_data['citation_start_page'] = str(initial_ebook_data['spage']) if initial_ebook_data['spage'] else parse_start_page_from_ourl( ourl_parts )
+    mapped_ebook_data['citation_title'] = initial_ebook_data['atitle'].strip()
+    mapped_ebook_data['citation_journal_title'] = initial_ebook_data['title']
+    mapped_ebook_data['citation_volume'] = initial_ebook_data['volume']
+    mapped_ebook_data['coursecode'] = leganto_course_id    
+    mapped_ebook_data['external_system_id'] = initial_ebook_data['requests.requestid']
+    mapped_ebook_data['reading_list_name'] = leganto_course_title
+    mapped_ebook_data['section_id'] = leganto_section_id
+    log.debug( f'mapped_ebook_data, ``{pprint.pformat(mapped_ebook_data)}``' )
+    return mapped_ebook_data
+
+## excerpts ---------------------------------------------------------
+
+
 def map_excerpts( excerpt_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
     mapped_articles = []
     for excerpt_result in excerpt_results:
@@ -178,6 +229,9 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: 
     mapped_excerpt_data['section_id'] = leganto_section_id
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
+
+
+## mappers ----------------------------------------------------------
 
 
 def map_empty( leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> dict:
@@ -217,6 +271,9 @@ def map_bruknow_openurl( db_openurl: str ) -> str:
     return new_openurl
 
 
+## parsers ----------------------------------------------------------
+
+
 def parse_excerpt_author( initial_excerpt_data: dict ) -> str:
     """ Checks multiple possible fields for author info.
         Exceprts seem to have author info in multiple places; this function handles that.
@@ -252,23 +309,6 @@ def parse_openurl( raw_ourl: str ) -> dict:
     return ourl_dct
 
 
-# def parse_openurl( raw_ourl: str ) -> dict:
-#     """ Returns fielded openurl elements.
-#         Called by map_article() """
-#     log.debug( f'raw_ourl, ``{raw_ourl}``' )
-#     ourl_dct = {}
-#     if raw_ourl[0:43] == 'https://login.revproxy.brown.edu/login?url=':
-#         log.debug( 'removing proxy ' )
-#         ourl = raw_ourl[43:]
-#         log.debug( f'updated ourl, ``{ourl}``' )
-#     else:
-#         ourl = raw_ourl
-#     ourl_section: str = ourl.split( '?' )[1]
-#     ourl_dct: dict = urllib.parse.parse_qs( ourl_section )
-#     log.debug( f'ourl_dct, ``{pprint.pformat(ourl_dct)}``' )
-#     return ourl_dct
-
-
 def parse_start_page_from_ourl( parts: dict ):
     try:
         spage = parts['spage'][0]
@@ -285,6 +325,9 @@ def parse_end_page_from_ourl( parts: dict ):
         epage = ''
     log.debug( f'epage, ``{epage}``' )
     return epage
+
+
+## misc helpers -----------------------------------------------------
 
 
 def check_pdfs( db_dict_entry: dict, pdf_data: dict, course_code: str, settings: dict ) -> str:
@@ -325,8 +368,3 @@ def check_pdfs( db_dict_entry: dict, pdf_data: dict, course_code: str, settings:
             pdf_check_result = repr( possible_matches )
     log.debug( f'pdf_check_result, ``{pdf_check_result}``' )
     return pdf_check_result
-
-
-## for prep_leganto_data() ------------------------------------------
-
-
