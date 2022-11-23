@@ -274,9 +274,20 @@ def map_bruknow_openurl( db_openurl: str ) -> str:
 ## parsers ----------------------------------------------------------
 
 
+def parse_ebook_author( initial_ebook_data: dict ) -> str:
+    """ Checks multiple possible fields for ebook author info.
+        Called by map_ebook() """
+    assert type (initial_ebook_data) == dict
+    first = initial_ebook_data['bk_aufirst']
+    last = initial_ebook_data['bk_aulast']
+    name = f'{first} {last}'.strip()
+    log.debug( f'name, ``{name}``' )
+    return name
+
+
 def parse_excerpt_author( initial_excerpt_data: dict ) -> str:
     """ Checks multiple possible fields for author info.
-        Exceprts seem to have author info in multiple places; this function handles that.
+        Excerpts seem to have author info in multiple places; this function handles that.
         Called by map_excerpt() """
     first: str = initial_excerpt_data.get( 'aufirst', '' )
     if first == '':

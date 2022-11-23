@@ -620,6 +620,36 @@ class MapperTest( unittest.TestCase ):
         expected = 'Felix Guattari, Gilles Deleuze'
         self.assertEqual( expected, readings_processor.parse_excerpt_author(excerpt_db_data) )
 
+
+
+    def test_parse_ebook_author(self):
+        """ Checks parse_excerpt_author() helper's processing of various author fields. """
+        ebook_db_data: dict = {
+            'articleid': 43842,
+            'aufirst': None,
+            'auinit': None,
+            'aulast': None,
+            'bk_aufirst': 'Karl',
+            'bk_auinit': '',
+            'bk_aulast': 'Polanyi',
+            }            
+        expected = 'Karl Polanyi'
+        self.assertEqual( expected, readings_processor.parse_ebook_author(ebook_db_data) )
+        ebook_db_data: dict = { 'articleid': 108130,
+            'assignment': '',
+            'atitle': '',
+            'aufirst': '',
+            'auinit': '',
+            'aulast': '',
+            'bibno': '',
+            'bk_aufirst': '',
+            'bk_auinit': '',
+            'bk_aulast': 'Pauly, Louis',
+            }
+        expected = 'Pauly, Louis'
+        self.assertEqual( expected, readings_processor.parse_ebook_author(ebook_db_data) )
+
+
     def test_map_bruknow_openurl_a(self):
         """ Checks transformed bruknow openurl from domain-start. """
         initial_ourl_a = '//library.brown.edu/easyarticle/?genre=article&atitle=3, 4, 6, 14, 16&title=The Senses in Performance&date=2006-01-01&volume=&issue=&spage=&epage=&issn=&doi=&aulast=&aufirst=&auinit=&__char_set=utf8'
