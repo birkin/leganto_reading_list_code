@@ -41,8 +41,10 @@ class OitCourseCodeTest( unittest.TestCase ):
 
     def test_grab_oit_course_data__all_good(self):
         """ Checks lookup for known good item. """
-        course_id = 'EAST0402'
-        expected = 'brown.east.0402.2022-fall.s01'
+        # course_id = 'EAST0402'
+        # expected = 'brown.east.0402.2022-fall.s01'
+        course_id = 'ANTH0066X'
+        expected = 'brown.anth.0066x.2023-spring.s01'
         data: list = oit_course_loader.grab_oit_course_data( course_id )
         assert type(data) == list
         self.assertEqual( expected, data[0]['COURSE_CODE'] )
