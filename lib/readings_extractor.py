@@ -29,9 +29,9 @@ def get_book_readings( class_id: str ) -> list:
     return result_set
 
 
-def get_article_readings( class_id: str ) -> list:
+def get_all_articles_readings( class_id: str ) -> list:
     db_connection = db_stuff.get_db_connection()
-    sql = f"SELECT * FROM reserves.articles, reserves.requests WHERE articles.requestid = requests.requestid AND classid = {int(class_id)} AND format = 'article' AND articles.requestid = requests.requestid AND articles.status != 'volume on reserve' AND articles.status != 'purchase requested' ORDER BY `articles`.`atitle` ASC"
+    sql = f"SELECT * FROM reserves.articles, reserves.requests WHERE articles.requestid = requests.requestid AND classid = {int(class_id)} AND articles.requestid = requests.requestid AND articles.status != 'volume on reserve' AND articles.status != 'purchase requested' ORDER BY `articles`.`atitle` ASC"
     log.debug( f'sql, ``{sql}``' )
     result_set: list = []
     with db_connection:

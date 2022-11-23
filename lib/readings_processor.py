@@ -35,6 +35,47 @@ MAPPED_CATEGORIES: dict = {
     'reading_list_name': ''
 }
 
+def filter_article_table_results( all_articles_results ):
+    """ Takes all article results and puts them in proper buckets.
+        Called by build_reading_list.prep_basic_data() """
+    assert type(all_articles_results) == list
+    log.debug( f'count of all_articles_results, ``{len(all_articles_results)}``' )
+    ( article_results, audio_results, ebook_results, excerpt_results, video_results, website_results ) = ( [], [], [], [], [], [] )
+    for result in all_articles_results:
+        if 'format' in result.keys():
+            if result['format'].strip() == 'article':
+                article_results.append( result )
+            elif result['format'].strip() == 'audio':
+                audio_results.append( result )
+            elif result['format'].strip() == 'ebook':
+                ebook_results.append( result )
+            elif result['format'].strip() == 'excerpt':
+                excerpt_results.append( result )
+            elif result['format'].strip() == 'video':
+                video_results.append( result )
+            elif result['format'].strip() == 'website':
+                website_results.append( result )
+            else:
+                log.debug( f'unknown format, ``{result["format"]}``' )
+        else:   # no format
+            log.debug( f'no format, ``{result}``' )
+    log.debug( f'count of article_results, ``{len(article_results)}``' )
+    log.debug( f'count of audio_results, ``{len(audio_results)}``' )
+    log.debug( f'count of ebook_results, ``{len(ebook_results)}``' )
+    log.debug( f'count of excerpt_results, ``{len(excerpt_results)}``' )
+    log.debug( f'count of video_results, ``{len(video_results)}``' )
+    log.debug( f'count of website_results, ``{len(website_results)}``' )
+
+    filtered_results = {
+        'article_results': article_results,
+        'audio_results': audio_results,
+        'ebook_results': ebook_results,
+        'excerpt_results': excerpt_results,
+        'video_results': video_results,
+        'website_results': website_results }    
+    log.debug( f'filtered_results, ``{pprint.pformat(filtered_results)}``' )
+    return filtered_results    
+
 
 def map_books( book_results: list, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> list:
     mapped_books = []

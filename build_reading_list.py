@@ -275,73 +275,6 @@ def get_class_id( course_id: str ) -> str:
     ## end def get_class_id()
 
 
-# def prep_basic_data( classes_info: list, settings: dict, oit_course_loader: OIT_Course_Loader ) -> list:
-#     """ Queries OCRA and builds initial data.
-#         Called by manage_build_reading_list() """
-#     all_results: list = []
-#     cdl_checker = CDL_Checker()
-#     for class_info_entry in classes_info:
-#         assert type(class_info_entry) == dict
-#         log.debug( f'class_info_entry, ``{class_info_entry}``' )
-#         ## set up tracker-cache check -------------------------------
-#         simple_coursecode = oit_course_loader.convert_oit_course_code_to_plain_course_code( class_info_entry['leganto_course_id'] )
-#         tracker_simple_coursecode = ''
-#         try:
-#             tracker_simple_coursecode = list( oit_course_loader.tracker['recent_course_data'].keys() )[0]
-#             log.debug(msg=f'successfully got tracker_simple_coursecode, ``{tracker_simple_coursecode}``')
-#         except:
-#             log.exception(msg='problem getting tracker_simple_coursecode')
-#             pass
-#         log.debug( f'simple_coursecode, ``{simple_coursecode}``; tracker_simple_coursecode, ``{tracker_simple_coursecode}``' )
-#         if simple_coursecode == tracker_simple_coursecode:  # grab data from tracker
-#             ## query tracker-cache ----------------------------------
-#             log.debug( 'coursecodes match; grabbing `all_course_results` from tracker' )
-#             # all_course_results = oit_course_loader.tracker['recent_course_data'][simple_coursecode]
-#             book_results = 
-
-#         else:
-#             ## no tracker-cache match; query OCRA -------------------
-#             log.debug( 'coursecodes do not match; grabbing `all_course_results` from OCRA' )
-#             class_id: str = class_info_entry['class_id']
-#             course_id: str = class_info_entry['course_id']
-#             leganto_course_id: str = class_info_entry['leganto_course_id']
-#             leganto_section_id: str = class_info_entry['leganto_section_code']
-#             leganto_course_title: str = class_info_entry['leganto_course_title']
-#             if class_id:
-#                 ## ocra book data -----------------------------------
-#                 # book_results: list = get_book_readings( class_id )
-#                 book_results: list = readings_extractor.get_book_readings( class_id )
-#                 ## ocra article data --------------------------------
-#                 article_results: list = readings_extractor.get_article_readings( class_id )
-#                 ## ocra excerpt data --------------------------------
-#                 excerpt_results: list = readings_extractor.get_excerpt_readings( class_id )
-#                 ## leganto book data --------------------------------         
-#                 leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
-#                 ## leganto article data -----------------------------
-#                 leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-#                 ## leganto excerpt data -----------------------------
-#                 leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-#                 ## leganto combined data ----------------------------
-#                 all_course_results: list = leg_books + leg_articles + leg_excerpts
-#                 if all_course_results == []:
-#                     all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
-#             else:
-#                 log.debug( f'no class_id found for class_info_entry, ``{class_info_entry}``' )
-#                 all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
-#             ## update tracker-cache ---------------------------------
-#             log.debug( 'updating tracker with OCRA `all_course_results`' )
-#             oit_course_loader.tracker['recent_course_data'] = { simple_coursecode: all_course_results }            
-#             log.debug( f'updated tracker recent_course_data with simple_coursecode, ``{simple_coursecode}``' )
-#         log.debug( f'all_course_results, ``{all_course_results}``' )
-#         ## add course_results to all_results --------------------
-#         all_results = all_results + all_course_results
-#     log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
-#     return all_results
-
-#     ## end def prep_basic_data()
-
-
-
 def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> list:
     """ Queries OCRA and builds initial data.
         Called by manage_build_reading_list() """
@@ -357,12 +290,24 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
         leganto_course_title: str = class_info_entry['leganto_course_title']
         if class_id:
             ## ocra book data ---------------------------------------
-            # book_results: list = get_book_readings( class_id )
             book_results: list = readings_extractor.get_book_readings( class_id )
-            ## ocra article data ------------------------------------
-            article_results: list = readings_extractor.get_article_readings( class_id )
-            ## ocra excerpt data ------------------------------------
-            excerpt_results: list = readings_extractor.get_excerpt_readings( class_id )
+            ## ocra all-artcles data --------------------------------
+            all_articles_results: list = readings_extractor.get_all_articles_readings( class_id )
+            ## ocra filtered article data ---------------------------
+            filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
+            article_results = filtered_articles_results['article_results']
+            audio_results = filtered_articles_results['audio_results']  # not yet used
+            ebook_results = filtered_articles_results['ebook_results'] # not yet used
+            excerpt_results = filtered_articles_results['excerpt_results']
+            video_results = filtered_articles_results['video_results']  # not yet used
+            website_results = filtered_articles_results['website_results']  # not yet used
+        
+
+            # ## ocra article data ------------------------------------
+            # article_results: list = readings_extractor.get_article_readings( class_id )
+            # ## ocra excerpt data ------------------------------------
+            # excerpt_results: list = readings_extractor.get_excerpt_readings( class_id )
+
             ## leganto book data ------------------------------------            
             leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
             ## leganto article data ---------------------------------
@@ -383,6 +328,49 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
     return all_results
 
     ## end def prep_basic_data()
+
+
+# def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> list:
+#     """ Queries OCRA and builds initial data.
+#         Called by manage_build_reading_list() """
+#     all_results: list = []
+#     cdl_checker = CDL_Checker()
+#     for class_info_entry in classes_info:
+#         assert type(class_info_entry) == dict
+#         log.debug( f'class_info_entry, ``{class_info_entry}``' )
+#         class_id: str = class_info_entry['class_id']
+#         course_id: str = class_info_entry['course_id']
+#         leganto_course_id: str = class_info_entry['leganto_course_id']
+#         leganto_section_id: str = class_info_entry['leganto_section_code']
+#         leganto_course_title: str = class_info_entry['leganto_course_title']
+#         if class_id:
+#             ## ocra book data ---------------------------------------
+#             # book_results: list = get_book_readings( class_id )
+#             book_results: list = readings_extractor.get_book_readings( class_id )
+#             ## ocra article data ------------------------------------
+#             article_results: list = readings_extractor.get_article_readings( class_id )
+#             ## ocra excerpt data ------------------------------------
+#             excerpt_results: list = readings_extractor.get_excerpt_readings( class_id )
+#             ## leganto book data ------------------------------------            
+#             leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+#             ## leganto article data ---------------------------------
+#             leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+#             ## leganto excerpt data ---------------------------------
+#             leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+#             ## leganto combined data --------------------------------
+#             all_course_results: list = leg_books + leg_articles + leg_excerpts
+#             if all_course_results == []:
+#                 all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+#         else:
+#             log.debug( f'no class_id found for class_info_entry, ``{class_info_entry}``' )
+#             all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+#         log.debug( f'all_course_results, ``{all_course_results}``' )
+#         all_results = all_results + all_course_results
+#         # log.debug( f'all_results, ``{pprint.pformat(all_results)}``' )
+#     log.info( f'all_results, ``{pprint.pformat(all_results)}``' )
+#     return all_results
+
+#     ## end def prep_basic_data()
 
 
 def prep_leganto_data( basic_data: list, settings: dict ) -> list:
