@@ -264,25 +264,23 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             website_results = filtered_articles_results['website_results']  # not yet used
 
 
-            ## leganto article data ---------------------------------
-            leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            ## leganto ebook data -----------------------------------
-            leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-
-
             # ## leganto article data ---------------------------------
             # leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto book data ------------------------------------            
-            # leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
             # ## leganto ebook data -----------------------------------
             # leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto excerpt data ---------------------------------
-            # leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto combined data --------------------------------
-            # all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts
+            # all_course_results: list = leg_articles + leg_ebooks 
 
 
-            all_course_results: list = leg_articles + leg_ebooks 
+            ## leganto article data ---------------------------------
+            leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto book data ------------------------------------            
+            leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+            ## leganto ebook data -----------------------------------
+            leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto excerpt data ---------------------------------
+            leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto combined data --------------------------------
+            all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts
 
 
             if all_course_results == []:

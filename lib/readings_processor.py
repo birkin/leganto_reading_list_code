@@ -170,14 +170,15 @@ def map_ebook( initial_ebook_data: dict, course_id: str, leganto_course_id: str,
     log.debug( f'initial_ebook_data, ``{pprint.pformat(initial_ebook_data)}``' )
     mapped_ebook_data: dict = MAPPED_CATEGORIES.copy()
     ourl_parts: dict = parse_openurl( initial_ebook_data['sfxlink'] )
-    mapped_ebook_data['citation_author'] = f'{initial_ebook_data["aulast"]}, {initial_ebook_data["aufirst"]}'
+    mapped_ebook_data['citation_author'] = parse_ebook_author( initial_ebook_data )
     mapped_ebook_data['citation_doi'] = initial_ebook_data['doi']
     mapped_ebook_data['citation_end_page'] = str(initial_ebook_data['epage']) if initial_ebook_data['epage'] else parse_end_page_from_ourl( ourl_parts )
+    mapped_ebook_data['citation_isbn'] = initial_ebook_data['isbn']
     mapped_ebook_data['citation_issn'] = initial_ebook_data['issn']
     mapped_ebook_data['citation_issue'] = initial_ebook_data['issue']
     mapped_ebook_data['citation_publication_date'] = str( initial_ebook_data['date'] )
     mapped_ebook_data['citation_secondary_type'] = 'EBOOK'  # guess
-    mapped_ebook_data['citation_source1'] = cdl.run_article_cdl_check( initial_ebook_data['facnotes'], initial_ebook_data['atitle'], cdl_checker )
+    mapped_ebook_data['citation_source1'] = cdl.run_article_cdl_check( initial_ebook_data['facnotes'], initial_ebook_data['title'], cdl_checker )
     mapped_ebook_data['citation_source2'] = initial_ebook_data['art_url']  
     mapped_ebook_data['citation_source3'] = map_bruknow_openurl( initial_ebook_data.get('sfxlink', '') )  
     mapped_ebook_data['citation_source4'] = check_pdfs( initial_ebook_data, settings['PDF_DATA'], course_id, settings )
