@@ -307,7 +307,7 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
             
             ## leganto ebook data -----------------------------------
-            leg_ebooks: list = readings_processor.map_ebooks( ebook_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+            leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
 
             ## leganto excerpt data ---------------------------------
             leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
