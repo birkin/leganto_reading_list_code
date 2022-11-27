@@ -79,6 +79,7 @@ def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  )
     """ Sees if data contains a CDL reference, and, if so, see if I can find one.
         Called by map_book() and map_article(). 
         TODO -- the same code is run regardless of the if-statement; why?! """
+    log.debug( f'ocra_facnotes_data, ``{ocra_facnotes_data}``' )
     field_text: str = ocra_facnotes_data
     if field_text == None:
         field_text = ''
