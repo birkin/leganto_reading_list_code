@@ -10,6 +10,7 @@ Usage:
 
 import datetime, json, logging, os, unittest
 
+from lib import cdl
 from lib import gsheet_prepper
 from lib import leganto_final_processor
 from lib import readings_processor
@@ -318,6 +319,22 @@ class CDL_Checker_Test( unittest.TestCase ):
         result: str = self.cdl_checker.prep_cdl_field_text( source_list )
         self.assertEqual( expected, result )
         ## end def test_prep_cdl_field_text__multiple_results()
+
+    def test_run_book_cdl_check(self):
+        """ Checks data prepared for citation_source1. 
+            Note, since this is a live test, it's possible that the data will change. """
+        inputs_and_expecteds = [
+            { 'ocra_facnotes_data': 'Ebook on reserve', 'title': ' The Palgrave Handbook Of Mass Dictatorship', 'expected': 'no CDL link found' },
+            { 'ocra_facnotes_data': '', 'title': 'Capitalizing on crisis : the political origins of the rise of finance', 'expected': 'no CDL link found' },
+            { 'ocra_facnotes_data': 'CDL linked 11/9/2022', 'title': 'Austerity the history of a dangerous idea', 'expected': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i168901742>' },
+            { 'ocra_facnotes_data': 'CDL linked 10/19/2022', 'title': 'Capital Rules: The Construction of Global Finance', 'expected': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/i142579956>' }, 
+            ]
+        for entry in inputs_and_expecteds:
+            ocra_facnotes_data = entry['ocra_facnotes_data']
+            title = entry['title']
+            expected = entry['expected']
+            result = cdl.run_book_cdl_check( ocra_facnotes_data, title, self.cdl_checker )
+            self.assertEqual( expected, result )
 
     ## end classCdlLinkerTest()
 
