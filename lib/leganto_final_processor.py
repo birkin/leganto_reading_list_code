@@ -184,6 +184,7 @@ def calculate_leganto_course_code( data_string: str ) -> str:
 
 def calculate_leganto_citation_source( result: dict ) -> str:
     """ Prioritizes PDF, then CDL. """
+    log.debug( f'c_l_c_s incoming result, ``{pprint.pformat(result)}``' )
     link: str = ''
     possible_pdf_data: str = result['citation_source4']
     possible_cdl_data: str = result['citation_source1']

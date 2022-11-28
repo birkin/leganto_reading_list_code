@@ -75,6 +75,20 @@ class CDL_Checker(object):
     ## end class CDL_Checker()
 
 
+def run_article_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
+    """ Sees if data contains a CDL reference, and, if so, see if I can find one.
+        Called by and map_article(). 
+        TODO -- since this now does the same thing as run_book_cdl_check(), refactor. """
+    log.debug( f'type(ocra_facnotes_data), ``{type(ocra_facnotes_data)}``' )
+    log.debug( f'ocra_facnotes_data for article cdl check, ``{ocra_facnotes_data}``' )
+    log.debug(f'ocra_title, ``{ocra_title}``')
+    field_text = 'no cdl link found'
+    results: list = cdl_checker.search_cdl( ocra_title )
+    field_text: str = cdl_checker.prep_cdl_field_text( results )
+    log.debug( f'article cdl lookup, ``{field_text}``' )
+    return field_text
+
+
 def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
     """ Try CDL check on ocra-title.
         (The `ocra_facnotes_data` string is not used and deprecated.)
@@ -90,15 +104,23 @@ def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  )
     return field_text
 
 
-def run_article_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
-    """ Sees if data contains a CDL reference, and, if so, see if I can find one.
-        Called by and map_article(). 
-        TODO -- since this now does the same thing as run_book_cdl_check(), refactor. """
-    log.debug( f'type(ocra_facnotes_data), ``{type(ocra_facnotes_data)}``' )
-    log.debug( f'ocra_facnotes_data for article cdl check, ``{ocra_facnotes_data}``' )
-    log.debug(f'ocra_title, ``{ocra_title}``')
-    field_text = 'no cdl link found'
-    results: list = cdl_checker.search_cdl( ocra_title )
-    field_text: str = cdl_checker.prep_cdl_field_text( results )
-    log.debug( f'article cdl lookup, ``{field_text}``' )
+def run_ebook_cdl_check( ocra_facnotes_data: str, ocra_art_url: str, ocra_title: str, cdl_checker  ) -> str:
+    """ If ocra_art_url has a cdl link, use that.
+        Otherwise, try CDL check on ocra-title.
+        (The `ocra_facnotes_data` string is not used and deprecated.)
+        Called by map_book(). """
+    log.debug( f'ocra_facnotes_data, ``{ocra_facnotes_data}``' )
+    log.debug( f'ocra_art_url, ``{ocra_art_url}``' )
+    log.debug( f'ocra_title, ``{ocra_title}``' )
+    if ocra_art_url == None:
+        ocra_art_url = ''
+    if ocra_title == None:
+        ocra_title = ''
+    field_text: str = 'no CDL link found'
+    if 'cdl.library.brown.edu' in ocra_art_url:
+        field_text = f'CDL link likely: {ocra_art_url}'
+    else:
+        results: list = cdl_checker.search_cdl( ocra_title )
+        field_text: str = cdl_checker.prep_cdl_field_text( results )
+    log.debug( f'field_text, ``{field_text}``' )
     return field_text

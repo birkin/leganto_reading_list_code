@@ -60,26 +60,64 @@ class OitCourseCodeTest( unittest.TestCase ):
         self.assertEqual( expected, data[0]['COURSE_CODE'] )
 
 
-class Misc_Test( unittest.TestCase ):
+class Leganto_Final_Processor_Test( unittest.TestCase ):
+    
+    """ Checks leganto-final-processor functions. """
 
-    """ Miscellaneous checks. """
+    def setUp( self ):
+        pass
 
-    def setUp(self) -> None:
-        self.scanned_data = self.load_scanned_data()
+    def test_calculate_leganto_citation_source_from_book_data(self):
+        """ Checks calculate_leganto_citation_source() using mapped-book-data. """
+        inputs_and_expecteds = [
+            {   'book_data':  { 'citation_source1': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i168901742>', 'citation_source4': '' },
+                'expected': 'https://cdl.library.brown.edu/cdl/item/i168901742' },
+            {   'book_data':  { 'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/i142579956>', 'citation_source4': '' },
+                'expected': 'https://cdl.library.brown.edu/cdl/item/i142579956' },
+            {   'book_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': '' },
+                'expected': '' },
+            ]
+        for entry in inputs_and_expecteds:
+            book_data = entry['book_data']
+            expected = entry['expected']
+            result = leganto_final_processor.calculate_leganto_citation_source( book_data )
+            self.assertEqual( expected, result )
 
-    def load_scanned_data( self ) -> dict:
-        scanned_data: dict = {}
-        with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
-            jsn: str = file_handler.read()
-            scanned_data = json.loads( jsn )
-        return scanned_data
+    def test_calculate_leganto_citation_source_from_article_data(self):
+        """ Checks calculate_leganto_citation_source() using mapped-article-data. """
+        inputs_and_expecteds = [
+            {   'article_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': 'https://library.brown.edu/reserves/pdffiles/61925_france_battles_over_whether_to_cancel.pdf' },
+                'expected': 'https://library.brown.edu/reserves/pdffiles/61925_france_battles_over_whether_to_cancel.pdf' },
+            {   'article_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': 'no_pdf_found' },
+                'expected': '' },
+            ]
+        for entry in inputs_and_expecteds:
+            article_data = entry['article_data']
+            expected = entry['expected']
+            result = leganto_final_processor.calculate_leganto_citation_source( article_data )
+            self.assertEqual( expected, result )
 
-    def test_column_math(self):
-        """ Checks calculated end-column. """
-        self.assertEqual( 'B', gsheet_prepper.calculate_end_column(2) )
-        self.assertEqual( 'AA', gsheet_prepper.calculate_end_column(27) )
-        self.assertEqual( 'BO', gsheet_prepper.calculate_end_column( 67 ) )
 
+
+    def test_calculate_leganto_citation_source_from_ebook_data(self):
+        """ Checks calculate_leganto_citation_source() using mapped-ebook-data. """
+        inputs_and_expecteds = [
+            {   'ebook_data':  { 'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/23267522610006966>', 'citation_source4': 'no_pdf_found' },
+                'expected': 'zz https://library.brown.edu/reserves/pdffiles/61925_france_battles_over_whether_to_cancel.pdf' },
+            {   'ebook_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': 'no_pdf_found' },
+                'expected': 'zz ' },
+
+            {   'ebook_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': 'no_pdf_found' },
+                'expected': 'zz ' },
+            ]
+        for entry in inputs_and_expecteds:
+            ebook_data = entry['ebook_data']
+            expected = entry['expected']
+            result = leganto_final_processor.calculate_leganto_citation_source( ebook_data )
+            self.assertEqual( expected, result )
+
+
+    
     def test_clean_citation_title(self):
         """ Checks cleaned leganto title. """
         self.assertEqual( 'no-title', 
@@ -115,6 +153,29 @@ class Misc_Test( unittest.TestCase ):
         self.assertEqual( '', 
             leganto_final_processor.clean_citation_author( ', ' ) 
             )
+
+    ## end class Leganto_Final_Processor_Test
+
+
+class Misc_Test( unittest.TestCase ):
+
+    """ Miscellaneous checks. """
+
+    def setUp(self) -> None:
+        self.scanned_data = self.load_scanned_data()
+
+    def load_scanned_data( self ) -> dict:
+        scanned_data: dict = {}
+        with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
+            jsn: str = file_handler.read()
+            scanned_data = json.loads( jsn )
+        return scanned_data
+
+    def test_column_math(self):
+        """ Checks calculated end-column. """
+        self.assertEqual( 'B', gsheet_prepper.calculate_end_column(2) )
+        self.assertEqual( 'AA', gsheet_prepper.calculate_end_column(27) )
+        self.assertEqual( 'BO', gsheet_prepper.calculate_end_column( 67 ) )
 
     # def test_check_pdfs_A(self):
     #     """ Checks for accurate file-name find. """
@@ -337,18 +398,21 @@ class CDL_Checker_Test( unittest.TestCase ):
             result = cdl.run_book_cdl_check( ocra_facnotes_data, title, self.cdl_checker )
             self.assertEqual( expected, result )
 
-    def test_run_book_cdl_check_from_ebook_data(self):
+    def test_run_ebook_cdl_check_from_ebook_data(self):
         """ Checks data prepared for citation_source1, from ocra-ebook-data. 
             Note, since this is a live test, it's possible that the data will change. """
         inputs_and_expecteds = [
-            { 'ocra_facnotes_data': '', 'title': 'Decoding the far-right symbols at the Capitol riot', 'expected': 'no CDL link found' },
-            { 'ocra_facnotes_data': '', 'title': 'The Great Transformation', 'expected': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/23267522610006966>' },
+            { 'ocra_facnotes_data': '', 'ocra_art_url': 'https://ebookcentral-proquest-com.revproxy.brown.edu/lib/brown/detail.action?docID=3117969', 'title': 'The Great Transformation', 
+                'expected': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/23267522610006966>' },
+            { 'ocra_facnotes_data': '', 'ocra_art_url': 'https://cdl.library.brown.edu/cdl/item/b2020176x_i111044777', 'title': 'The Great Crash', 
+                'expected': 'CDL link likely: https://cdl.library.brown.edu/cdl/item/b2020176x_i111044777' },
             ]
         for entry in inputs_and_expecteds:
             ocra_facnotes_data = entry['ocra_facnotes_data']
+            ocra_art_url = entry['ocra_art_url']
             title = entry['title']
             expected = entry['expected']
-            result = cdl.run_book_cdl_check( ocra_facnotes_data, title, self.cdl_checker )
+            result = cdl.run_ebook_cdl_check( ocra_facnotes_data, ocra_art_url, title, self.cdl_checker )
             self.assertEqual( expected, result )
 
     ## end classCdlLinkerTest()
@@ -366,13 +430,6 @@ class OpenUrlParserTest( unittest.TestCase ):
             None
             ]
 
-    # def setUp( self ):
-    #     self.maxDiff = None
-    #     self.ourls: list = [
-    #         '//library.brown.edu/easyarticle/?genre=article&atitle="If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines&title=Theatre Journal&date=2011&volume=63&issue=4&spage=607&epage=621&issn=&doi=&aulast=J. Lorenzo&aufirst=Perillo&auinit=&__char_set=utf8',
-    #         'https://login.revproxy.brown.edu/login?url=http://sfx.brown.edu:8888/sfx_local?sid=sfx:citation&genre=article&atitle=The Plot of her Undoing&title=Feminist Art Coalition&date=2020-12-28&volume=&issue=&spage=&epage=&issn=&id=&aulast=Hartman&aufirst=Saidiya&auinit=&__char_set=utf8',
-    #         ]
-
     def test_parse_openurl(self):
         """ Checks parsing of openurl, including revproxied urls. """
         expected = [
@@ -385,17 +442,6 @@ class OpenUrlParserTest( unittest.TestCase ):
             log.debug( f'parts, ``{parts}``' )
             self.assertEqual( expected[i], parts )
 
-    # def test_parse_openurl(self):
-    #     """ Checks parsing of openurl, including revproxied urls. """
-    #     expected = [
-    #         {'genre': ['article'], 'atitle': ['"If I was not in prison, I would not be famous": Discipline, Choreography, and Mimicry in the Philippines'], 'title': ['Theatre Journal'], 'date': ['2011'], 'volume': ['63'], 'issue': ['4'], 'spage': ['607'], 'epage': ['621'], 'aulast': ['J. Lorenzo'], 'aufirst': ['Perillo'], '__char_set': ['utf8']},
-    #         {'sid': ['sfx:citation'], 'genre': ['article'], 'atitle': ['The Plot of her Undoing'], 'title': ['Feminist Art Coalition'], 'date': ['2020-12-28'], 'aulast': ['Hartman'], 'aufirst': ['Saidiya'], '__char_set': ['utf8']},
-    #         ]
-    #     for (i, ourl) in enumerate(self.ourls):
-    #         parts: dict = readings_processor.parse_openurl( ourl )
-    #         log.debug( f'parts, ``{parts}``' )
-    #         self.assertEqual( expected[i], parts )
-
     def test_parse_start_page_from_ourl(self):
         expected = [ '607', '', '']
         for (i, ourl) in enumerate(self.ourls):
@@ -403,26 +449,12 @@ class OpenUrlParserTest( unittest.TestCase ):
             spage: str = readings_processor.parse_start_page_from_ourl( parts )
             self.assertEqual( expected[i], spage )
 
-    # def test_parse_start_page_from_ourl(self):
-    #     expected = [ '607', '' ]
-    #     for (i, ourl) in enumerate(self.ourls):
-    #         parts: dict = readings_processor.parse_openurl( ourl )
-    #         spage: str = readings_processor.parse_start_page_from_ourl( parts )
-    #         self.assertEqual( expected[i], spage )
-
     def test_parse_end_page_from_ourl(self):
         expected = [ '621', '', '' ]
         for (i, ourl) in enumerate(self.ourls):
             parts: dict = readings_processor.parse_openurl( ourl )
             epage: str = readings_processor.parse_end_page_from_ourl( parts )
             self.assertEqual( expected[i], epage )
-
-    # def test_parse_end_page_from_ourl(self):
-    #     expected = [ '621', '' ]
-    #     for (i, ourl) in enumerate(self.ourls):
-    #         parts: dict = readings_processor.parse_openurl( ourl )
-    #         epage: str = readings_processor.parse_end_page_from_ourl( parts )
-    #         self.assertEqual( expected[i], epage )
 
     ## end class OpenUrlParserTest()
 
