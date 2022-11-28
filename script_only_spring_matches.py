@@ -55,22 +55,18 @@ def make_file_of_existing_spring_courses() -> None:
         else:
             parts = line.split( '\t' )
             oit_course_code_part = parts[0]
-            zz do tracker lookup here
+            tracker_course_data = tracker_data['oit_courses_processed'][oit_course_code_part]
+            assert type( tracker_course_data ) == dict
+            status = tracker_course_data['status']
+            if 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND' in status:
+                pass
+            else:
+                match_lines.append( line )
+    ## save new file -----------------------------------------------
+    oit_spring_matches_filepath = os.environ['LGNT__SPRING_MATCHES_FILEPATH']
+    oit_spring_matches_filepath = f'{settings["OIT_COURSES_DIRPATH"]}/oit_spring_MATCHES.tsv'
 
 
-        # for i, line in enumerate( lines ):
-        #     if i == 0:
-        #         new_file_lines.append( line )
-        #     else:
-        #         parts = line.split( '\t' )
-        #         oit_course_code_part = parts[0]
-        #         if 'spring' in oit_course_code_part:
-        #             new_file_lines.append( line )
-
-
-        break
-
-    1/0
 
     return
     
@@ -81,15 +77,9 @@ def load_initial_settings() -> dict:
     """ Loads envar settings.
         Called by manage_build_reading_list() """
     settings = {
-        'ALL_SPRING_COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],                   # path to OIT course-data
-        # 'SPRING_COURSES_OUTPUT_DIRPATH': os.environ['LGNT__CSV_OUTPUT_DIR_PATH'],
-        # 'PDF_OLDER_THAN_DAYS': 30,                                                  # to ascertain whether to requery OCRA for pdf-data
-        # 'CREDENTIALS': json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] ),    # gspread setting
-        # 'SPREADSHEET_NAME': os.environ['LGNT__SHEET_NAME'],                         # gspread setting
-        # 'LAST_CHECKED_PATH': os.environ['LGNT__LAST_CHECKED_JSON_PATH'],            # contains last-run spreadsheet course-IDs
-        # 'PDF_JSON_PATH': os.environ['LGNT__PDF_JSON_PATH'],                         # pre-extracted pdf data
-        # 'FILES_URL_PATTERN': os.environ['LGNT__FILES_URL_PATTERN'],                 # pdf-url
+        'ALL_SPRING_COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],        # path to OIT course-data
         'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_JSON_FILEPATH'],         # json-tracker filepath
+        'OIT_COURSES_DIRPATH': os.environ['LGNT__OIT_COURSES_DIRPATH']      # path to new matches-only file
     }
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
