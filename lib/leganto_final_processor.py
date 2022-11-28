@@ -74,49 +74,6 @@ def clean_citation_title( db_title: str ) -> str:
     ## end def clean_citation_title()
 
 
-# def clean_citation_title( db_title: str ) -> str:
-#     log.debug( f'db_title initially, ``{db_title}``' )
-#     if db_title:
-#         db_title = db_title.strip()
-#         if '(EXCERPT)' in db_title:
-#             db_title = db_title.replace( '(EXCERPT)', '' )
-#         db_title = db_title.strip()
-#         if db_title[-1] == ':':
-#             db_title = db_title[0:-1]
-#         if db_title[-1] == '.':
-#             log.debug( 'found period' )
-#             db_title = db_title[0:-1]
-#         if db_title[0] == '“':  # starting smart-quotes
-#             ## remove initial-smart-quotes if there's only one, and only one end-smart-quotes, and it's at the end.
-#             log.debug( 'found starting smart-quotes' )
-#             count_start: int = db_title.count( '“' )
-#             if count_start == 1:
-#                 count_end: int = db_title.count( '”' )
-#                 if count_end == 1:
-#                     if db_title[-1] == '”':  # ok, remove both
-#                         db_title = db_title[1:-1]
-#         if db_title[0] == '“':
-#             count_quotes: int = db_title.count( '“' )
-#             if count_quotes == 1:
-#                 db_title = db_title[1:] 
-#         if db_title[0] == '"':
-#             ## remove initial-quotes if there are two, and the other is at the end.
-#             log.debug( 'found starting simple-quotes' )
-#             count_quotes: int = db_title.count( '"' )
-#             if count_quotes == 2:
-#                 if db_title[-1] == '"':  # ok, remove both
-#                     db_title = db_title[1:-1]
-#         if db_title[0] == '"':
-#             count_quotes: int = db_title.count( '"' )
-#             if count_quotes == 1:
-#                 db_title = db_title[1:]
-#         db_title = db_title.strip()
-#     log.debug( f'db_title cleaned, ``{db_title}``' )
-#     return db_title
-
-#     ## end def clean_citation_title()
-
-
 def clean_citation_author( db_author: str ) -> str:
     log.debug( f'db_author initially, ``{db_author}``' )
     if db_author:
@@ -152,16 +109,6 @@ def calculate_end_column( number_of_columns: int ) -> str:
         result = f'{char_one}{char_two}'
     log.debug( f'result, ``{result}``' )
     return result
-
-
-# def calculate_leganto_title( title: str ) -> str:
-#     """ Removes `(EXCERPT) ` if necessary. """
-#     return_title = title
-#     if '(EXCERPT)' in title:
-#         return_title = title.replace( '(EXCERPT)', '' )
-#         return_title = return_title.strip()
-#     log.debug( f'return_title, ``{return_title}``' )
-#     return return_title
 
 
 def calculate_leganto_type( perceived_type: str ) -> str:
@@ -212,35 +159,6 @@ def calculate_leganto_citation_source( result: dict ) -> str:
     return link
 
 
-# def calculate_leganto_citation_source( result: dict ) -> str:
-#     """ Prioritizes PDF, then CDL. """
-#     log.debug( f'c_l_c_s incoming result, ``{pprint.pformat(result)}``' )
-#     link: str = ''
-#     possible_pdf_data: str = result['citation_source4']
-#     possible_cdl_data: str = result['citation_source1']
-#     if possible_pdf_data:
-#         log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
-#         if possible_pdf_data == 'no_pdf_found':
-#             link = ''
-#         else:
-#             link = possible_pdf_data
-#     elif possible_cdl_data:
-#         log.debug( f'in `possible_cdl_data`; possible_cdl_data, ``{possible_cdl_data}``')
-#         if possible_cdl_data == 'TODO -- handle multiple possible results':
-#             link = ''
-#         elif possible_cdl_data == 'no CDL link found':
-#             link = ''
-#         elif 'CDL link' in possible_cdl_data:
-#             # log.debug( 'here' )
-#             link = possible_cdl_data.replace( 'CDL link likely: <', '' )
-#             link = link.replace( 'CDL link possibly: <', '' )
-#             link = link.replace( '>', '' )
-#         else:
-#             link = possible_cdl_data
-#     log.debug( f'link, ``{link}``' )
-#     return link
-
-
 def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
     """ Returns possibly-helpful info for staff. """
     log.debug( f'possible_full_text, ``{possible_full_text}``' )
@@ -264,27 +182,6 @@ def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str
             message = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
     log.debug( f'staff-message, ``{message}``' )
     return message
-
-
-# def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str ) -> str:
-#     """ Returns possibly-helpful info for staff. """
-#     log.debug( f'possible_full_text, ``{possible_full_text}``' )
-#     log.debug( f'possible_openurl, ``{possible_openurl}``' )
-#     message = ''
-#     if possible_full_text:
-#         message = f'Possible full-text link: <{possible_full_text}>.'
-#     if possible_openurl:
-#         if 'https' in possible_openurl:
-#             params: str = possible_openurl.split( 'openurl?' )[1]  # sometimes there's a link, but with no parameters.
-#             if params:
-#                 log.debug( 'params exist' )
-#                 ourl_message: str = f'Occasionally-helpful link: <{possible_openurl}>.'
-#                 if message:
-#                     message = f'{message} {ourl_message}'
-#                 else:
-#                     message = ourl_message
-#     log.debug( f'staff-message, ``{message}``' )
-#     return message
 
 
 def reformat_for_leganto_sheet( leganto_data: list ) -> list:
