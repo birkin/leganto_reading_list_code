@@ -1,5 +1,5 @@
 """
-Main manager file to produce reading lists.
+Main manager file to produce reading-list file of only Spring OIT-entries.
 """
 
 import argparse, datetime, json, logging, os, pprint, sys
