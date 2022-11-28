@@ -135,6 +135,8 @@ def calculate_leganto_citation_source( result: dict ) -> str:
     link: str = ''
     possible_pdf_data: str = result['citation_source4']
     possible_cdl_data: str = result['citation_source1']
+    possible_article_url: str = result.get('citation_source2', '')
+    ocra_format: str = result.get('citation_secondary_type', '').lower().strip()
     if possible_pdf_data:
         log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
         if possible_pdf_data == 'no_pdf_found':
@@ -155,8 +157,13 @@ def calculate_leganto_citation_source( result: dict ) -> str:
             link = link.replace( '>', '' )
         else:
             link = possible_cdl_data
+    if link == '' and ocra_format == 'website':
+        if 'brown.kanopystreaming.com' in possible_article_url:
+            link = possible_article_url 
     log.debug( f'link, ``{link}``' )
     return link
+
+    # end def calculate_leganto_citation_source()
 
 
 def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
