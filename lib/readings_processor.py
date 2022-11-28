@@ -186,8 +186,10 @@ def map_ebook( initial_ebook_data: dict, course_id: str, leganto_course_id: str,
     mapped_ebook_data['citation_source3'] = map_bruknow_openurl( initial_ebook_data.get('sfxlink', '') )  
     mapped_ebook_data['citation_source4'] = check_pdfs( initial_ebook_data, settings['PDF_DATA'], course_id, settings )
     mapped_ebook_data['citation_start_page'] = str(initial_ebook_data['spage']) if initial_ebook_data['spage'] else parse_start_page_from_ourl( ourl_parts )
-    mapped_ebook_data['citation_title'] = initial_ebook_data['atitle'].strip()
-    mapped_ebook_data['citation_journal_title'] = initial_ebook_data['title']
+    mapped_ebook_data['citation_title'] = initial_ebook_data['title'].strip()
+    # mapped_ebook_data['citation_journal_title'] = initial_ebook_data['title']
+    # mapped_ebook_data['citation_title'] = initial_ebook_data['atitle'].strip()
+    # mapped_ebook_data['citation_journal_title'] = initial_ebook_data['title']
     mapped_ebook_data['citation_volume'] = initial_ebook_data['volume']
     mapped_ebook_data['coursecode'] = leganto_course_id    
     mapped_ebook_data['external_system_id'] = initial_ebook_data['requests.requestid']
