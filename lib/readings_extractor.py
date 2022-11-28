@@ -30,6 +30,9 @@ def get_book_readings( class_id: str ) -> list:
 
 
 def get_all_articles_readings( class_id: str ) -> list:
+    """ Runs sql to get article-data for given class_id. 
+        Previously checked for `format = 'article'`, but now ignores that; formats are filtered later.
+        Called by build_reading_list.prep_basic_data() """
     db_connection = db_stuff.get_db_connection()
     sql = f"SELECT * FROM reserves.articles, reserves.requests WHERE articles.requestid = requests.requestid AND classid = {int(class_id)} AND articles.requestid = requests.requestid AND articles.status != 'volume on reserve' AND articles.status != 'purchase requested' ORDER BY `articles`.`atitle` ASC"
     log.debug( f'sql, ``{sql}``' )
