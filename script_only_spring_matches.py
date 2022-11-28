@@ -36,9 +36,10 @@ def make_file_of_existing_spring_courses() -> None:
     ## load settings ------------------------------------------------
     settings: dict = load_initial_settings()
     assert type(settings) == dict
-    ## load OIT spring-only course-data -----------------------------
+    ## load OIT all-spring-only course-data -------------------------
     all_spring_courses_lines = []
-    input_filepath = settings['ALL_SPRING_COURSES_FILEPATH']
+    # input_filepath = settings['ALL_SPRING_COURSES_FILEPATH']
+    input_filepath = f'{settings["OIT_COURSES_DIRPATH"]}/spring_courses_ALL.csv'
     with open( input_filepath, 'r' ) as f:
         all_spring_courses_lines = f.readlines()
     ## load tracker.json --------------------------------------------
@@ -63,11 +64,10 @@ def make_file_of_existing_spring_courses() -> None:
             else:
                 match_lines.append( line )
     ## save new file -----------------------------------------------
-    oit_spring_matches_filepath = os.environ['LGNT__SPRING_MATCHES_FILEPATH']
     oit_spring_matches_filepath = f'{settings["OIT_COURSES_DIRPATH"]}/oit_spring_MATCHES.tsv'
-
-
-
+    with open( oit_spring_matches_filepath, 'w' ) as f:
+        f.writelines( match_lines )
+    log.debug( 'ending make_file_of_existing_spring_courses()' )
     return
     
     ## end def make_file_of_existing_spring_courses()
@@ -77,9 +77,8 @@ def load_initial_settings() -> dict:
     """ Loads envar settings.
         Called by manage_build_reading_list() """
     settings = {
-        'ALL_SPRING_COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],        # path to OIT course-data
-        'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_JSON_FILEPATH'],         # json-tracker filepath
-        'OIT_COURSES_DIRPATH': os.environ['LGNT__OIT_COURSES_DIRPATH']      # path to new matches-only file
+        'OIT_COURSES_DIRPATH': os.environ['LGNT__OIT_COURSES_DIRPATH'],
+        'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_JSON_FILEPATH'],
     }
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
