@@ -33,23 +33,44 @@ def make_file_of_existing_spring_courses() -> None:
         - if entry was processed, saves course to new file.
         Called by if...main: """
     log.debug( 'starting make_file_of_existing_spring_courses()' )
-    ## settings -----------------------------------------------------
+    ## load settings ------------------------------------------------
     settings: dict = load_initial_settings()
     assert type(settings) == dict
     ## load OIT spring-only course-data -----------------------------
     all_spring_courses_lines = []
-    input_filepath = settings['SPRING_COURSES_FILEPATH']
+    input_filepath = settings['ALL_SPRING_COURSES_FILEPATH']
     with open( input_filepath, 'r' ) as f:
         all_spring_courses_lines = f.readlines()
     ## load tracker.json --------------------------------------------
     tracker_data = {}
-    tracker_filepath = settings['TRACKER_FILEPATH']
+    tracker_filepath = settings['TRACKER_JSON_FILEPATH']
     with open( tracker_filepath, 'r' ) as f:
         tracker_data = json.load(f)
     ## iterate through OIT spring-only course-data for matches ------
-    for line in all_spring_courses_lines:
+    match_lines = []
+    for i, line in enumerate( all_spring_courses_lines ):
+        assert type(line) == str, type(line)
+        if i == 0:  # skip header
+            match_lines.append( line )
+        else:
+            parts = line.split( '\t' )
+            oit_course_code_part = parts[0]
+            zz do tracker lookup here
 
 
+        # for i, line in enumerate( lines ):
+        #     if i == 0:
+        #         new_file_lines.append( line )
+        #     else:
+        #         parts = line.split( '\t' )
+        #         oit_course_code_part = parts[0]
+        #         if 'spring' in oit_course_code_part:
+        #             new_file_lines.append( line )
+
+
+        break
+
+    1/0
 
     return
     
@@ -60,15 +81,15 @@ def load_initial_settings() -> dict:
     """ Loads envar settings.
         Called by manage_build_reading_list() """
     settings = {
-        'COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],                   # path to OIT course-data
-        'SPRING_COURSES_OUTPUT_DIRPATH': os.environ['LGNT__CSV_OUTPUT_DIR_PATH'],
+        'ALL_SPRING_COURSES_FILEPATH': os.environ['LGNT__COURSES_FILEPATH'],                   # path to OIT course-data
+        # 'SPRING_COURSES_OUTPUT_DIRPATH': os.environ['LGNT__CSV_OUTPUT_DIR_PATH'],
         # 'PDF_OLDER_THAN_DAYS': 30,                                                  # to ascertain whether to requery OCRA for pdf-data
         # 'CREDENTIALS': json.loads( os.environ['LGNT__SHEET_CREDENTIALS_JSON'] ),    # gspread setting
         # 'SPREADSHEET_NAME': os.environ['LGNT__SHEET_NAME'],                         # gspread setting
         # 'LAST_CHECKED_PATH': os.environ['LGNT__LAST_CHECKED_JSON_PATH'],            # contains last-run spreadsheet course-IDs
         # 'PDF_JSON_PATH': os.environ['LGNT__PDF_JSON_PATH'],                         # pre-extracted pdf data
         # 'FILES_URL_PATTERN': os.environ['LGNT__FILES_URL_PATTERN'],                 # pdf-url
-        # 'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_JSON_FILEPATH'],         # json-tracker filepath
+        'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_JSON_FILEPATH'],         # json-tracker filepath
     }
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
