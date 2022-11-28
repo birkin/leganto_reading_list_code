@@ -3,6 +3,7 @@ import urllib.parse
 
 from lib import cdl
 
+
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
 logging.basicConfig(
     filename=LOG_PATH,
@@ -198,6 +199,7 @@ def map_ebook( initial_ebook_data: dict, course_id: str, leganto_course_id: str,
     log.debug( f'mapped_ebook_data, ``{pprint.pformat(mapped_ebook_data)}``' )
     return mapped_ebook_data
 
+
 ## excerpts ---------------------------------------------------------
 
 
@@ -236,6 +238,51 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: 
     log.debug( f'mapped_excerpt_data, ``{pprint.pformat(mapped_excerpt_data)}``' )
     return mapped_excerpt_data
 
+
+def map_websites( website_results: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
+    mapped_websites = []
+    for website_result in website_results:
+        mapped_website: dict = map_website( website_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+        mapped_websites.append( mapped_website )
+    return mapped_websites
+
+
+def map_website( initial_website_data: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> dict:
+    """ This function maps the data from the database to the format required by the Leganto API. 
+        Notes: 
+        - the `course_id` is used for building the url for the leganto citation_source4 field (the pdf-url).
+        - the `leganto_course_code` is used for the leganto `coursecode` field. """
+    log.debug( f'initial_website_data, ``{pprint.pformat(initial_website_data)}``' )
+    mapped_website_data: dict = MAPPED_CATEGORIES.copy()
+    ourl_parts: dict = parse_openurl( initial_website_data['sfxlink'] )
+    # mapped_website_data['citation_author'] = parse_ebook_author( initial_website_data )
+    mapped_website_data['citation_author'] = ''
+    mapped_website_data['citation_doi'] = initial_website_data['doi']
+    mapped_website_data['citation_end_page'] = str(initial_website_data['epage']) if initial_website_data['epage'] else parse_end_page_from_ourl( ourl_parts )
+    mapped_website_data['citation_isbn'] = initial_website_data['isbn']
+    mapped_website_data['citation_issn'] = initial_website_data['issn']
+    mapped_website_data['citation_issue'] = initial_website_data['issue']
+    mapped_website_data['citation_publication_date'] = str( initial_website_data['date'] )
+    mapped_website_data['citation_secondary_type'] = 'WEBSITE'  # guess
+    log.debug( 'about to call run_website_cdl_check() from map_website()' )
+    # mapped_website_data['citation_source1'] = cdl.run_article_cdl_check( initial_website_data['facnotes'], initial_website_data['title'], cdl_checker )
+    mapped_website_data['citation_source1'] = cdl.run_ebook_cdl_check( initial_website_data['facnotes'], initial_website_data['art_url'], initial_website_data['title'], cdl_checker )
+    # mapped_website_data['citation_source1'] = 'TEMP-ENTRY'
+    mapped_website_data['citation_source2'] = initial_website_data['art_url']  
+    mapped_website_data['citation_source3'] = map_bruknow_openurl( initial_website_data.get('sfxlink', '') )  
+    mapped_website_data['citation_source4'] = check_pdfs( initial_website_data, settings['PDF_DATA'], course_id, settings )
+    mapped_website_data['citation_start_page'] = str(initial_website_data['spage']) if initial_website_data['spage'] else parse_start_page_from_ourl( ourl_parts )
+    mapped_website_data['citation_title'] = initial_website_data['title'].strip()
+    # mapped_website_data['citation_journal_title'] = initial_website_data['title']
+    # mapped_website_data['citation_title'] = initial_website_data['atitle'].strip()
+    # mapped_website_data['citation_journal_title'] = initial_website_data['title']
+    mapped_website_data['citation_volume'] = initial_website_data['volume']
+    mapped_website_data['coursecode'] = leganto_course_id    
+    mapped_website_data['external_system_id'] = initial_website_data['requests.requestid']
+    mapped_website_data['reading_list_name'] = leganto_course_title
+    mapped_website_data['section_id'] = leganto_section_id
+    log.debug( f'mapped_website_data, ``{pprint.pformat(mapped_website_data)}``' )
+    return mapped_website_data
 
 ## mappers ----------------------------------------------------------
 

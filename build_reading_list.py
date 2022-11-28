@@ -262,11 +262,9 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             excerpt_results = filtered_articles_results['excerpt_results']
             video_results = filtered_articles_results['video_results']          # not yet used
 
-
             website_results = filtered_articles_results['website_results']      # not yet used
-            log.debug( f'website_results, ``{ppprint.pformat(website_results)}``' )
+            log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
 
-            
             ## leganto article data ---------------------------------
             leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto book data ------------------------------------            
@@ -275,8 +273,12 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto excerpt data ---------------------------------
             leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            
+            ## leganto website data ---------------------------------
+            leg_websites: list = readings_processor.map_websites( website_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+
             ## leganto combined data --------------------------------
-            all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts
+            all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites
 
 
             if all_course_results == []:
