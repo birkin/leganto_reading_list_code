@@ -202,8 +202,9 @@ def calculate_leganto_citation_source( result: dict ) -> str:
             link = ''
         elif 'CDL link' in possible_cdl_data:
             log.debug( 'parsing possible cdl data' )
-            link = possible_cdl_data.replace( 'CDL link likely: <', '' )
-            link = link.replace( 'CDL link possibly: <', '' )
+            link = possible_cdl_data.replace( 'CDL link likely: ', '' )
+            link = link.replace( 'CDL link possibly: ', '' )
+            link = link.replace( '<', '' )
             link = link.replace( '>', '' )
         else:
             link = possible_cdl_data
