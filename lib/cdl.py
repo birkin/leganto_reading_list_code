@@ -76,53 +76,29 @@ class CDL_Checker(object):
 
 
 def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
-    """ Sees if data contains a CDL reference, and, if so, see if I can find one.
-        Called by map_book() and map_article(). 
-        TODO -- the same code is run regardless of the if-statement; why?! """
+    """ Try CDL check on ocra-title.
+        (The `ocra_facnotes_data` string is not used and deprecated.)
+        Called by map_book(). """
     log.debug( f'type(ocra_facnotes_data), ``{type(ocra_facnotes_data)}``' )
     log.debug( f'ocra_facnotes_data, ``{ocra_facnotes_data}``' )
+    if ocra_title == None:
+        ocra_title = ''
     field_text: str = ocra_facnotes_data
-    if field_text == None:
-        field_text = ''
-    if ocra_facnotes_data:
-        if 'cdl' in ocra_facnotes_data.lower():
-            results: list = cdl_checker.search_cdl( ocra_title )
-            field_text: str = cdl_checker.prep_cdl_field_text( results )
-        else:
-            results: list = cdl_checker.search_cdl( ocra_title )
-            field_text: str = cdl_checker.prep_cdl_field_text( results )
-            log.debug( f'ADDITIONAL BOOK-CDL CHECK WOULD HAVE FOUND..., ``{field_text}``' )
-    else:  ## TODO refactor this duplicate code
-        results: list = cdl_checker.search_cdl( ocra_title )
-        field_text: str = cdl_checker.prep_cdl_field_text( results )
-        log.debug( f'ADDITIONAL BOOK-CDL CHECK WOULD HAVE FOUND..., ``{field_text}``' )
+    results: list = cdl_checker.search_cdl( ocra_title )
+    field_text: str = cdl_checker.prep_cdl_field_text( results )
     log.debug( f'field_text, ``{field_text}``' )
     return field_text
 
 
-# def run_book_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
-#     """ Sees if data contains a CDL reference, and, if so, see if I can find one.
-#         Called by map_book() and map_article(). 
-#         TODO -- the same code is run regardless of the if-statement; why?! """
-#     field_text: str = ocra_facnotes_data
-#     if 'cdl' in ocra_facnotes_data.lower():
-#         results: list = cdl_checker.search_cdl( ocra_title )
-#         field_text: str = cdl_checker.prep_cdl_field_text( results )
-#     else:
-#         results: list = cdl_checker.search_cdl( ocra_title )
-#         field_text: str = cdl_checker.prep_cdl_field_text( results )
-#         log.debug( f'ADDITIONAL BOOK-CDL CHECK WOULD HAVE FOUND..., ``{field_text}``' )
-#     log.debug( f'field_text, ``{field_text}``' )
-#     return field_text
-
-
 def run_article_cdl_check( ocra_facnotes_data: str, ocra_title: str, cdl_checker  ) -> str:
     """ Sees if data contains a CDL reference, and, if so, see if I can find one.
-        Called by map_book() and map_article(). """
-    field_text: str = ocra_facnotes_data
-    if ocra_facnotes_data == '':
-        results: list = cdl_checker.search_cdl( ocra_title )
-        field_text: str = cdl_checker.prep_cdl_field_text( results )
-        log.debug( f'ARTICLE CDL-CHECK RESULT, ``{field_text}``' )
-    log.debug( f'field_text, ``{field_text}``' )
+        Called by and map_article(). 
+        TODO -- since this now does the same thing as run_book_cdl_check(), refactor. """
+    log.debug( f'type(ocra_facnotes_data), ``{type(ocra_facnotes_data)}``' )
+    log.debug( f'ocra_facnotes_data for article cdl check, ``{ocra_facnotes_data}``' )
+    log.debug(f'ocra_title, ``{ocra_title}``')
+    field_text = 'no cdl link found'
+    results: list = cdl_checker.search_cdl( ocra_title )
+    field_text: str = cdl_checker.prep_cdl_field_text( results )
+    log.debug( f'article cdl lookup, ``{field_text}``' )
     return field_text

@@ -320,14 +320,29 @@ class CDL_Checker_Test( unittest.TestCase ):
         self.assertEqual( expected, result )
         ## end def test_prep_cdl_field_text__multiple_results()
 
-    def test_run_book_cdl_check(self):
-        """ Checks data prepared for citation_source1. 
+    def test_run_book_cdl_check_from_book_data(self):
+        """ Checks data prepared for citation_source1, from ocra-book-data. 
             Note, since this is a live test, it's possible that the data will change. """
         inputs_and_expecteds = [
             { 'ocra_facnotes_data': 'Ebook on reserve', 'title': ' The Palgrave Handbook Of Mass Dictatorship', 'expected': 'no CDL link found' },
             { 'ocra_facnotes_data': '', 'title': 'Capitalizing on crisis : the political origins of the rise of finance', 'expected': 'no CDL link found' },
             { 'ocra_facnotes_data': 'CDL linked 11/9/2022', 'title': 'Austerity the history of a dangerous idea', 'expected': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i168901742>' },
             { 'ocra_facnotes_data': 'CDL linked 10/19/2022', 'title': 'Capital Rules: The Construction of Global Finance', 'expected': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/i142579956>' }, 
+            { 'ocra_facnotes_data': None, 'title': None, 'expected': 'no CDL link found' }, 
+            ]
+        for entry in inputs_and_expecteds:
+            ocra_facnotes_data = entry['ocra_facnotes_data']
+            title = entry['title']
+            expected = entry['expected']
+            result = cdl.run_book_cdl_check( ocra_facnotes_data, title, self.cdl_checker )
+            self.assertEqual( expected, result )
+
+    def test_run_book_cdl_check_from_ebook_data(self):
+        """ Checks data prepared for citation_source1, from ocra-ebook-data. 
+            Note, since this is a live test, it's possible that the data will change. """
+        inputs_and_expecteds = [
+            { 'ocra_facnotes_data': '', 'title': 'Decoding the far-right symbols at the Capitol riot', 'expected': 'no CDL link found' },
+            { 'ocra_facnotes_data': '', 'title': 'The Great Transformation', 'expected': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/23267522610006966>' },
             ]
         for entry in inputs_and_expecteds:
             ocra_facnotes_data = entry['ocra_facnotes_data']
