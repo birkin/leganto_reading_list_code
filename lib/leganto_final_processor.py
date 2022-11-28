@@ -191,17 +191,17 @@ def calculate_leganto_citation_source( result: dict ) -> str:
     if possible_pdf_data:
         log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
         if possible_pdf_data == 'no_pdf_found':
-            link = ''
+            pass
         else:
             link = possible_pdf_data
-    elif possible_cdl_data:
+    if link == '':
         log.debug( f'in `possible_cdl_data`; possible_cdl_data, ``{possible_cdl_data}``')
         if possible_cdl_data == 'TODO -- handle multiple possible results':
             link = ''
         elif possible_cdl_data == 'no CDL link found':
             link = ''
         elif 'CDL link' in possible_cdl_data:
-            # log.debug( 'here' )
+            log.debug( 'parsing possible cdl data' )
             link = possible_cdl_data.replace( 'CDL link likely: <', '' )
             link = link.replace( 'CDL link possibly: <', '' )
             link = link.replace( '>', '' )
@@ -209,6 +209,35 @@ def calculate_leganto_citation_source( result: dict ) -> str:
             link = possible_cdl_data
     log.debug( f'link, ``{link}``' )
     return link
+
+
+# def calculate_leganto_citation_source( result: dict ) -> str:
+#     """ Prioritizes PDF, then CDL. """
+#     log.debug( f'c_l_c_s incoming result, ``{pprint.pformat(result)}``' )
+#     link: str = ''
+#     possible_pdf_data: str = result['citation_source4']
+#     possible_cdl_data: str = result['citation_source1']
+#     if possible_pdf_data:
+#         log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
+#         if possible_pdf_data == 'no_pdf_found':
+#             link = ''
+#         else:
+#             link = possible_pdf_data
+#     elif possible_cdl_data:
+#         log.debug( f'in `possible_cdl_data`; possible_cdl_data, ``{possible_cdl_data}``')
+#         if possible_cdl_data == 'TODO -- handle multiple possible results':
+#             link = ''
+#         elif possible_cdl_data == 'no CDL link found':
+#             link = ''
+#         elif 'CDL link' in possible_cdl_data:
+#             # log.debug( 'here' )
+#             link = possible_cdl_data.replace( 'CDL link likely: <', '' )
+#             link = link.replace( 'CDL link possibly: <', '' )
+#             link = link.replace( '>', '' )
+#         else:
+#             link = possible_cdl_data
+#     log.debug( f'link, ``{link}``' )
+#     return link
 
 
 def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:

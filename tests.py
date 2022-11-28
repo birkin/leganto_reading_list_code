@@ -102,14 +102,16 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
     def test_calculate_leganto_citation_source_from_ebook_data(self):
         """ Checks calculate_leganto_citation_source() using mapped-ebook-data. """
         inputs_and_expecteds = [
+            {   'ebook_data':  { 'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/23267522610006966>', 'citation_source4': 'https://library.brown.edu/reserves/pdffiles/61925_france_battles_over_whether_to_cancel.pdf' },
+                'expected': 'https://library.brown.edu/reserves/pdffiles/61925_france_battles_over_whether_to_cancel.pdf',
+                'comment': 'tests that pdf trumps cdl' },
             {   'ebook_data':  { 'citation_source1': 'CDL link possibly: <https://cdl.library.brown.edu/cdl/item/23267522610006966>', 'citation_source4': 'no_pdf_found' },
-                'expected': 'zz https://library.brown.edu/reserves/pdffiles/61925_france_battles_over_whether_to_cancel.pdf' },
+                'expected': 'https://cdl.library.brown.edu/cdl/item/23267522610006966',
+                'comment': 'tests that if there is no pdf, use the cdl link' },
             {   'ebook_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': 'no_pdf_found' },
-                'expected': 'zz ' },
-
-            {   'ebook_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': 'no_pdf_found' },
-                'expected': 'zz ' },
-            ]
+                'expected': '',
+                'comment': 'tests that empty result is returned if there is no pdf or cdl info' },
+            ]        
         for entry in inputs_and_expecteds:
             ebook_data = entry['ebook_data']
             expected = entry['expected']
