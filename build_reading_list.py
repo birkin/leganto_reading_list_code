@@ -280,7 +280,6 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             ## leganto combined data --------------------------------
             all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites
 
-
             if all_course_results == []:
                 all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         else:
@@ -326,14 +325,11 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = leganto_final_processor.calculate_leganto_course_code( result['coursecode'] )
         row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
-        # row_dict['reading_list_library_note'] = f'Possible full-text link: <{result["citation_source2"]}>.' if result["citation_source2"] else ''
-        # row_dict['reading_list_library_note'] = f'Possible full-text link: <https://url_one>./nOccasionally-helpful link: <https://url_two>'
-        row_dict['reading_list_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'], result['external_system_id'] )
-        if row_dict['reading_list_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
+        row_dict['citation_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source2'], result['citation_source3'], result['external_system_id'] )
+        if row_dict['citation_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
             result['external_system_id'] = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'  # so this will appear in the staff spreadsheet
         row_dict['reading_list_name'] = result['reading_list_name'] if result['external_system_id'] else ''
         row_dict['reading_list_status'] = 'BeingPrepared' if result['external_system_id'] else ''
-        # row_dict['section_id'] = result['section_id'] if result['external_system_id'] else 'NO-OCRA-DATA-FOUND'
         row_dict['section_id'] = result['section_id']
         row_dict['section_name'] = 'Resources' if result['external_system_id'] else ''
         row_dict['visibility'] = 'RESTRICTED' if result['external_system_id'] else ''

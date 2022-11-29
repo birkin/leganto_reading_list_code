@@ -179,7 +179,8 @@ class OIT_Course_Loader( object ):
             leganto_entry: dict = entry
             log.debug( f'leganto_entry, ``{leganto_entry}``' )
             oit_coursecode = leganto_entry['coursecode']
-            if leganto_entry['reading_list_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
+            # if leganto_entry['reading_list_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
+            if leganto_entry['citation_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
                 status: str = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
             else:
                 status: str = 'processed'
