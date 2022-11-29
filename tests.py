@@ -150,6 +150,33 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
         self.assertEqual( 'Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg',
             leganto_final_processor.clean_citation_title( '“Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg' ) 
             )
+        string_with_returns = '''Is Summer Learning Loss Real? How I lost faith in one of
+education research‚Äôs classic results - Education Next : Education
+Next'''
+        self.assertEqual( '''Is Summer Learning Loss Real? How I lost faith in one of education research‚Äôs classic results - Education Next : Education Next''', 
+            leganto_final_processor.clean_citation_title( string_with_returns ) 
+            )
+
+    # def test_clean_citation_title(self):
+    #     """ Checks cleaned leganto title. """
+    #     self.assertEqual( 'no-title', 
+    #         leganto_final_processor.clean_citation_title( '' ) 
+    #         )
+    #     self.assertEqual( '(EXCERPT)', 
+    #         leganto_final_processor.clean_citation_title( '(EXCERPT) ' ) 
+    #         )
+    #     self.assertEqual( 'Bharatha Natyam-What Are You?', 
+    #         leganto_final_processor.clean_citation_title( '(EXCERPT) "Bharatha Natyam-What Are You?.' ) 
+    #         )
+    #     self.assertEqual( 'Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama', 
+    #         leganto_final_processor.clean_citation_title( '“Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama”' ) 
+    #         )
+    #     self.assertEqual( 'Ritual', 
+    #         leganto_final_processor.clean_citation_title( '"Ritual"' ) 
+    #         )
+    #     self.assertEqual( 'Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg',
+    #         leganto_final_processor.clean_citation_title( '“Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg' ) 
+    #         )
 
     def test_clean_citation_author(self):
         """ Checks cleaned leganto author. """
