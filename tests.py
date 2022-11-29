@@ -116,13 +116,12 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
             result = leganto_final_processor.calculate_leganto_citation_source( ebook_data )
             self.assertEqual( expected, result )
 
-    
     def test_calculate_leganto_citation_source_from_website_data(self):
         """ Checks calculate_leganto_citation_source() using mapped-website-data. """
         inputs_and_expecteds = [
-            {   'website_data':  { 'citation_source1': 'no CDL link found', 'citation_source2': '', 'citation_source4': 'https://library.brown.edu/reserves/pdffiles/61886_belonging_is_stronger_than_facts__nyt.pdf', 'citation_secondary_type': 'WEBSITE' },
+            {   'website_data':  { 'citation_source1': 'no CDL link found', 'citation_source2': '', 'citation_source4': 'https://library.brown.edu/reserves/pdffiles/61886_belonging_is_stronger_than_facts__nyt.pdf', 'citation_secondary_type': 'WS' },
                 'expected': 'https://library.brown.edu/reserves/pdffiles/61886_belonging_is_stronger_than_facts__nyt.pdf' },
-            {   'website_data':  { 'citation_source1': 'no CDL link found', 'citation_source2': 'https://brown.kanopystreaming.com/node/111103', 'citation_source4': 'no_pdf_found', 'citation_secondary_type': 'WEBSITE' },
+            {   'website_data':  { 'citation_source1': 'no CDL link found', 'citation_source2': 'https://brown.kanopystreaming.com/node/111103', 'citation_source4': 'no_pdf_found', 'citation_secondary_type': 'WS' },
                 'expected': 'https://brown.kanopystreaming.com/node/111103' },
             ]
         for entry in inputs_and_expecteds:
@@ -130,8 +129,6 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
             expected = entry['expected']
             result = leganto_final_processor.calculate_leganto_citation_source( website_data )
             self.assertEqual( expected, result )
-
-
 
     def test_clean_citation_title(self):
         """ Checks cleaned leganto title. """

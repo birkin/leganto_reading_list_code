@@ -178,7 +178,7 @@ def map_ebook( initial_ebook_data: dict, course_id: str, leganto_course_id: str,
     mapped_ebook_data['citation_issn'] = initial_ebook_data['issn']
     mapped_ebook_data['citation_issue'] = initial_ebook_data['issue']
     mapped_ebook_data['citation_publication_date'] = str( initial_ebook_data['date'] )
-    mapped_ebook_data['citation_secondary_type'] = 'EBOOK'  # guess
+    mapped_ebook_data['citation_secondary_type'] = 'E_BK'
     log.debug( 'about to call run_ebook_cdl_check() from map_ebook()' )
     # mapped_ebook_data['citation_source1'] = cdl.run_article_cdl_check( initial_ebook_data['facnotes'], initial_ebook_data['title'], cdl_checker )
     mapped_ebook_data['citation_source1'] = cdl.run_ebook_cdl_check( initial_ebook_data['facnotes'], initial_ebook_data['art_url'], initial_ebook_data['title'], cdl_checker )
@@ -263,7 +263,7 @@ def map_website( initial_website_data: dict, course_id: str, leganto_course_id: 
     mapped_website_data['citation_issn'] = initial_website_data['issn']
     mapped_website_data['citation_issue'] = initial_website_data['issue']
     mapped_website_data['citation_publication_date'] = str( initial_website_data['date'] )
-    mapped_website_data['citation_secondary_type'] = 'WEBSITE'  # guess
+    mapped_website_data['citation_secondary_type'] = 'WS'
     log.debug( 'about to call run_website_cdl_check() from map_website()' )
     # mapped_website_data['citation_source1'] = cdl.run_article_cdl_check( initial_website_data['facnotes'], initial_website_data['title'], cdl_checker )
     mapped_website_data['citation_source1'] = cdl.run_ebook_cdl_check( initial_website_data['facnotes'], initial_website_data['art_url'], initial_website_data['title'], cdl_checker )
