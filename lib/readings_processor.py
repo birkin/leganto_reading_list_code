@@ -313,9 +313,9 @@ def map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_sect
         No course_id needed; it's only used to build pdf links.
         Called by build_reading_list.prep_basic_data """
     mapped_audio_files = []
-    for audio_file in audio_results:
-        mapped_audiofile: dict = map_av( 'audio', audio_file, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-        mapped_audio_files.append( mapped_audiofile )
+    for audio_result in audio_results:
+        mapped_audiofile: dict = map_av( 'audio', audio_result, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+        mapped_audio_results.append( mapped_audiofile )
     return mapped_audio_files
 
 def map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings ) -> list:
@@ -324,7 +324,7 @@ def map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_i
         Called by build_reading_list.prep_basic_data """
     mapped_videos = []
     for video_result in video_results:
-        mapped_video: dict = map_av( 'video', video_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+        mapped_video: dict = map_av( 'video', video_result, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
         mapped_videos.append( mapped_video )
     return mapped_videos
 
