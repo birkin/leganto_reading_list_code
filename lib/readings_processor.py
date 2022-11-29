@@ -312,11 +312,11 @@ def map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_sect
     """ Runs audio mapping. 
         No course_id needed; it's only used to build pdf links.
         Called by build_reading_list.prep_basic_data """
-    mapped_audios = []
-    for video_result in video_results:
-        mapped_audiofile: dict = map_av( 'audio', video_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-        mapped_audios.append( mapped_audiofile )
-    return mapped_audios
+    mapped_audio_files = []
+    for audio_file in audio_results:
+        mapped_audiofile: dict = map_av( 'audio', audio_file, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+        mapped_audio_files.append( mapped_audiofile )
+    return mapped_audio_files
 
 def map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings ) -> list:
     """ Runs video mapping. 

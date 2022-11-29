@@ -277,7 +277,7 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
 
 
             ## leganto audio data -----------------------------------
-            leg_audios: list = readings_processor.map_audios( audio_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            leg_audios: list = readings_processor.map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto video data -----------------------------------
             leg_videos: list = readings_processor.map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
 
