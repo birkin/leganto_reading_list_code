@@ -26,7 +26,9 @@ def make_filtered_oit_file() -> None:
     ## setup --------------------------------------------------------
     settings = load_settings()
     oit_complete_filepath = f"{settings['OIT_COURSES_DIRPATH']}/leganto-course-data_20221129001455.txt"
+    log.debug( f'oit_complete_filepath, ``{oit_complete_filepath}``' )
     tracker_filepath = settings['TRACKER_JSON_FILEPATH']
+    log.debug( f'tracker_filepath, ``{tracker_filepath}``' )
     oit_filtered_filepath = f"{settings['OIT_COURSES_DIRPATH']}/oit_winter_&_spring_exlcuding_no_matches.txt"
 
     ## load complete oit-course-file --------------------------------
