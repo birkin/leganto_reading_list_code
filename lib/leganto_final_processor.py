@@ -157,7 +157,8 @@ def calculate_leganto_citation_source( result: dict ) -> str:
             link = link.replace( '>', '' )
         else:
             link = possible_cdl_data
-    if link == '' and ocra_format == 'WS':
+    # if link == '' and ocra_format == 'WS':
+    if link == '' and ocra_format in ['AR', 'VD', 'WS']:
         if 'brown.kanopystreaming.com' in possible_article_url:
             link = possible_article_url 
     log.debug( f'link, ``{link}``' )

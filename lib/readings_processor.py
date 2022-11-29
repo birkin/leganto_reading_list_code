@@ -314,8 +314,8 @@ def map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_sect
         Called by build_reading_list.prep_basic_data """
     mapped_audio_files = []
     for audio_result in audio_results:
-        mapped_audiofile: dict = map_av( 'audio', audio_result, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-        mapped_audio_results.append( mapped_audiofile )
+        mapped_audio_file: dict = map_av( 'audio', audio_result, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+        mapped_audio_files.append( mapped_audio_file )
     return mapped_audio_files
 
 def map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings ) -> list:
@@ -332,16 +332,16 @@ def map_av( av_type: str, av_result: dict, leganto_course_id: str, cdl_checker, 
     """ Maps audio/video result to leganto format.
         Called by map_videos() """
     mapped_av_item: dict = MAPPED_CATEGORIES.copy()
-    mapped_av_item['citation_author'] = av_result['author']
-    mapped_av_item['citation_publication_date'] = av_result['year']
+    mapped_av_item['citation_author'] = av_result.get('author', '')
+    mapped_av_item['citation_publication_date'] = av_result.get('year', )
     mapped_av_item['citation_secondary_type'] = 'AR' if av_type == 'audio' else 'VD'
     mapped_av_item['citation_source1'] = ''
-    mapped_av_item['citation_source2'] = av_result['art_url']
-    mapped_av_item['citation_source3'] = map_bruknow_openurl( initial_website_data.get('sfxlink', '') ) 
+    mapped_av_item['citation_source2'] = av_result.get('art_url', '')
+    mapped_av_item['citation_source3'] = map_bruknow_openurl( av_result.get('sfxlink', '') ) 
     mapped_av_item['citation_source4'] = ''
     mapped_av_item['citation_title'] = av_result['title'].strip()
     mapped_av_item['coursecode'] = leganto_course_id
-    mapped_av_item['external_system_id'] = av_result['requests.requestid']
+    mapped_av_item['external_system_id'] = av_result.get('requests.requestid')
     mapped_av_item['reading_list_name'] = leganto_course_title
     mapped_av_item['section_id'] = leganto_section_id
     log.debug(msg=f'mapped_av_item, ``{pprint.pformat(mapped_av_item)}``')
