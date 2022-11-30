@@ -26,6 +26,7 @@ def get_headers() -> list:
     log.debug( f'header-count, ``{len(headers)}``' )
     return headers
 
+
 def clean_citation_title( db_title: str ) -> str:
     log.debug( f'db_title initially, ``{db_title}``' )
     if db_title:
@@ -74,53 +75,6 @@ def clean_citation_title( db_title: str ) -> str:
     return db_title
 
     ## end def clean_citation_title()
-
-# def clean_citation_title( db_title: str ) -> str:
-#     log.debug( f'db_title initially, ``{db_title}``' )
-#     if db_title:
-#         db_title = db_title.strip()
-#         log.debug( f'db_title after strip, ``{db_title}``' )
-#         if db_title == '(EXCERPT)':
-#             pass
-#         elif '(EXCERPT)' in db_title:
-#             db_title = db_title.replace( '(EXCERPT)', '' )
-#             db_title = db_title.strip()
-#         if db_title[-1] == ':':
-#             db_title = db_title[0:-1]
-#         if db_title[-1] == '.':
-#             log.debug( 'found period' )
-#             db_title = db_title[0:-1]
-#         if db_title[0] == '“':  # starting smart-quotes
-#             ## remove initial-smart-quotes if there's only one, and only one end-smart-quotes, and it's at the end.
-#             log.debug( 'found starting smart-quotes' )
-#             count_start: int = db_title.count( '“' )
-#             if count_start == 1:
-#                 count_end: int = db_title.count( '”' )
-#                 if count_end == 1:
-#                     if db_title[-1] == '”':  # ok, remove both
-#                         db_title = db_title[1:-1]
-#         if db_title[0] == '“':
-#             count_quotes: int = db_title.count( '“' )
-#             if count_quotes == 1:
-#                 db_title = db_title[1:] 
-#         if db_title[0] == '"':
-#             ## remove initial-quotes if there are two, and the other is at the end.
-#             log.debug( 'found starting simple-quotes' )
-#             count_quotes: int = db_title.count( '"' )
-#             if count_quotes == 2:
-#                 if db_title[-1] == '"':  # ok, remove both
-#                     db_title = db_title[1:-1]
-#         if db_title[0] == '"':
-#             count_quotes: int = db_title.count( '"' )
-#             if count_quotes == 1:
-#                 db_title = db_title[1:]
-#         db_title = db_title.strip()
-#     else:
-#         db_title = 'no-title'
-#     log.debug( f'db_title cleaned, ``{db_title}``' )
-#     return db_title
-
-#     ## end def clean_citation_title()
 
 
 def clean_citation_author( db_author: str ) -> str:
@@ -216,8 +170,12 @@ def calculate_leganto_citation_source( result: dict ) -> str:
     # end def calculate_leganto_citation_source()
 
 
-def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
-    """ Returns possibly-helpful info for staff. """
+def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
+    """ Returns possibly-helpful info for staff. 
+        `possible_full_text` is the raw-url sometimes in citation_source2.
+        `possible_openurl` is the openurl-link sometimes in citation_source3. 
+        Called by build_reading_list.prep_leganto_data() """
+    log.debug( f'possible_cdl_text, ``{possible_cdl_text}``' )
     log.debug( f'possible_full_text, ``{possible_full_text}``' )
     log.debug( f'possible_openurl, ``{possible_openurl}``' )
     log.debug( f'external_system_id, ``{external_system_id}``' )
@@ -239,6 +197,35 @@ def calculate_leganto_staff_note( possible_full_text: str, possible_openurl: str
             message = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
     log.debug( f'staff-message, ``{message}``' )
     return message
+
+    
+# def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
+#     """ Returns possibly-helpful info for staff. 
+#         `possible_full_text` is the raw-url sometimes in citation_source2.
+#         `possible_openurl` is the openurl-link sometimes in citation_source3. 
+#         Called by build_reading_list.prep_leganto_data() """
+#     log.debug( f'possible_cdl_text, ``{possible_cdl_text}``' )
+#     log.debug( f'possible_full_text, ``{possible_full_text}``' )
+#     log.debug( f'possible_openurl, ``{possible_openurl}``' )
+#     log.debug( f'external_system_id, ``{external_system_id}``' )
+#     message = ''
+#     if possible_full_text:
+#         message = f'Possible full-text link: <{possible_full_text}>.'
+#     if possible_openurl:
+#         if 'https' in possible_openurl:
+#             params: str = possible_openurl.split( 'openurl?' )[1]  # sometimes there's a link, but with no parameters.
+#             if params:
+#                 log.debug( 'params exist' )
+#                 ourl_message: str = f'Occasionally-helpful link: <{possible_openurl}>.'
+#                 if message:
+#                     message = f'{message} {ourl_message}'
+#                 else:
+#                     message = ourl_message
+#     if message == '':
+#         if not external_system_id:
+#             message = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
+#     log.debug( f'staff-message, ``{message}``' )
+#     return message
 
 
 def reformat_for_leganto_sheet( leganto_data: list ) -> list:

@@ -67,6 +67,33 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
     def setUp( self ):
         pass
 
+    def test_calculate_leganto_staff_note(self):
+        """ Checks preparation of staff note. """
+        inputs_and_expecteds = [
+            { 'data': {'citation_source1': 'not yet used', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': '20170126002905nf' },
+              'expected': '' },
+            { 'data': {'citation_source1': 'not yet used', 'citation_source2': 'http://josiah.brown.edu/record=b7696750~S7', 'citation_source3': 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&', 'external_system_id': '20160122142047lp' },
+              'expected': 'Possible full-text link: <http://josiah.brown.edu/record=b7696750~S7>. Occasionally-helpful link: <https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&>.' },
+            { 'data': {'citation_source1': 'not yet used', 'citation_source2': 'https://login.revproxy.brown.edu/login?URL=http://www.brown.eblib.com/EBLWeb/patron/?target=patron&extendedid=P_4096830_0 ', 'citation_source3': 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&', 'external_system_id': '20170202184000ks' },
+              'expected': 'Possible full-text link: <https://login.revproxy.brown.edu/login?URL=http://www.brown.eblib.com/EBLWeb/patron/?target=patron&extendedid=P_4096830_0 >. Occasionally-helpful link: <https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&>.' },
+ 
+             { 'data': {'citation_source1': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': '20210119155607ra' },
+              'expected': 'z CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>.' },
+
+             { 'data': {'citation_source1': 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': 'test123' },
+              'expected': 'z Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>.' }
+
+        ]
+        for entry in inputs_and_expecteds:
+            possible_cdl_text = entry['data']['citation_source1']
+            possible_full_text = entry['data']['citation_source2']
+            possible_openurl = entry['data']['citation_source3']
+            external_system_id = entry['data']['external_system_id']
+            expected = entry['expected']
+            result = leganto_final_processor.calculate_leganto_staff_note(
+                possible_cdl_text, possible_full_text, possible_openurl, external_system_id )
+            self.assertEqual( expected, result, f'failed; returned, ``{result}``' )
+
     def test_calculate_leganto_citation_source_from_book_data(self):
         """ Checks calculate_leganto_citation_source() using mapped-book-data. """
         inputs_and_expecteds = [
@@ -156,27 +183,6 @@ Next'''
         self.assertEqual( '''Is Summer Learning Loss Real? How I lost faith in one of education research‚Äôs classic results - Education Next : Education Next''', 
             leganto_final_processor.clean_citation_title( string_with_returns ) 
             )
-
-    # def test_clean_citation_title(self):
-    #     """ Checks cleaned leganto title. """
-    #     self.assertEqual( 'no-title', 
-    #         leganto_final_processor.clean_citation_title( '' ) 
-    #         )
-    #     self.assertEqual( '(EXCERPT)', 
-    #         leganto_final_processor.clean_citation_title( '(EXCERPT) ' ) 
-    #         )
-    #     self.assertEqual( 'Bharatha Natyam-What Are You?', 
-    #         leganto_final_processor.clean_citation_title( '(EXCERPT) "Bharatha Natyam-What Are You?.' ) 
-    #         )
-    #     self.assertEqual( 'Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama', 
-    #         leganto_final_processor.clean_citation_title( '“Frayed Fabrications: Feminine Mobility, Surrogate Bodies and Robe Usage in Noh Drama”' ) 
-    #         )
-    #     self.assertEqual( 'Ritual', 
-    #         leganto_final_processor.clean_citation_title( '"Ritual"' ) 
-    #         )
-    #     self.assertEqual( 'Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg',
-    #         leganto_final_processor.clean_citation_title( '“Research, Countertext, Proposal: Considering the Textual Authority of the Dramaturg' ) 
-    #         )
 
     def test_clean_citation_author(self):
         """ Checks cleaned leganto author. """

@@ -79,39 +79,6 @@ def filter_article_table_results( all_articles_results ):
     ## end def filter_article_table_results()  
 
 
-## video & audio ----------------------------------------------------
-
-def map_videos( video_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings ):
-    mapped_videos = []
-    for video_result in video_results:
-        mapped_video: dict = map_av( 'video', video_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-        mapped_videos.append( mapped_video )
-    return mapped_videos
-
-def map_av( av_type: str, av_result: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> dict:
-    """ Maps audio/video result to leganto format.
-        Called by map_videos() """
-    mapped_video: dict = MAPPED_CATEGORIES.copy()
-    mapped_video['coursecode'] = course_id
-    mapped_video['section_id'] = leganto_section_id
-    mapped_video['citation_secondary_type'] = 'AR' if av_type == 'audio' else 'VD'
-    mapped_video['citation_title'] = av_result['title']
-    mapped_video['citation_author'] = av_result['author']
-    mapped_video['citation_publication_date'] = av_result['year']
-    mapped_video['citation_source1'] = av_result['url']
-    mapped_video['citation_source2'] = av_result['url']
-    mapped_video['citation_source3'] = av_result['url']
-    mapped_video['citation_source4'] = av_result['url']
-    mapped_video['external_system_id'] = av_result['id']
-    mapped_video['reading_list_name'] = leganto_course_title
-    mapped_video['course_id'] = leganto_course_id
-    mapped_video['cdl'] = cdl_checker.check_cdl( av_result['title'], av_result['author'] )
-    mapped_video['leganto_section_id'] = leganto_section_id
-    mapped_video['leganto_course_title'] = leganto_course_title
-    mapped_video['settings'] = settings
-    return mapped_video
-
-
 ## articles ---------------------------------------------------------
 
 def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
