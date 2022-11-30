@@ -180,9 +180,22 @@ def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, po
     log.debug( f'possible_openurl, ``{possible_openurl}``' )
     log.debug( f'external_system_id, ``{external_system_id}``' )
     message = ''
+    if possible_cdl_text:
+        ok_strings = [ 'CDL link likely', 'CDL link possibly' ]
+        if any( ok_string in possible_cdl_text for ok_string in ok_strings ):
+            message = possible_cdl_text
+            if message[-1] != '.':
+                message = f'{message}.'
     if possible_full_text:
-        message = f'Possible full-text link: <{possible_full_text}>.'
+        log.debug( 'hereA' )
+        temp_message = f'Possible full-text link: <{possible_full_text}>.'
+        if message:
+            log.debug( 'hereB' )
+            message = message + ' ' + temp_message
+        else:
+            message = temp_message
     if possible_openurl:
+        log.debug( 'hereC' )
         if 'https' in possible_openurl:
             params: str = possible_openurl.split( 'openurl?' )[1]  # sometimes there's a link, but with no parameters.
             if params:
@@ -198,7 +211,7 @@ def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, po
     log.debug( f'staff-message, ``{message}``' )
     return message
 
-    
+
 # def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
 #     """ Returns possibly-helpful info for staff. 
 #         `possible_full_text` is the raw-url sometimes in citation_source2.

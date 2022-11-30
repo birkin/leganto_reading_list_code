@@ -78,13 +78,18 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
               'expected': 'Possible full-text link: <https://login.revproxy.brown.edu/login?URL=http://www.brown.eblib.com/EBLWeb/patron/?target=patron&extendedid=P_4096830_0 >. Occasionally-helpful link: <https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&>.' },
  
              { 'data': {'citation_source1': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': '20210119155607ra' },
-              'expected': 'z CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>.' },
+              'expected': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>.' },
 
              { 'data': {'citation_source1': 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': 'test123' },
-              'expected': 'z Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>.' }
+              'expected': 'z5 Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>.' }
 
         ]
+
+
+
+
         for entry in inputs_and_expecteds:
+            log.debug( '-------')
             possible_cdl_text = entry['data']['citation_source1']
             possible_full_text = entry['data']['citation_source2']
             possible_openurl = entry['data']['citation_source3']
