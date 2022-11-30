@@ -181,7 +181,7 @@ def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, po
     log.debug( f'external_system_id, ``{external_system_id}``' )
     message = ''
     if possible_cdl_text:
-        ok_strings = [ 'CDL link likely', 'CDL link possibly' ]
+        ok_strings = [ 'CDL link likely', 'CDL link possibly', 'Multiple possible CDL links' ]
         if any( ok_string in possible_cdl_text for ok_string in ok_strings ):
             message = possible_cdl_text
             if message[-1] != '.':

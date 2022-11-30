@@ -81,7 +81,7 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
               'expected': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>.' },
 
              { 'data': {'citation_source1': 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': 'test123' },
-              'expected': 'z5 Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>.' }
+              'expected': 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>.' }
 
         ]
 
