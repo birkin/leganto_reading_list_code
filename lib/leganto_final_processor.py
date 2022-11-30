@@ -140,17 +140,21 @@ def calculate_leganto_citation_source( result: dict ) -> str:
     possible_cdl_data: str = result['citation_source1']
     possible_article_url: str = result.get('citation_source2', '')
     ocra_format: str = result.get('citation_secondary_type', '')
+    ## prioritize pdf -----------------------------------------------
     if possible_pdf_data:
         log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
         if possible_pdf_data == 'no_pdf_found':
             pass
         else:
             link = possible_pdf_data
+    ## then CDL -----------------------------------------------------
     if link == '':
         log.debug( f'in `possible_cdl_data`; possible_cdl_data, ``{possible_cdl_data}``')
         if possible_cdl_data == 'TODO -- handle multiple possible results':
             link = ''
         elif possible_cdl_data == 'no CDL link found':
+            link = ''
+        elif 'Multiple possible CDL links' in possible_cdl_data:
             link = ''
         elif 'CDL link' in possible_cdl_data:
             log.debug( 'parsing possible cdl data' )
@@ -160,7 +164,7 @@ def calculate_leganto_citation_source( result: dict ) -> str:
             link = link.replace( '>', '' )
         else:
             link = possible_cdl_data
-    # if link == '' and ocra_format == 'WS':
+    ## allow kanopy links for audio, video, and websites ------------
     if link == '' and ocra_format in ['AR', 'VD', 'WS']:
         if 'brown.kanopystreaming.com' in possible_article_url:
             link = possible_article_url 
@@ -168,6 +172,44 @@ def calculate_leganto_citation_source( result: dict ) -> str:
     return link
 
     # end def calculate_leganto_citation_source()
+
+
+# def calculate_leganto_citation_source( result: dict ) -> str:
+#     """ Prioritizes PDF, then CDL. """
+#     log.debug( f'c_l_c_s incoming result, ``{pprint.pformat(result)}``' )
+#     link: str = ''
+#     possible_pdf_data: str = result['citation_source4']
+#     possible_cdl_data: str = result['citation_source1']
+#     possible_article_url: str = result.get('citation_source2', '')
+#     ocra_format: str = result.get('citation_secondary_type', '')
+#     if possible_pdf_data:
+#         log.debug( f'in `possible_pdf_data`; possible_pdf_data, ``{possible_pdf_data}``')
+#         if possible_pdf_data == 'no_pdf_found':
+#             pass
+#         else:
+#             link = possible_pdf_data
+#     if link == '':
+#         log.debug( f'in `possible_cdl_data`; possible_cdl_data, ``{possible_cdl_data}``')
+#         if possible_cdl_data == 'TODO -- handle multiple possible results':
+#             link = ''
+#         elif possible_cdl_data == 'no CDL link found':
+#             link = ''
+#         elif 'CDL link' in possible_cdl_data:
+#             log.debug( 'parsing possible cdl data' )
+#             link = possible_cdl_data.replace( 'CDL link likely: ', '' )
+#             link = link.replace( 'CDL link possibly: ', '' )
+#             link = link.replace( '<', '' )
+#             link = link.replace( '>', '' )
+#         else:
+#             link = possible_cdl_data
+#     # if link == '' and ocra_format == 'WS':
+#     if link == '' and ocra_format in ['AR', 'VD', 'WS']:
+#         if 'brown.kanopystreaming.com' in possible_article_url:
+#             link = possible_article_url 
+#     log.debug( f'link, ``{link}``' )
+#     return link
+
+#     # end def calculate_leganto_citation_source()
 
 
 def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
@@ -210,35 +252,6 @@ def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, po
             message = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
     log.debug( f'staff-message, ``{message}``' )
     return message
-
-
-# def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
-#     """ Returns possibly-helpful info for staff. 
-#         `possible_full_text` is the raw-url sometimes in citation_source2.
-#         `possible_openurl` is the openurl-link sometimes in citation_source3. 
-#         Called by build_reading_list.prep_leganto_data() """
-#     log.debug( f'possible_cdl_text, ``{possible_cdl_text}``' )
-#     log.debug( f'possible_full_text, ``{possible_full_text}``' )
-#     log.debug( f'possible_openurl, ``{possible_openurl}``' )
-#     log.debug( f'external_system_id, ``{external_system_id}``' )
-#     message = ''
-#     if possible_full_text:
-#         message = f'Possible full-text link: <{possible_full_text}>.'
-#     if possible_openurl:
-#         if 'https' in possible_openurl:
-#             params: str = possible_openurl.split( 'openurl?' )[1]  # sometimes there's a link, but with no parameters.
-#             if params:
-#                 log.debug( 'params exist' )
-#                 ourl_message: str = f'Occasionally-helpful link: <{possible_openurl}>.'
-#                 if message:
-#                     message = f'{message} {ourl_message}'
-#                 else:
-#                     message = ourl_message
-#     if message == '':
-#         if not external_system_id:
-#             message = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
-#     log.debug( f'staff-message, ``{message}``' )
-#     return message
 
 
 def reformat_for_leganto_sheet( leganto_data: list ) -> list:

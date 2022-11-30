@@ -76,20 +76,13 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
               'expected': 'Possible full-text link: <http://josiah.brown.edu/record=b7696750~S7>. Occasionally-helpful link: <https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&>.' },
             { 'data': {'citation_source1': 'not yet used', 'citation_source2': 'https://login.revproxy.brown.edu/login?URL=http://www.brown.eblib.com/EBLWeb/patron/?target=patron&extendedid=P_4096830_0 ', 'citation_source3': 'https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&', 'external_system_id': '20170202184000ks' },
               'expected': 'Possible full-text link: <https://login.revproxy.brown.edu/login?URL=http://www.brown.eblib.com/EBLWeb/patron/?target=patron&extendedid=P_4096830_0 >. Occasionally-helpful link: <https://bruknow.library.brown.edu/discovery/openurl?institution=01BU_INST&vid=01BU_INST:BROWN&>.' },
- 
              { 'data': {'citation_source1': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': '20210119155607ra' },
               'expected': 'CDL link likely: <https://cdl.library.brown.edu/cdl/item/i177331252>.' },
-
              { 'data': {'citation_source1': 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>', 'citation_source2': '', 'citation_source3': 'no openurl found', 'external_system_id': 'test123' },
               'expected': 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>.' }
-
         ]
-
-
-
-
         for entry in inputs_and_expecteds:
-            log.debug( '-------')
+            # log.debug( '-------')
             possible_cdl_text = entry['data']['citation_source1']
             possible_full_text = entry['data']['citation_source2']
             possible_openurl = entry['data']['citation_source3']
@@ -108,8 +101,11 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
                 'expected': 'https://cdl.library.brown.edu/cdl/item/i142579956' },
             {   'book_data':  { 'citation_source1': 'no CDL link found', 'citation_source4': '' },
                 'expected': '' },
+            {   'book_data':  { 'citation_source1': 'Multiple possible CDL links: <https://cdl.library.brown.edu/cdl/item/23300432020006966>, <https://cdl.library.brown.edu/cdl/item/23300432030006966>', 'citation_source4': '' },
+                'expected': '' },
             ]
         for entry in inputs_and_expecteds:
+            # log.debug( '-------')
             book_data = entry['book_data']
             expected = entry['expected']
             result = leganto_final_processor.calculate_leganto_citation_source( book_data )
