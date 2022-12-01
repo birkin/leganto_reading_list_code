@@ -358,7 +358,7 @@ def parse_args() -> dict:
     # parser = argparse.ArgumentParser( description='Required: a `course_id` like `EDUC1234` (accepts multiples like `EDUC1234,HIST1234`) -- and confirmation that the spreadsheet should actually be updated with prepared data.' )
     parser = argparse.ArgumentParser( description='''Example usage...
     ## processes first 5 courses in oit_file ------------------------
-    python3 ./build_reading_list.py -course_id oit_file -range '{"start": 5, "end": 10}'
+    python3 ./build_reading_list.py -course_id oit_file -range_inclusive '{"start": 5, "end": 10}'
     ## processes two courses and updates the google-sheet -----------
     python3 ./build_reading_list.py -course_id EAST0402,TAPS1600 -update_ss true
     ## processes the google-sheet's worksheet-1 courses ------------- 
@@ -368,7 +368,7 @@ def parse_args() -> dict:
     parser.add_argument( '-course_id', help='(required) typically like: `EDUC1234` -- or `SPREADSHEET` to get sources from google-sheet', required=True )
     parser.add_argument( '-update_ss', help='(required if course_id is `spreadsheet` or a course-listing) takes boolean `false` or `true`, used to specify whether spreadsheet should be updated with prepared data', required=False )
     parser.add_argument( '-force', help='(optional) takes boolean `false` or `true`, used to skip spreadsheet recently-updated check', required=False )
-    parser.add_argument( '-range', help='(optional) used only with `-course_id oit_file' )
+    parser.add_argument( '-range_inclusive', help='(optional) used only with `-course_id oit_file' )
     args: dict = vars( parser.parse_args() )
     log.info( f'\n\nSTARTING script; perceived args, ```{args}```' )
     ## do a bit of validation ---------------------------------------
@@ -386,18 +386,18 @@ def check_args( args ) -> bool:
     fail_check = False
     if args['course_id'] == None or len(args['course_id']) < 8:
         fail_check = True
-    if args['course_id'] == 'oit_file' and args['range']:
+    if args['course_id'] == 'oit_file' and args['range_inclusive']:
         ## check range_arg ------------------------------------------
         range_arg = {}
         try:
-            range_arg = json.loads( args['range'] )
+            range_arg = json.loads( args['range_inclusive'] )
         except:
-            log.exception( 'json-load of `range` failed' )
+            log.exception( 'json-load of `range_inclusive` failed' )
             fail_check = True
         try:
             assert range_arg['start'] <= range_arg['end']
         except:
-            log.exception( 'range arg validation failed' )
+            log.exception( 'range_inclusive arg validation failed' )
             fail_check = True
     if args['update_ss'] == None and args['course_id'] != 'oit_file':
         log.debug( 'update_ss must be specified if course_id is not `oit_file`' )
@@ -428,7 +428,7 @@ if __name__ == '__main__':
     else:
         update_ss: bool = json.loads( args['update_ss'] )
     force: bool = json.loads( args['force'] ) if args['force'] else False
-    range_arg: dict = json.loads(args['range']) if args['range'] else {}
+    range_arg: dict = json.loads(args['range_inclusive']) if args['range_inclusive'] else {}
     log.debug( f'range_arg initially, ``{pprint.pformat(range_arg)}``' )
     range_arg['start'] = range_arg['start'] - 2     # -2 to account for header-row and 0-indexing
     range_arg['end'] = range_arg['end'] - 1         # so that slice will be inclusive of range-arguments
