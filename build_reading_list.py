@@ -447,17 +447,13 @@ def update_range_arg( range_arg ) -> dict:
     original_end = range_arg['end']
 
     if original_start == 1:
-        log.debug( 'hereA' )
-        updated_range_arg['start'] = 0
+        updated_range_arg['start'] = 0      # don't return anything; this is the header
     else:
-        log.debug( 'hereB' )
         updated_range_arg['start'] = original_start - 2
 
     if original_end == 1:
-        log.debug( 'hereC' )
-        updated_range_arg['end'] = 1
+        updated_range_arg['end'] = 0        # don't return anything; this is the header
     else:
-        log.debug( 'hereD' )
         updated_range_arg['end'] = original_end - 1
 
     log.debug( f'updated_range_arg, ``{pprint.pformat(updated_range_arg)}``' )

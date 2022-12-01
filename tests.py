@@ -229,13 +229,17 @@ class Misc_Test( unittest.TestCase ):
             build_reading_list.update_range_arg( {'start': 5, 'end': 10} )
         )
         self.assertEqual(  ## 'row-1' single item
-            { 'start': 0, 'end': 1 },
+            { 'start': 0, 'end': 0 },
             build_reading_list.update_range_arg( {'start': 1, 'end': 1} )
         )
-        # self.assertEqual(  ## 'row-2' single item
-        #     { 'start': 1, 'end': 2 },
-        #     build_reading_list.update_range_arg( {'start': 2, 'end': 2} )
-        # )
+        self.assertEqual(  ## 'row-2' single item
+            { 'start': 0, 'end': 1 },
+            build_reading_list.update_range_arg( {'start': 2, 'end': 2} )
+        )
+        self.assertEqual(  ## 'row-3' single item
+            { 'start': 1, 'end': 2 },
+            build_reading_list.update_range_arg( {'start': 3, 'end': 3} )
+        )
 
     def test_column_math(self):
         """ Checks calculated end-column. """
