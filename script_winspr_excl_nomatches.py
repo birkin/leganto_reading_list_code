@@ -25,7 +25,7 @@ def make_filtered_oit_file() -> None:
 
     ## setup --------------------------------------------------------
     settings = load_settings()
-    oit_complete_filepath = f"{settings['OIT_COURSES_DIRPATH']}/leganto-course-data_20221129001455.txt"
+    oit_complete_filepath = f"{settings['OIT_COURSES_DIRPATH']}/archived_files/leganto-course-data_20221129001455.txt"
     log.debug( f'oit_complete_filepath, ``{oit_complete_filepath}``' )
     tracker_filepath = settings['TRACKER_JSON_FILEPATH']
     log.debug( f'tracker_filepath, ``{tracker_filepath}``' )
@@ -48,20 +48,25 @@ def make_filtered_oit_file() -> None:
         ## get course-code ------------------------------------------
         oit_course_code_part: str = ''
         if i == 0:
-            new_file_lines.append( line )
+            new_file_lines.append( line )  # the header
         else:
             parts = line.split( '\t' )
             oit_course_code_part = parts[0]
+            log.debug( f'handling oit_course_code_part, ``{oit_course_code_part}``' )
             ## check if course-code is part of desired session ------
             ok_strings = [ '2023-winter', '2023-spring' ]
             if any( ok_string in oit_course_code_part for ok_string in ok_strings ):
+                log.debug( 'course-code is part of desired session' )
                 ## check course-code against tracker-file ------------
                 tracker_entry = tracker_data['oit_courses_processed'].get( oit_course_code_part, None )
                 if tracker_entry:
                     if 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND' not in tracker_entry['status']:
                         new_file_lines.append( line )
                 else:
-                    log.debug( f'no tracker-entry for oit_course_code_part, ``{oit_course_code_part}``' )
+                    log.debug( f'no tracker-entry, so adding course-entry' )
+                    new_file_lines.append( line )
+            else:
+                log.debug( f'course not in desired session; oit_course_code_part, ``{oit_course_code_part}``' )
     log.debug(msg=f'len(new_file_lines), ``{len(new_file_lines)}``')
 
     ## write filtered oit-course-file -------------------------------
@@ -75,7 +80,7 @@ def load_settings() -> dict:
         Called by make_filtered_oit_file() """
     settings = {
         'OIT_COURSES_DIRPATH': os.environ['LGNT__OIT_COURSES_DIRPATH'],
-        'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_JSON_FILEPATH'],
+        'TRACKER_JSON_FILEPATH': os.environ['LGNT__TRACKER_BIG_RUN_JSON_FILEPATH'],
     }
     return settings
 
