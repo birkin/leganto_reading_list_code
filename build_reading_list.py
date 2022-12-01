@@ -387,6 +387,7 @@ def check_args( args ) -> bool:
     if args['course_id'] == None or len(args['course_id']) < 8:
         fail_check = True
     if args['course_id'] == 'oit_file' and args['range']:
+        ## check range_arg ------------------------------------------
         range_arg = {}
         try:
             range_arg = json.loads( args['range'] )
@@ -394,7 +395,7 @@ def check_args( args ) -> bool:
             log.exception( 'json-load of `range` failed' )
             fail_check = True
         try:
-            assert range_arg['start'] < range_arg['end']
+            assert range_arg['start'] <= range_arg['end']
         except:
             log.exception( 'range arg validation failed' )
             fail_check = True
@@ -428,4 +429,8 @@ if __name__ == '__main__':
         update_ss: bool = json.loads( args['update_ss'] )
     force: bool = json.loads( args['force'] ) if args['force'] else False
     range_arg: dict = json.loads(args['range']) if args['range'] else {}
+    log.debug( f'range_arg initially, ``{pprint.pformat(range_arg)}``' )
+    range_arg['start'] = range_arg['start'] - 2     # -2 to account for header-row and 0-indexing
+    range_arg['end'] = range_arg['end'] - 1         # so that slice will be inclusive of range-arguments
+    log.debug( f'range_arg after updates, ``{pprint.pformat(range_arg)}``' )
     manage_build_reading_list( course_id, update_ss, force, range_arg )
