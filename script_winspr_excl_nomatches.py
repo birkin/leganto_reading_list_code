@@ -52,7 +52,7 @@ def make_filtered_oit_file() -> None:
         else:
             parts = line.split( '\t' )
             oit_course_code_part = parts[0]
-            log.debug( f'handling oit_course_code_part, ``{oit_course_code_part}``' )
+            log.debug( f'\n\nhandling oit_course_code_part, ``{oit_course_code_part}``' )
             ## check if course-code is part of desired session ------
             ok_strings = [ '2023-winter', '2023-spring' ]
             if any( ok_string in oit_course_code_part for ok_string in ok_strings ):
@@ -60,13 +60,18 @@ def make_filtered_oit_file() -> None:
                 ## check course-code against tracker-file ------------
                 tracker_entry = tracker_data['oit_courses_processed'].get( oit_course_code_part, None )
                 if tracker_entry:
-                    if 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND' not in tracker_entry['status']:
+                    log.debug( 'course-code is in tracker-file' )
+                    if 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND' in tracker_entry['status']:
+                        log.debug( 'course-code has no OCRA matches (from previous lookup), so skipping' )
+                        pass
+                    else:
+                        log.debug( 'course-code has OCRA matches, so appending' )
                         new_file_lines.append( line )
                 else:
-                    log.debug( f'no tracker-entry, so adding course-entry' )
+                    log.debug( f'no tracker-entry, so appending' )
                     new_file_lines.append( line )
             else:
-                log.debug( f'course not in desired session; oit_course_code_part, ``{oit_course_code_part}``' )
+                log.debug( f'course not in desired session, so skipping' )
     log.debug(msg=f'len(new_file_lines), ``{len(new_file_lines)}``')
 
     ## write filtered oit-course-file -------------------------------
