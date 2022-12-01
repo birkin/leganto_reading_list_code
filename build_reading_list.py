@@ -419,6 +419,51 @@ def check_args( args ) -> bool:
     ## end def check_args()
 
 
+# def update_range_arg( range_arg ) -> dict:
+#     """ Updates the start and end values to make the submitted "range_inclusive" argument work.
+#         Called by main() """
+#     log.debug( f'range_arg initially, ``{pprint.pformat(range_arg)}``' )
+#     updated_range_arg = range_arg.copy()
+#     original_start = range_arg['start']
+#     original_end = range_arg['end']
+#     if original_start == 1 and original_end == 1:
+#         log.debug( 'hereA' )
+#         updated_range_arg['start'] = 0
+#         updated_range_arg['end'] = 1
+#     else:
+#         log.debug( 'hereB' )
+#         updated_range_arg['start'] = original_start - 2     # -2 to account for header-row and 0-indexing
+#         updated_range_arg['end'] = original_end - 1         # so that slice will be inclusive of range-arguments
+#     log.debug( f'updated_range_arg, ``{pprint.pformat(updated_range_arg)}``' )
+#     return updated_range_arg
+
+
+def update_range_arg( range_arg ) -> dict:
+    """ Updates the start and end values to make the submitted "range_inclusive" argument work.
+        Called by main() """
+    log.debug( f'range_arg initially, ``{pprint.pformat(range_arg)}``' )
+    updated_range_arg = range_arg.copy()
+    original_start = range_arg['start']
+    original_end = range_arg['end']
+
+    if original_start == 1:
+        log.debug( 'hereA' )
+        updated_range_arg['start'] = 0
+    else:
+        log.debug( 'hereB' )
+        updated_range_arg['start'] = original_start - 2
+
+    if original_end == 1:
+        log.debug( 'hereC' )
+        updated_range_arg['end'] = 1
+    else:
+        log.debug( 'hereD' )
+        updated_range_arg['end'] = original_end - 1
+
+    log.debug( f'updated_range_arg, ``{pprint.pformat(updated_range_arg)}``' )
+    return updated_range_arg
+
+
 if __name__ == '__main__':
     log.debug( 'starting if()' )
     args: dict = parse_args()
@@ -429,8 +474,5 @@ if __name__ == '__main__':
         update_ss: bool = json.loads( args['update_ss'] )
     force: bool = json.loads( args['force'] ) if args['force'] else False
     range_arg: dict = json.loads(args['range_inclusive']) if args['range_inclusive'] else {}
-    log.debug( f'range_arg initially, ``{pprint.pformat(range_arg)}``' )
-    range_arg['start'] = range_arg['start'] - 2     # -2 to account for header-row and 0-indexing
-    range_arg['end'] = range_arg['end'] - 1         # so that slice will be inclusive of range-arguments
-    log.debug( f'range_arg after updates, ``{pprint.pformat(range_arg)}``' )
-    manage_build_reading_list( course_id, update_ss, force, range_arg )
+    updated_range_arg = update_range_arg( range_arg )
+    manage_build_reading_list( course_id, update_ss, force, updated_range_arg )

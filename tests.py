@@ -10,6 +10,7 @@ Usage:
 
 import datetime, json, logging, os, unittest
 
+import build_reading_list
 from lib import cdl
 from lib import gsheet_prepper
 from lib import leganto_final_processor
@@ -207,15 +208,34 @@ class Misc_Test( unittest.TestCase ):
 
     """ Miscellaneous checks. """
 
-    def setUp(self) -> None:
-        self.scanned_data = self.load_scanned_data()
+    # def setUp(self) -> None:
+    #     self.scanned_data = self.load_scanned_data()
 
-    def load_scanned_data( self ) -> dict:
-        scanned_data: dict = {}
-        with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
-            jsn: str = file_handler.read()
-            scanned_data = json.loads( jsn )
-        return scanned_data
+    # def load_scanned_data( self ) -> dict:
+    #     scanned_data: dict = {}
+    #     with open( SCANNED_DATA_PATH, encoding='utf-8' ) as file_handler:
+    #         jsn: str = file_handler.read()
+    #         scanned_data = json.loads( jsn )
+    #     return scanned_data
+
+    def test_update_range_arg(self):
+        """ Checks the update_range_arg() function. """
+        self.assertEqual(  ## typical single item
+            { 'start': 3, 'end': 4 },
+            build_reading_list.update_range_arg( {'start': 5, 'end': 5} )
+        )
+        self.assertEqual(  ## typical multiple items
+            { 'start': 3, 'end': 9 },
+            build_reading_list.update_range_arg( {'start': 5, 'end': 10} )
+        )
+        self.assertEqual(  ## 'row-1' single item
+            { 'start': 0, 'end': 1 },
+            build_reading_list.update_range_arg( {'start': 1, 'end': 1} )
+        )
+        # self.assertEqual(  ## 'row-2' single item
+        #     { 'start': 1, 'end': 2 },
+        #     build_reading_list.update_range_arg( {'start': 2, 'end': 2} )
+        # )
 
     def test_column_math(self):
         """ Checks calculated end-column. """
