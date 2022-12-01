@@ -470,5 +470,6 @@ if __name__ == '__main__':
         update_ss: bool = json.loads( args['update_ss'] )
     force: bool = json.loads( args['force'] ) if args['force'] else False
     range_arg: dict = json.loads(args['range_inclusive']) if args['range_inclusive'] else {}
-    updated_range_arg = update_range_arg( range_arg )
+    # updated_range_arg = update_range_arg( range_arg )
+    updated_range_arg = update_range_arg(range_arg) if range_arg else {}
     manage_build_reading_list( course_id, update_ss, force, updated_range_arg )
