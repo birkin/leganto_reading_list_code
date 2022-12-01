@@ -34,8 +34,8 @@ def create_csv( data: list, headers: list ) -> None:
         else:
             cleaned_data.append( entry )
     
-    output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.csv'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469.csv`
-    # output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.txt'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469.txt`
+    # output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.csv'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469.csv`
+    output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.tsv'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469.csv`
     log.debug( f'output_filename, ``{output_filename}``' ) 
 
     output_filepath: str = f'{CSV_OUTPUT_DIR_PATH}/{output_filename}'
@@ -44,7 +44,10 @@ def create_csv( data: list, headers: list ) -> None:
     csvfile = open( output_filepath, 'w' )
 
     ## make a new variable - c - for Python's DictWriter object - note that fieldnames is required
-    c = csv.DictWriter( csvfile, fieldnames=headers) 
+    # c = csv.DictWriter( csvfile, fieldnames=headers) 
+
+    ## make a DictWriter with a tab delimiter
+    c = csv.DictWriter( csvfile, fieldnames=headers, delimiter='\t' )
 
     ## optional - write a header row
     c.writeheader()
