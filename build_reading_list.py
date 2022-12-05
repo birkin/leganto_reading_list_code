@@ -111,9 +111,7 @@ def prep_course_id_list( course_id_input: str, settings: dict, oit_course_loader
                 log.info( 'recent updates found' )
     elif course_id_input == 'oit_file':
         oit_coursecode_list: list = oit_course_loader.grab_course_list( range_arg )
-
         oit_coursecode_list = oit_course_loader.remove_already_processed_courses( oit_coursecode_list, settings )
-
         oit_course_loader.populate_tracker( oit_coursecode_list )
     else:
         simplistic_coursecode_list: list = course_id_input.split( ',' )
@@ -171,6 +169,35 @@ def check_for_updates( course_id_list: list, settings: dict ) -> bool:
     return new_updates_exist
 
 
+# def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
+#     """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
+#         Called by manage_build_reading_list() """
+#     log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
+#     classes_info = []
+#     for entry in course_id_list:  # with the oit-coursecode, get necessary OIT data
+#         course_id_entry: str = entry
+#         log.debug( f'course_id_entry, ``{course_id_entry}``' )
+#         oit_course_data: list = oit_course_loader.grab_oit_course_data( course_id_entry )
+#         log.debug( f'oit_course_data, ``{oit_course_data}``' )
+#         for entry in oit_course_data:
+#             oit_course_data_entry: dict = entry
+#             log.debug( f'oit_course_data_entry, ``{oit_course_data_entry}``' )
+#             leganto_course_id: str = oit_course_data_entry['COURSE_CODE'] if oit_course_data_entry else f'oit_course_code_not_found_for__{course_id_entry}'
+#             leganto_course_title: str = oit_course_data_entry['COURSE_TITLE'] if oit_course_data_entry else ''
+#             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
+#             simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
+#             class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
+#             class_info_dict: dict = { 
+#                 'course_id': course_id_entry, 
+#                 'class_id': class_id, 
+#                 'leganto_course_id': leganto_course_id,
+#                 'leganto_course_title': leganto_course_title,
+#                 'leganto_section_code': leganto_section_code }
+#             classes_info.append( class_info_dict )
+#     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
+#     return classes_info
+
+
 def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
     """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
         Called by manage_build_reading_list() """
@@ -188,22 +215,23 @@ def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loade
             leganto_course_title: str = oit_course_data_entry['COURSE_TITLE'] if oit_course_data_entry else ''
             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
             simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
-            class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
-            class_info_dict: dict = { 
-                'course_id': course_id_entry, 
-                'class_id': class_id, 
-                'leganto_course_id': leganto_course_id,
-                'leganto_course_title': leganto_course_title,
-                'leganto_section_code': leganto_section_code }
-            classes_info.append( class_info_dict )
+            class_id_entries: list = get_class_id_entries( simplistic_courseid )  # gets class-id used for db lookups
+            for class_id_entry in class_id_entries:
+                class_info_dict: dict = { 
+                    'course_id': course_id_entry, 
+                    'class_id': class_id_entry, 
+                    'leganto_course_id': leganto_course_id,
+                    'leganto_course_title': leganto_course_title,
+                    'leganto_section_code': leganto_section_code }
+                classes_info.append( class_info_dict )
     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
     return classes_info
 
 
-def get_class_id( course_id: str ) -> str:
-    """ Finds class_id from given course_id.
+def get_class_id_entries( course_id: str ) -> list:
+    """ Finds one or more class_id entries from given course_id.
         Called by manage_build_reading_list() -> prep_classes_info() """
-    class_id: str = 'init'
+    class_id_list = []
     ## split the id -------------------------------------------------
     db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
     split_position: int = 0
@@ -215,7 +243,7 @@ def get_class_id( course_id: str ) -> str:
             break
     ( subject_code, course_code ) = ( course_id[0:split_position], course_id[split_position:] ) 
     log.debug( f'subject_code, ``{subject_code}``; course_code, ``{course_code}``' )
-    ## run query to get class_id ------------------------------------
+    ## run query to get class_id entries ----------------------------
     sql = f"SELECT * FROM `banner_courses` WHERE `subject` LIKE '{subject_code}' AND `course` LIKE '{course_code}' ORDER BY `banner_courses`.`term` DESC"
     log.debug( f'sql, ``{sql}``' )
     result_set: list = []
@@ -226,14 +254,51 @@ def get_class_id( course_id: str ) -> str:
             assert type(result_set) == list
     log.debug( f'result_set, ``{result_set}``' )
     if result_set:
-        recent_row = result_set[0]
-        class_id = str( recent_row['classid'] )
-    else:
-        class_id = ''
-    log.debug( f'class_id, ``{class_id}``' )
-    return class_id
+        for entry in result_set:
+            class_id = entry.get( 'class_id', None )
+            if class_id:
+                class_id_str = str( class_id )
+                class_id_list.append( class_id_str )
+    log.debug( f'class_id_list, ``{class_id_list}``' )
+    return class_id_list
 
-    ## end def get_class_id()
+    ## end def get_class_id_entries()
+
+
+# def get_class_id( course_id: str ) -> str:
+#     """ Finds class_id from given course_id.
+#         Called by manage_build_reading_list() -> prep_classes_info() """
+#     class_id: str = 'init'
+#     ## split the id -------------------------------------------------
+#     db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
+#     split_position: int = 0
+#     for ( i, character ) in enumerate( course_id ): 
+#         if character.isalpha():
+#             pass
+#         else:
+#             split_position = i
+#             break
+#     ( subject_code, course_code ) = ( course_id[0:split_position], course_id[split_position:] ) 
+#     log.debug( f'subject_code, ``{subject_code}``; course_code, ``{course_code}``' )
+#     ## run query to get class_id ------------------------------------
+#     sql = f"SELECT * FROM `banner_courses` WHERE `subject` LIKE '{subject_code}' AND `course` LIKE '{course_code}' ORDER BY `banner_courses`.`term` DESC"
+#     log.debug( f'sql, ``{sql}``' )
+#     result_set: list = []
+#     with db_connection:
+#         with db_connection.cursor() as db_cursor:
+#             db_cursor.execute( sql )
+#             result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
+#             assert type(result_set) == list
+#     log.debug( f'result_set, ``{result_set}``' )
+#     if result_set:
+#         recent_row = result_set[0]
+#         class_id = str( recent_row['classid'] )
+#     else:
+#         class_id = ''
+#     log.debug( f'class_id, ``{class_id}``' )
+#     return class_id
+
+#     ## end def get_class_id()
 
 
 def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> list:
