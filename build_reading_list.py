@@ -259,6 +259,8 @@ def get_class_id_entries( course_id: str ) -> list:
             if class_id:
                 class_id_str = str( class_id )
                 class_id_list.append( class_id_str )
+        if len( result_set ) > 1:
+            log.debug( f'more than one class-id found for course_id, ``{course_id}``' )
     log.debug( f'class_id_list, ``{class_id_list}``' )
     return class_id_list
 
