@@ -255,7 +255,7 @@ def get_class_id_entries( course_id: str ) -> list:
     log.debug( f'result_set, ``{result_set}``' )
     if result_set:
         for entry in result_set:
-            class_id = entry.get( 'class_id', None )
+            class_id = entry.get( 'classid', None )
             if class_id:
                 class_id_str = str( class_id )
                 class_id_list.append( class_id_str )
