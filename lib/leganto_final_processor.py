@@ -212,7 +212,7 @@ def calculate_leganto_citation_source( result: dict ) -> str:
 #     # end def calculate_leganto_citation_source()
 
 
-def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, possible_openurl: str, external_system_id: str ) -> str:
+def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, possible_openurl: str, external_system_id: str, initial_staff_note='' ) -> str:
     """ Returns possibly-helpful info for staff. 
         `possible_full_text` is the raw-url sometimes in citation_source2.
         `possible_openurl` is the openurl-link sometimes in citation_source3. 
@@ -221,6 +221,7 @@ def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, po
     log.debug( f'possible_full_text, ``{possible_full_text}``' )
     log.debug( f'possible_openurl, ``{possible_openurl}``' )
     log.debug( f'external_system_id, ``{external_system_id}``' )
+    log.debug( f'initial_staff_note, ``{initial_staff_note}``' )
     message = ''
     if possible_cdl_text:
         ok_strings = [ 'CDL link likely', 'CDL link possibly', 'Multiple possible CDL links' ]
@@ -247,6 +248,12 @@ def calculate_leganto_staff_note( possible_cdl_text, possible_full_text: str, po
                     message = f'{message} {ourl_message}'
                 else:
                     message = ourl_message
+    if initial_staff_note:
+        log.debug( 'hereD' )
+        if message:
+            message = f'{message} {initial_staff_note}'
+        else:
+            message = initial_staff_note
     if message == '':
         if not external_system_id:
             message = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'
