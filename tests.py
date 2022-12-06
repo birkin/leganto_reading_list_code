@@ -537,6 +537,58 @@ class MapperTest( unittest.TestCase ):
     def setUp( self ):
         self.maxDiff = None
 
+    def test_map_ocra_tracker_data(self):
+        """ Checks conversion of ocra tracker data to leganto fields. """
+        initial_ocra_tracker_data: dict = {
+            'albumid': 804,
+            'alttitle': None,
+            'classid': 327,
+            'diskno': 1,
+            'filename': '1093887456432459.mp3',
+            'opid': 1,
+            'procdate': datetime.date(2004, 8, 30),
+            'requestid': '20040830131339',
+            'sideno': 0,
+            'timing': datetime.timedelta(seconds=290),
+            'trackid': 2144,
+            'trackno': '1',
+            'tracks2classes.trackid': 2144,
+            'tracktitle': 'Bali: 01 Music of the Baris dance: demonstration',
+        }
+        misc_fields = {
+            'course_id': '12345',
+            'leganto_course_id': '67890',
+            'leganto_section_id': '1112131415',
+            'leganto_course_title': 'The Course Title',
+        }
+        expected: dict = {
+            'citation_author': '',
+            'citation_doi': '',
+            'citation_end_page': '',
+            'citation_isbn': '',
+            'citation_issn': '',
+            'citation_issue': '',
+            'citation_journal_title': '',
+            'citation_library_note': 'filename, ``1093887456432459.mp3``',
+            'citation_publication_date': '',
+            'citation_secondary_type': 'AR',
+            'citation_source1': '',
+            'citation_source2': '',
+            'citation_source3': '',
+            'citation_source4': '',
+            'citation_start_page': '',
+            'citation_title': 'Bali: 01 Music of the Baris dance: demonstration',
+            'citation_volume': '',
+            'coursecode': '12345',
+            'external_system_id': '',
+            'reading_list_name': 'The Course Title',
+            'section_id': '1112131415'        
+        }
+        self.assertEqual( 
+            expected, 
+            readings_processor.map_track( initial_ocra_tracker_data, misc_fields['course_id'], misc_fields['leganto_course_id'], misc_fields['leganto_section_id'], misc_fields['leganto_course_title'] )
+        )
+
     # def test_map_book_data(self):
     #     initial_book_data: dict = {
     #         'bibno': '',
