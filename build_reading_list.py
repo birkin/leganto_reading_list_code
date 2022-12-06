@@ -169,35 +169,6 @@ def check_for_updates( course_id_list: list, settings: dict ) -> bool:
     return new_updates_exist
 
 
-# def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
-#     """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
-#         Called by manage_build_reading_list() """
-#     log.debug( f'(temp) course_id_list, ``{pprint.pformat( course_id_list )}``' )
-#     classes_info = []
-#     for entry in course_id_list:  # with the oit-coursecode, get necessary OIT data
-#         course_id_entry: str = entry
-#         log.debug( f'course_id_entry, ``{course_id_entry}``' )
-#         oit_course_data: list = oit_course_loader.grab_oit_course_data( course_id_entry )
-#         log.debug( f'oit_course_data, ``{oit_course_data}``' )
-#         for entry in oit_course_data:
-#             oit_course_data_entry: dict = entry
-#             log.debug( f'oit_course_data_entry, ``{oit_course_data_entry}``' )
-#             leganto_course_id: str = oit_course_data_entry['COURSE_CODE'] if oit_course_data_entry else f'oit_course_code_not_found_for__{course_id_entry}'
-#             leganto_course_title: str = oit_course_data_entry['COURSE_TITLE'] if oit_course_data_entry else ''
-#             leganto_section_code: str = oit_course_data_entry['SECTION_ID'] if oit_course_data else ''
-#             simplistic_courseid = oit_course_loader.convert_oit_course_code_to_plain_course_code( leganto_course_id )
-#             class_id: str = get_class_id( simplistic_courseid )  # gets class-id used for db lookups.
-#             class_info_dict: dict = { 
-#                 'course_id': course_id_entry, 
-#                 'class_id': class_id, 
-#                 'leganto_course_id': leganto_course_id,
-#                 'leganto_course_title': leganto_course_title,
-#                 'leganto_section_code': leganto_section_code }
-#             classes_info.append( class_info_dict )
-#     log.debug( f'classes_info, ``{pprint.pformat(classes_info)}``' )
-#     return classes_info
-
-
 def prep_classes_info( course_id_list: list, oit_course_loader: OIT_Course_Loader ) -> list:
     """ Takes list of course_ids -- whether simplistic-coursecodes or oit-coursecodes -- and adds required minimal info using OIT data.
         Called by manage_build_reading_list() """
@@ -267,42 +238,6 @@ def get_class_id_entries( course_id: str ) -> list:
     ## end def get_class_id_entries()
 
 
-# def get_class_id( course_id: str ) -> str:
-#     """ Finds class_id from given course_id.
-#         Called by manage_build_reading_list() -> prep_classes_info() """
-#     class_id: str = 'init'
-#     ## split the id -------------------------------------------------
-#     db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
-#     split_position: int = 0
-#     for ( i, character ) in enumerate( course_id ): 
-#         if character.isalpha():
-#             pass
-#         else:
-#             split_position = i
-#             break
-#     ( subject_code, course_code ) = ( course_id[0:split_position], course_id[split_position:] ) 
-#     log.debug( f'subject_code, ``{subject_code}``; course_code, ``{course_code}``' )
-#     ## run query to get class_id ------------------------------------
-#     sql = f"SELECT * FROM `banner_courses` WHERE `subject` LIKE '{subject_code}' AND `course` LIKE '{course_code}' ORDER BY `banner_courses`.`term` DESC"
-#     log.debug( f'sql, ``{sql}``' )
-#     result_set: list = []
-#     with db_connection:
-#         with db_connection.cursor() as db_cursor:
-#             db_cursor.execute( sql )
-#             result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
-#             assert type(result_set) == list
-#     log.debug( f'result_set, ``{result_set}``' )
-#     if result_set:
-#         recent_row = result_set[0]
-#         class_id = str( recent_row['classid'] )
-#     else:
-#         class_id = ''
-#     log.debug( f'class_id, ``{class_id}``' )
-#     return class_id
-
-#     ## end def get_class_id()
-
-
 def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> list:
     """ Queries OCRA and builds initial data.
         Called by manage_build_reading_list() """
@@ -317,6 +252,8 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
         leganto_section_id: str = class_info_entry['leganto_section_code']
         leganto_course_title: str = class_info_entry['leganto_course_title']
         if class_id:
+
+
             ## ocra book data ---------------------------------------
             book_results: list = readings_extractor.get_book_readings( class_id )
             ## ocra all-artcles data --------------------------------
@@ -324,34 +261,42 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             ## ocra filtered article data ---------------------------
             filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
             article_results = filtered_articles_results['article_results']
-            audio_results = filtered_articles_results['audio_results']          # not yet used
+            audio_results = filtered_articles_results['audio_results']          # from article-table; TODO rename
             ebook_results = filtered_articles_results['ebook_results'] 
             excerpt_results = filtered_articles_results['excerpt_results']
-            video_results = filtered_articles_results['video_results']          # not yet used
+            video_results = filtered_articles_results['video_results']          
             website_results = filtered_articles_results['website_results']      
             log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
 
+            ## ocra tracks data -------------------------------------
+            tracks_results: list = readings_extractor.get_tracks_data( class_id )
+
+            1/0
+
+
             ## leganto article data ---------------------------------
             leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto audio data (from article-table) --------------
+            leg_audios: list = readings_processor.map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto book data ------------------------------------            
             leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
             ## leganto ebook data -----------------------------------
             leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto excerpt data ---------------------------------
             leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto video data -----------------------------------
+            leg_videos: list = readings_processor.map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto website data ---------------------------------
             leg_websites: list = readings_processor.map_websites( website_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
 
-
-            ## leganto audio data -----------------------------------
-            leg_audios: list = readings_processor.map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            ## leganto video data -----------------------------------
-            leg_videos: list = readings_processor.map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            ## leganto tracks data ----------------------------------
+            leg_tracks: list = readings_processor.map_tracks( tracks_results, leganto_course_id, leganto_section_id, leganto_course_title )
 
 
             ## leganto combined data --------------------------------
-            # all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites
-            all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites + leg_audios + leg_videos
+            # all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites + leg_audios + leg_videos
+            # all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_videos + leg_websites  
+            all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_tracks + leg_videos + leg_websites  
 
 
             if all_course_results == []:
@@ -484,25 +429,6 @@ def check_args( args ) -> bool:
     return fail_check
 
     ## end def check_args()
-
-
-# def update_range_arg( range_arg ) -> dict:
-#     """ Updates the start and end values to make the submitted "range_inclusive" argument work.
-#         Called by main() """
-#     log.debug( f'range_arg initially, ``{pprint.pformat(range_arg)}``' )
-#     updated_range_arg = range_arg.copy()
-#     original_start = range_arg['start']
-#     original_end = range_arg['end']
-#     if original_start == 1 and original_end == 1:
-#         log.debug( 'hereA' )
-#         updated_range_arg['start'] = 0
-#         updated_range_arg['end'] = 1
-#     else:
-#         log.debug( 'hereB' )
-#         updated_range_arg['start'] = original_start - 2     # -2 to account for header-row and 0-indexing
-#         updated_range_arg['end'] = original_end - 1         # so that slice will be inclusive of range-arguments
-#     log.debug( f'updated_range_arg, ``{pprint.pformat(updated_range_arg)}``' )
-#     return updated_range_arg
 
 
 def update_range_arg( range_arg ) -> dict:
