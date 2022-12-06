@@ -252,8 +252,9 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
         leganto_section_id: str = class_info_entry['leganto_section_code']
         leganto_course_title: str = class_info_entry['leganto_course_title']
         if class_id:
-
-
+            ## ------------------------------------------------------
+            ## GET OCRA DATA ----------------------------------------
+            ## ------------------------------------------------------
             ## ocra book data ---------------------------------------
             book_results: list = readings_extractor.get_book_readings( class_id )
             ## ocra all-artcles data --------------------------------
@@ -267,13 +268,11 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             video_results = filtered_articles_results['video_results']          
             website_results = filtered_articles_results['website_results']      
             log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
-
             ## ocra tracks data -------------------------------------
             tracks_results: list = readings_extractor.get_tracks_data( class_id )
-
-            # 1/0
-
-
+            ## ------------------------------------------------------
+            ## MAP OCRA DATA TO LEGANTO DATA ------------------------           
+            ## ------------------------------------------------------
             ## leganto article data ---------------------------------
             leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto audio data (from article-table) --------------
@@ -288,17 +287,12 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             leg_videos: list = readings_processor.map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
             ## leganto website data ---------------------------------
             leg_websites: list = readings_processor.map_websites( website_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-
             ## leganto tracks data ----------------------------------
             leg_tracks: list = readings_processor.map_tracks( tracks_results, course_id, leganto_course_id, leganto_section_id, leganto_course_title )
-
-
             ## leganto combined data --------------------------------
             # all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites + leg_audios + leg_videos
             # all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_videos + leg_websites  
             all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_tracks + leg_videos + leg_websites  
-
-
             if all_course_results == []:
                 all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
         else:
