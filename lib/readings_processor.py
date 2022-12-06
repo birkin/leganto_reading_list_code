@@ -82,13 +82,14 @@ def filter_article_table_results( all_articles_results ):
 ## tracks -----------------------------------------------------------
 
 def map_tracks( track_results: list, course_id: str, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> list:
-    # log.debug( f'track_results, ``{pprint.pformat(track_results)}``' )
+    """ Loop-caller for map_track(). 
+        Called by build_reading_list.prep_basic_data()"""
     mapped_tracks = []
     for track_result in track_results:
         mapped_track: dict = map_track( track_result, leganto_course_id, leganto_section_id, leganto_course_title )
         mapped_tracks.append( mapped_track )
-    # log.debug( f'count of mapped_tracks, ``{len(mapped_tracks)}``' )
-    log.debug( f'mapped_tracks, ``{pprint.pformat(mapped_tracks)}``' )
+    log.debug( f'count of mapped_tracks, ``{len(mapped_tracks)}``' )
+    # log.debug( f'mapped_tracks, ``{pprint.pformat(mapped_tracks)}``' )
     return mapped_tracks
 
 def map_track( initial_track_result_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> dict:
