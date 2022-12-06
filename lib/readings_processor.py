@@ -79,6 +79,28 @@ def filter_article_table_results( all_articles_results ):
     ## end def filter_article_table_results()  
 
 
+## tracks -----------------------------------------------------------
+
+def map_tracks( track_results: list, course_id: str, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> list:
+    mapped_tracks = []
+    for track_result in track_results:
+        mapped_track: dict = map_track( track_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+        mapped_tracks.append( mapped_track )
+    return mapped_tracks
+
+def map_track( track_result: dict, course_id: str, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> dict:
+    """ Maps track data to leganto format.
+        Called by map_tracks() """
+    mapped_track: dict = MAPPED_CATEGORIES
+    mapped_track['citation_secondary_type'] = 'AR'
+    mapped_track['citation_library_note'] = f'filename, ``{track_result["filename"]}``'
+    mapped_track['citation_title'] = track_result['tracktitle']
+    mapped_track['coursecode'] = course_id
+    mapped_track['reading_list_name'] = leganto_course_title
+    mapped_track['section_id'] = leganto_section_id
+    return mapped_track
+
+
 ## articles ---------------------------------------------------------
 
 def map_articles( article_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
