@@ -556,7 +556,6 @@ class MapperTest( unittest.TestCase ):
             'tracktitle': 'Bali: 01 Music of the Baris dance: demonstration',
         }
         misc_fields = {
-            'course_id': '12345',
             'leganto_course_id': '67890',
             'leganto_section_id': '1112131415',
             'leganto_course_title': 'The Course Title',
@@ -579,14 +578,14 @@ class MapperTest( unittest.TestCase ):
             'citation_start_page': '',
             'citation_title': 'Bali: 01 Music of the Baris dance: demonstration',
             'citation_volume': '',
-            'coursecode': '12345',
+            'coursecode': '67890',
             'external_system_id': '',
             'reading_list_name': 'The Course Title',
             'section_id': '1112131415'        
         }
         self.assertEqual( 
             expected, 
-            readings_processor.map_track( initial_ocra_tracker_data, misc_fields['course_id'], misc_fields['leganto_course_id'], misc_fields['leganto_section_id'], misc_fields['leganto_course_title'] )
+            readings_processor.map_track( initial_ocra_tracker_data, misc_fields['leganto_course_id'], misc_fields['leganto_section_id'], misc_fields['leganto_course_title'] )
         )
 
     # def test_map_book_data(self):

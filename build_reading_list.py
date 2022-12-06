@@ -271,7 +271,7 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             ## ocra tracks data -------------------------------------
             tracks_results: list = readings_extractor.get_tracks_data( class_id )
 
-            1/0
+            # 1/0
 
 
             ## leganto article data ---------------------------------
@@ -290,7 +290,7 @@ def prep_basic_data( classes_info: list, settings: dict, oit_course_loader ) -> 
             leg_websites: list = readings_processor.map_websites( website_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
 
             ## leganto tracks data ----------------------------------
-            leg_tracks: list = readings_processor.map_tracks( tracks_results, leganto_course_id, leganto_section_id, leganto_course_title )
+            leg_tracks: list = readings_processor.map_tracks( tracks_results, course_id, leganto_course_id, leganto_section_id, leganto_course_title )
 
 
             ## leganto combined data --------------------------------
