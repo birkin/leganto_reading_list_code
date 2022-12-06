@@ -92,14 +92,16 @@ class Leganto_Final_Processor_Test( unittest.TestCase ):
             possible_full_text = entry['data']['citation_source2']
             possible_openurl = entry['data']['citation_source3']
             external_system_id = entry['data']['external_system_id']
-            preexisting_staff_note = entry['data'].get( 'citation_library_note', '' )
+            # preexisting_staff_note = entry['data'].get( 'citation_library_note', '' )
             expected = entry['expected']
-            if preexisting_staff_note:
-                result = leganto_final_processor.calculate_leganto_staff_note(
-                    possible_cdl_text, possible_full_text, possible_openurl, external_system_id, preexisting_staff_note )
-            else:
-                result = leganto_final_processor.calculate_leganto_staff_note(
-                    possible_cdl_text, possible_full_text, possible_openurl, external_system_id )
+            result = leganto_final_processor.calculate_leganto_staff_note(
+                possible_cdl_text, possible_full_text, possible_openurl, external_system_id, entry['data'].get('citation_library_note', '') )
+            # if preexisting_staff_note:
+            #     result = leganto_final_processor.calculate_leganto_staff_note(
+            #         possible_cdl_text, possible_full_text, possible_openurl, external_system_id, preexisting_staff_note )
+            # else:
+            #     result = leganto_final_processor.calculate_leganto_staff_note(
+            #         possible_cdl_text, possible_full_text, possible_openurl, external_system_id )
             self.assertEqual( expected, result, f'failed; returned, ``{result}``' )
 
     # def test_calculate_leganto_staff_note(self):

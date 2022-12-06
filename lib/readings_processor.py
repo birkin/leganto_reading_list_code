@@ -82,23 +82,27 @@ def filter_article_table_results( all_articles_results ):
 ## tracks -----------------------------------------------------------
 
 def map_tracks( track_results: list, course_id: str, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> list:
+    # log.debug( f'track_results, ``{pprint.pformat(track_results)}``' )
     mapped_tracks = []
     for track_result in track_results:
         mapped_track: dict = map_track( track_result, leganto_course_id, leganto_section_id, leganto_course_title )
         mapped_tracks.append( mapped_track )
+    # log.debug( f'count of mapped_tracks, ``{len(mapped_tracks)}``' )
+    log.debug( f'mapped_tracks, ``{pprint.pformat(mapped_tracks)}``' )
     return mapped_tracks
 
-def map_track( track_result: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> dict:
+def map_track( initial_track_result_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> dict:
     """ Maps track data to leganto format.
         Called by map_tracks() """
-    mapped_track: dict = MAPPED_CATEGORIES
-    mapped_track['citation_library_note'] = f'filename, ``{track_result["filename"]}``'
+    mapped_track: dict = MAPPED_CATEGORIES.copy()
+    mapped_track['citation_library_note'] = f'filename, ``{initial_track_result_data["filename"]}``'
     mapped_track['citation_secondary_type'] = 'AR'
-    mapped_track['citation_title'] = track_result['tracktitle']
+    mapped_track['citation_title'] = initial_track_result_data['tracktitle']
     mapped_track['coursecode'] = leganto_course_id
-    mapped_track['external_system_id'] = str( track_result['trackid'] )
+    mapped_track['external_system_id'] = str( initial_track_result_data['trackid'] )
     mapped_track['reading_list_name'] = leganto_course_title
     mapped_track['section_id'] = leganto_section_id
+    log.debug( f'mapped_track, ``{pprint.pformat(mapped_track)}``' )
     return mapped_track
 
 
@@ -151,6 +155,7 @@ def map_books( book_results: list, leganto_course_id: str, leganto_section_id: s
     for book_result in book_results:
         mapped_book: dict = map_book( book_result, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
         mapped_books.append( mapped_book )
+    log.debug( f'mapped_books, ``{pprint.pformat(mapped_books)}``' )
     return mapped_books
 
 def map_book( initial_book_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> dict:
