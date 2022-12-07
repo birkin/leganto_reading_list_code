@@ -236,6 +236,9 @@ Next'''
         self.assertEqual( '', 
             leganto_final_processor.clean_citation_author( ', ' ) 
             )
+        self.assertEqual( '', 
+            leganto_final_processor.clean_citation_author( ' ' ) 
+            )
 
     ## end class Leganto_Final_Processor_Test
 

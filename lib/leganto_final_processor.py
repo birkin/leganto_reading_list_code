@@ -78,21 +78,43 @@ def clean_citation_title( db_title: str ) -> str:
 
 
 def clean_citation_author( db_author: str ) -> str:
+    """ Cleans author-string, removing leading/trailing commas and whitespace. 
+        TODO: refactor this using `cleaned_author = ''` default. It passes the tests, but it's a little sloppy.
+        Called by `build_reading_list.prep_leganto_data()`."""
     log.debug( f'db_author initially, ``{db_author}``' )
     if db_author:
-        log.debug( 'hereA' )
+        # log.debug( 'hereA' )
         db_author = db_author.strip()
-        if db_author[0] == ',':
-            log.debug( 'hereB' )
-            db_author = db_author[1:]
-        try:
-            if db_author[-1] == ',':
-                db_author = db_author[0:-1]
-        except:
-            pass
-        db_author = db_author.strip()
+        if db_author:
+            if db_author[0] == ',':
+                # log.debug( 'hereB' )
+                db_author = db_author[1:]
+            try:
+                if db_author[-1] == ',':
+                    db_author = db_author[0:-1]
+            except:
+                pass
+        # db_author = db_author.strip()
     log.debug( f'db_author cleaned, ``{db_author}``' )
     return db_author
+
+
+# def clean_citation_author( db_author: str ) -> str:
+#     log.debug( f'db_author initially, ``{db_author}``' )
+#     if db_author:
+#         log.debug( 'hereA' )
+#         db_author = db_author.strip()
+#         if db_author[0] == ',':
+#             log.debug( 'hereB' )
+#             db_author = db_author[1:]
+#         try:
+#             if db_author[-1] == ',':
+#                 db_author = db_author[0:-1]
+#         except:
+#             pass
+#         db_author = db_author.strip()
+#     log.debug( f'db_author cleaned, ``{db_author}``' )
+#     return db_author
 
 
 def calculate_end_column( number_of_columns: int ) -> str:
