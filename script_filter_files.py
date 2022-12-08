@@ -30,28 +30,33 @@ def manage_filtered_build():
     for source_filepath in source_filepaths:
         ## get data-rows --------------------------------------------
         source_lines = get_source_lines( source_filepath )
+        output_lines = []
         ## iterate through data-rows --------------------------------
         for i, line in enumerate( source_lines ):
             if i == 0:
                 continue  # skip header
-            process_line( line, exclusion_dict, settings )
+            process_line( line, exclusion_dict, output_lines, settings )
+        break
+    log.debug( f'output_lines, ``{pprint.pformat(output_lines)}``' )
+    log.debug( f'exclusion_dict, ``{pprint.pformat(exclusion_dict)}``' )
     return
 
 
-def process_line( line: str, exclusion_dict: dict, settings: dict ):
+def process_line( line: str, exclusion_dict: dict, output_lines: list, settings: dict ) -> None:
     """ Processes a line from a source file. 
+        Returns nothing, but updates exclusion_dict and output_lines.
         Called by manage_filtered_build() """
     log.debug( f'line, ``{line}``' )
     ## get course-code ----------------------------------------------
     simple_course_code = get_simple_course_code( line )
-    1/0
+    log.debug( f'simple_course_code, ``{simple_course_code}``' )
     ## if course-code is in exclusions, append to exclusion-dict entry 
-    # if course_code in exclusions:
-
-
-    # ## else, write to filtered file ------------------------
-    # else:
-    #     write_filtered_line( line, settings )
+    if simple_course_code in exclusion_dict:
+        log.debug( f'adding line to exclusion_dict' )
+        exclusion_dict[simple_course_code].append( line )
+    else:
+        log.debug( f'adding line to output_lines' )
+        output_lines.append( line )    
     return
 
 
@@ -88,7 +93,7 @@ def get_source_lines( source_filepath: str ) -> list:
         Called by manage_filtered_build() """
     with open( source_filepath, 'r' ) as f:
         source_lines = f.readlines()
-    log.debug( f'returning source lines for `{source_filepath}`' )
+    log.debug( f'len(source_lines), ``{len(source_lines)}`` for source_filepath, ``{source_filepath}``' )
     return source_lines
 
 
