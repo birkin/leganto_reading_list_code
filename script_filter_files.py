@@ -43,8 +43,27 @@ def manage_filtered_build():
         ## write filtered file --------------------------------------
         write_filtered_file( filtered_file_lines, source_filepath, settings )
     ## write exclusion files ----------------------------------------
-    pass
+    write_exclusion_files( exclusion_dict, settings )
     return
+
+
+def write_exclusion_files( exclusion_dict: dict, settings: dict ) -> None:
+    """ Writes a file for each excluded course-code.
+        Called by manage_filtered_build() """
+    for key, value in exclusion_dict.items():
+        excluded_lines = value
+        if excluded_lines:
+            filename = f'{key}_exclusion.txt'
+        else:
+            filename = f'{key}_exclusion_EMPTY.txt'
+        filepath = f'{settings["EXCLUSIONS_DIR_PATH"]}/{filename}'
+        log.debug( f'filepath, ``{filepath}``' )
+        with open( filepath, 'w' ) as f:
+            f.writelines( value )   
+    return
+
+
+## called functions (mostly in reverse-called order) ----------------
 
 
 def write_filtered_file( filtered_file_lines: list, source_filepath: str, settings: dict ) -> None:
@@ -62,9 +81,6 @@ def write_filtered_file( filtered_file_lines: list, source_filepath: str, settin
         f.writelines( filtered_file_lines )
     return
 
-
-
-## called functions -------------------------------------------------
 
 def process_line( line: str, exclusion_dict: dict, filtered_file_lines: list, settings: dict ) -> None:
     """ Processes a line from a source file. 
