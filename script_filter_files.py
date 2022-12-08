@@ -29,22 +29,22 @@ def manage_filtered_build():
     exclusion_dict = make_exclusions_dict( exclusions )
     for source_filepath in source_filepaths:
         ## get data-rows --------------------------------------------
-        source_lines = get_source_lines( source_filepath )
-        output_lines = []
+        source_file_lines = get_source_file_lines( source_filepath )
+        filtered_file_lines = []
         ## iterate through data-rows --------------------------------
-        for i, line in enumerate( source_lines ):
+        for i, line in enumerate( source_file_lines ):
             if i == 0:
                 continue  # skip header
-            process_line( line, exclusion_dict, output_lines, settings )
+            process_line( line, exclusion_dict, filtered_file_lines, settings )
         break
-    log.debug( f'output_lines, ``{pprint.pformat(output_lines)}``' )
+    log.debug( f'filtered_file_lines, ``{pprint.pformat(filtered_file_lines)}``' )
     log.debug( f'exclusion_dict, ``{pprint.pformat(exclusion_dict)}``' )
     return
 
 
-def process_line( line: str, exclusion_dict: dict, output_lines: list, settings: dict ) -> None:
+def process_line( line: str, exclusion_dict: dict, filtered_file_lines: list, settings: dict ) -> None:
     """ Processes a line from a source file. 
-        Returns nothing, but updates exclusion_dict and output_lines.
+        Returns nothing, but updates exclusion_dict and filtered_file_lines.
         Called by manage_filtered_build() """
     log.debug( f'line, ``{line}``' )
     ## get course-code ----------------------------------------------
@@ -55,8 +55,8 @@ def process_line( line: str, exclusion_dict: dict, output_lines: list, settings:
         log.debug( f'adding line to exclusion_dict' )
         exclusion_dict[simple_course_code].append( line )
     else:
-        log.debug( f'adding line to output_lines' )
-        output_lines.append( line )    
+        log.debug( f'adding line to filtered_file_lines' )
+        filtered_file_lines.append( line )    
     return
 
 
@@ -88,13 +88,13 @@ def make_exclusions_dict( exclusions: list ) -> dict:
     return exclusion_dict
 
 
-def get_source_lines( source_filepath: str ) -> list:
+def get_source_file_lines( source_filepath: str ) -> list:
     """ Returns a list of data-rows from the source file.
         Called by manage_filtered_build() """
     with open( source_filepath, 'r' ) as f:
-        source_lines = f.readlines()
-    log.debug( f'len(source_lines), ``{len(source_lines)}`` for source_filepath, ``{source_filepath}``' )
-    return source_lines
+        source_file_lines = f.readlines()
+    log.debug( f'len(source_file_lines), ``{len(source_file_lines)}`` for source_filepath, ``{source_filepath}``' )
+    return source_file_lines
 
 
 def load_initial_settings() -> dict:
