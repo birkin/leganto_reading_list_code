@@ -34,13 +34,37 @@ def manage_filtered_build():
         ## iterate through data-rows --------------------------------
         for i, line in enumerate( source_file_lines ):
             if i == 0:
-                continue  # skip header
+                filtered_file_lines.append( line )
+                continue
             process_line( line, exclusion_dict, filtered_file_lines, settings )
-        break
-    log.debug( f'filtered_file_lines, ``{pprint.pformat(filtered_file_lines)}``' )
-    log.debug( f'exclusion_dict, ``{pprint.pformat(exclusion_dict)}``' )
+        # break
+        log.debug( f'filtered_file_lines, ``{pprint.pformat(filtered_file_lines)}``' )
+        log.debug( f'exclusion_dict at this point, ``{pprint.pformat(exclusion_dict)}``' )
+        ## write filtered file --------------------------------------
+        write_filtered_file( filtered_file_lines, source_filepath, settings )
+    ## write exclusion files ----------------------------------------
+    pass
     return
 
+
+def write_filtered_file( filtered_file_lines: list, source_filepath: str, settings: dict ) -> None:
+    """ Writes a filtered reading-list file.
+        Called by manage_filtered_build() """
+    ## get file-name from path --------------------------------------
+    filename = source_filepath.split('/')[-1]
+    ## append 'filtered' to file-name -------------------------------
+    filtered_filename = filename.replace( '.txt', '_filtered.txt' )
+    # log.debug( f'filtered_filename, ``{filtered_filename}``' )
+    filtered_filepath = f'{settings["OUTPUTFILES_DIR_PATH"]}/{filtered_filename}'
+    log.debug( f'filtered_filepath, ``{filtered_filepath}``' )
+    # write file ---------------------------------------------------
+    with open( f'{settings["OUTPUTFILES_DIR_PATH"]}/{filtered_filename}', 'w' ) as f:
+        f.writelines( filtered_file_lines )
+    return
+
+
+
+## called functions -------------------------------------------------
 
 def process_line( line: str, exclusion_dict: dict, filtered_file_lines: list, settings: dict ) -> None:
     """ Processes a line from a source file. 
@@ -58,12 +82,6 @@ def process_line( line: str, exclusion_dict: dict, filtered_file_lines: list, se
         log.debug( f'adding line to filtered_file_lines' )
         filtered_file_lines.append( line )    
     return
-
-
-
-
-
-## called functions -------------------------------------------------
 
 
 def get_simple_course_code( line: str ) -> str:
@@ -102,7 +120,8 @@ def load_initial_settings() -> dict:
         Called by manage_build_reading_list() """
     settings = {
         'SOURCEFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/archived/2022-12-07_reading_lists',                   
-        'OUTPUTFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-08_filtered_reading_lists',                   
+        'OUTPUTFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-08_filtered_reading_lists',
+        'EXCLUSIONS_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-08_exclusion_files',                   
     }
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
