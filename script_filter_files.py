@@ -27,25 +27,49 @@ def manage_filtered_build():
     source_filepaths = get_source_readinglist_files( settings )
     ## iterate through source files ---------------------------------
     exclusion_dict = make_exclusions_dict( exclusions )
-    # for source_filepath in source_filepaths:
-    #     ## get data-rows --------------------------------------------
-    #     source_lines = get_source_lines( source_filepath )
-    #     ## iterate through data-rows --------------------------------
-    #     for line in source_lines:
-    #         ## get course-code --------------------------------------
-    #         course_code = line.split( ',' )[0]
-    #         ## if course-code is in exclusions, write to file ------
-    #         if course_code in exclusions:
-    #             write_excluded_course_code( course_code, settings )
-    #         ## else, write to filtered file ------------------------
-    #         else:
-    #             write_filtered_line( line, settings )
+    for source_filepath in source_filepaths:
+        ## get data-rows --------------------------------------------
+        source_lines = get_source_lines( source_filepath )
+        ## iterate through data-rows --------------------------------
+        for i, line in enumerate( source_lines ):
+            if i == 0:
+                continue  # skip header
+            process_line( line, exclusion_dict, settings )
+    return
+
+
+def process_line( line: str, exclusion_dict: dict, settings: dict ):
+    """ Processes a line from a source file. 
+        Called by manage_filtered_build() """
+    log.debug( f'line, ``{line}``' )
+    ## get course-code ----------------------------------------------
+    simple_course_code = get_simple_course_code( line )
+    1/0
+    ## if course-code is in exclusions, append to exclusion-dict entry 
+    # if course_code in exclusions:
+
+
+    # ## else, write to filtered file ------------------------
+    # else:
+    #     write_filtered_line( line, settings )
     return
 
 
 
 
+
 ## called functions -------------------------------------------------
+
+
+def get_simple_course_code( line: str ) -> str:
+    """ Converts OIT course-code to a simplified version.
+        Called by process_line() """
+    oit_course_code = line.split( '\t' )[0]
+    parts: list = oit_course_code.split('.')
+    new_simple_course_code: str = parts[1].upper() + '_' + parts[2].upper()
+    assert type(new_simple_course_code) == str
+    log.debug( f'before, ``{oit_course_code}``; after, ``{new_simple_course_code}``' )
+    return new_simple_course_code
 
 
 def make_exclusions_dict( exclusions: list ) -> dict:
@@ -55,7 +79,7 @@ def make_exclusions_dict( exclusions: list ) -> dict:
     for exclusion in exclusions:
         updated_key = exclusion.replace( ' ', '_' ) # for use in file-names, eventually
         exclusion_dict[updated_key] = []
-    log.debug( f'exclusion_dict, ``{pprint.pformat(exclusion_dict)}``' )
+    log.debug( f'exclusion_dict, ``{pprint.pformat(exclusion_dict)[0:100]}...``' )
     return exclusion_dict
 
 
