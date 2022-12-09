@@ -105,7 +105,8 @@ def get_simple_course_code( line: str ) -> str:
         Called by process_line() """
     oit_course_code = line.split( '\t' )[0]
     parts: list = oit_course_code.split('.')
-    new_simple_course_code: str = parts[1].upper() + '_' + parts[2].upper()
+    # new_simple_course_code: str = parts[1].upper() + '_' + parts[2].upper()
+    new_simple_course_code: str = parts[1].upper() + '_' + parts[2].lower()
     assert type(new_simple_course_code) == str
     log.debug( f'before, ``{oit_course_code}``; after, ``{new_simple_course_code}``' )
     return new_simple_course_code
