@@ -135,9 +135,9 @@ def load_initial_settings() -> dict:
     """ Loads envar settings.
         Called by manage_build_reading_list() """
     settings = {
-        'SOURCEFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/archived/2022-12-07_reading_lists',                   
-        'OUTPUTFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-08_filtered_reading_lists',
-        'EXCLUSIONS_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-08_exclusion_files',                   
+        'SOURCEFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/archived/2022-12-07_full_reading_lists',                   
+        'OUTPUTFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-09_filtered_reading_lists',
+        'EXCLUSIONS_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-09_exclusion_files',                   
     }
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
