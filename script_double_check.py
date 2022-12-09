@@ -1,3 +1,15 @@
+import logging, os, pprint
+
+LOG_PATH: str = os.environ['LGNT__LOG_PATH']
+logging.basicConfig(
+    filename=LOG_PATH,
+    level=logging.DEBUG,
+    format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
+    datefmt='%d/%b/%Y %H:%M:%S' )
+log = logging.getLogger(__name__)
+log.debug( 'logging ready' )
+
+
 exclusions_list = [
         'AMST 1500b',
         'AMST 1611m',
@@ -68,20 +80,40 @@ def run_double_check( exclusions_list ):
     """ for each exclusion entry,
         convert the entry to the pattern 'xxxx.1234' 
         and check if it exists anywhere in the filtered-files directory. It shouldn't. """
-    settings: dict = load_settings()
+    settings: dict = load_initial_settings()
+    # temp_intential_error_entry = 'afri.0990'
+    # exclusions_list.append( temp_intential_error_entry )
+    filtered_files_dir_path = settings['FILTERED_FILES_DIR_PATH']
+    log.debug( f'filtered_files_dir_path, ``{filtered_files_dir_path}``' )
+    ## get a list of the files in the filtered-files directory ------
+    all_paths: list = os.listdir( filtered_files_dir_path )
+    reading_list_files: list = []
+    for entry in all_paths:
+        if entry.endswith( '.txt' ):
+            reading_list_files.append( entry )
+    log.debug( f'reading_list_files, ``{reading_list_files}``' )
     for entry in exclusions_list:
-        search_code = entry.replace( ' ', '.' )
-        print( search_code )
+        ## get search-code ------------------------------------------
+        search_code = entry.replace( ' ', '.' ).lower()
+        log.debug( f'checking exclude_code, ``{search_code}``' )
         ## check if the search_code exists in the filtered-files directory
+        for reading_list_file in reading_list_files:
+            reading_list_filepath = f'{filtered_files_dir_path}/{reading_list_file}'
+            ## open file and see if search_code is in it
+            with open( reading_list_filepath, 'r' ) as f:
+                contents = f.read()
+                if search_code in contents:
+                    raise Exception( f'found search_code, ``{search_code}`` in reading_list_filepath, ``{reading_list_filepath}``' )
+    log.debug( 'double-check complete' )
+    return
 
 
 def load_initial_settings() -> dict:
     """ Loads envar settings.
         Called by manage_build_reading_list() """
     settings = {
-        'SOURCEFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-07_full_reading_lists',                   
-        'OUTPUTFILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-08_filtered_reading_lists',
-        # 'EXCLUSIONS_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-08_exclusion_files',                   
+        # 'FILTERED_FILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/archived/2022-12-08_filtered_reading_lists',
+        'FILTERED_FILES_DIR_PATH': f'{os.environ["LGNT__CSV_OUTPUT_DIR_PATH"]}/2022-12-09_filtered_reading_lists',
     }
     log.debug( f'settings-keys, ``{pprint.pformat( sorted(list(settings.keys())) )}``' )
     return settings
