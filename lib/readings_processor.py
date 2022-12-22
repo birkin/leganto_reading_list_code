@@ -262,7 +262,7 @@ def map_excerpt( initial_excerpt_data: dict, course_id: str, leganto_course_id: 
 
 ## websites ---------------------------------------------------------
 
-def map_websites( website_results: dict, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
+def map_websites( website_results: list, course_id: str, leganto_course_id: str, cdl_checker, leganto_section_id: str, leganto_course_title: str, settings: dict ) -> list:
     mapped_websites = []
     for website_result in website_results:
         mapped_website: dict = map_website( website_result, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
@@ -329,7 +329,7 @@ def map_av( av_type: str, av_result: dict, leganto_course_id: str, cdl_checker, 
         Called by map_videos() """
     mapped_av_item: dict = MAPPED_CATEGORIES.copy()
     mapped_av_item['citation_author'] = av_result.get('author', '')
-    mapped_av_item['citation_publication_date'] = av_result.get('year', )
+    mapped_av_item['citation_publication_date'] = av_result.get( 'year', '' )
     mapped_av_item['citation_secondary_type'] = 'AR' if av_type == 'audio' else 'VD'
     mapped_av_item['citation_source1'] = ''
     mapped_av_item['citation_source2'] = av_result.get('art_url', '')
@@ -337,7 +337,7 @@ def map_av( av_type: str, av_result: dict, leganto_course_id: str, cdl_checker, 
     mapped_av_item['citation_source4'] = ''
     mapped_av_item['citation_title'] = av_result['title'].strip()
     mapped_av_item['coursecode'] = leganto_course_id
-    mapped_av_item['external_system_id'] = av_result.get('requests.requestid')
+    mapped_av_item['external_system_id'] = av_result.get( 'requests.requestid', '' )
     mapped_av_item['reading_list_name'] = leganto_course_title
     mapped_av_item['section_id'] = leganto_section_id
     log.debug(msg=f'mapped_av_item, ``{pprint.pformat(mapped_av_item)}``')
