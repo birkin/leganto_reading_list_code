@@ -68,6 +68,7 @@ for i, data_line in enumerate( data_lines ):
     if len(course_code_parts) == 5:
         course_code_dict['course_code_section'] = course_code_parts[4]
     else:
+        log.debug( 'adding EMPTY section' )
         course_code_dict['course_code_section'] = 'EMPTY'
         course_code_section_missing_count += 1
     ## handle year and term
@@ -105,19 +106,19 @@ for i, data_line in enumerate( data_lines ):
         course_code_sections.append( course_code_dict['course_code_section'] )
 
 ## log results ------------------------------------------------------
-log.debug( f'missing_institutions, ``{pprint.pformat(missing_institutions)}``' )
-log.debug( f'missing_departments, ``{pprint.pformat(missing_departments)}``' )
-log.debug( f'missing_numbers, ``{pprint.pformat(missing_numbers)}``' )
-log.debug( f'missing_years, ``{pprint.pformat(missing_years)}``' )
-log.debug( f'missing_terms, ``{pprint.pformat(missing_terms)}``' )
-log.debug( f'missing_sections, ``{pprint.pformat(missing_sections)}``' )
-log.debug( f'course_code_institutions, ``{pprint.pformat(course_code_institutions)}``' )
-log.debug( f'course_code_departments, ``{pprint.pformat(course_code_departments)}``' )
+log.debug( f'OIT course entries count, ``{len(data_lines)}``' )
+log.debug( f'missing_departments, ``{pprint.pformat(sorted(missing_departments))}``' )
+log.debug( f'missing_numbers, ``{pprint.pformat(sorted(missing_numbers))}``' )
+log.debug( f'missing_years, ``{pprint.pformat(sorted(missing_years))}``' )
+log.debug( f'missing_terms, ``{pprint.pformat(sorted(missing_terms))}``' )
+log.debug( f'missing_sections, ``{pprint.pformat(sorted(missing_sections))}``' )
+log.debug( f'course_code_institutions, ``{pprint.pformat(sorted(course_code_institutions))}``' )
+log.debug( f'course_code_departments, ``{pprint.pformat(sorted(course_code_departments))}``' )
 # log.debug( f'course_code_numbers, ``{pprint.pformat(course_code_numbers)}``' )
-log.debug( f'course_code_years, ``{pprint.pformat(course_code_years)}``' )
-log.debug( f'course_code_terms, ``{pprint.pformat(course_code_terms)}``' )
-log.debug( f'course_code_sections, ``{pprint.pformat(course_code_sections)}``' )
-
+log.debug( f'course_code_years, ``{pprint.pformat(sorted(course_code_years))}``' )
+log.debug( f'course_code_terms, ``{pprint.pformat(sorted(course_code_terms))}``' )
+log.debug( f'course_code_sections, ``{pprint.pformat(sorted(course_code_sections))}``' )
+log.debug( f'course_code_section_missing_count, ``{course_code_section_missing_count}``' )
 
 
 
