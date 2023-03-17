@@ -22,33 +22,6 @@ def manage_build_reading_list():
     ## settings -----------------------------------------------------
     settings: dict = load_initial_settings()
 
-    ## load/prep necessary data -------------------------------------
-    # err: dict = loaders.rebuild_pdf_data_if_necessary( {'days': settings["PDF_OLDER_THAN_DAYS"]} )
-    # if err:
-    #     raise Exception( f'problem rebuilding pdf-json, error-logged, ``{err["err"]}``' )  
-    # oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )  # instantiation loads data from file into list of dicts
-    # ## prep course_id_list ------------------------------------------
-    # course_id_list: list = prep_course_id_list( course_id_input, settings, oit_course_loader, range_arg )
-    # ## prep class-info-dicts ----------------------------------------
-    # classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
-    # ## prep basic data ----------------------------------------------
-    # basic_data: list = prep_basic_data( classes_info, settings, oit_course_loader )
-    # ## prep leganto data --------------------------------------------
-    # leganto_data: list = prep_leganto_data( basic_data, settings )
-    # ## update tracker if necessary ----------------------------------
-    # if course_id_input == 'oit_file':
-    #     oit_course_loader.update_tracker( leganto_data, settings )
-    # ## update spreadsheet if necessary ------------------------------
-    # if update_ss:
-    #     log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
-    #     # gsheet_prepper.update_gsheet( leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
-    #     gsheet_prepper.update_gsheet( basic_data, leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
-    # else:
-    #     log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
-    # ## create .csv file ---------------------------------------------
-    # csv_maker.create_csv( leganto_data, leganto_final_processor.get_headers() )
-    # log.info( 'csv produced' )
-
     ## end def manage_build_reading_list()
 
 
@@ -303,6 +276,34 @@ if __name__ == '__main__':
 
 
 ## old code ---------------------------------------------------------
+
+
+    ## load/prep necessary data -------------------------------------
+    # err: dict = loaders.rebuild_pdf_data_if_necessary( {'days': settings["PDF_OLDER_THAN_DAYS"]} )
+    # if err:
+    #     raise Exception( f'problem rebuilding pdf-json, error-logged, ``{err["err"]}``' )  
+    # oit_course_loader = OIT_Course_Loader( settings['COURSES_FILEPATH'] )  # instantiation loads data from file into list of dicts
+    # ## prep course_id_list ------------------------------------------
+    # course_id_list: list = prep_course_id_list( course_id_input, settings, oit_course_loader, range_arg )
+    # ## prep class-info-dicts ----------------------------------------
+    # classes_info: list = prep_classes_info( course_id_list, oit_course_loader )
+    # ## prep basic data ----------------------------------------------
+    # basic_data: list = prep_basic_data( classes_info, settings, oit_course_loader )
+    # ## prep leganto data --------------------------------------------
+    # leganto_data: list = prep_leganto_data( basic_data, settings )
+    # ## update tracker if necessary ----------------------------------
+    # if course_id_input == 'oit_file':
+    #     oit_course_loader.update_tracker( leganto_data, settings )
+    # ## update spreadsheet if necessary ------------------------------
+    # if update_ss:
+    #     log.info( f'update_ss is ``{update_ss}``; will update gsheet' )
+    #     # gsheet_prepper.update_gsheet( leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
+    #     gsheet_prepper.update_gsheet( basic_data, leganto_data, settings['CREDENTIALS'], settings['SPREADSHEET_NAME'] )
+    # else:
+    #     log.info( f'update_ss is ``{update_ss}``; not updating gsheet' )
+    # ## create .csv file ---------------------------------------------
+    # csv_maker.create_csv( leganto_data, leganto_final_processor.get_headers() )
+    # log.info( 'csv produced' )
 
 
 # def parse_args() -> dict:
