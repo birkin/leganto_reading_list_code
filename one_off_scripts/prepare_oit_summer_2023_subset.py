@@ -62,7 +62,23 @@ def main():
     buckets_dict: dict = add_counts( buckets_dict )
     log.debug( f'updated_buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
+    ## prep easyview output -----------------------------------------
+    easyview_output = make_easyview_output( buckets_dict )
+    log.debug( f'easyview_output, ``{easyview_output}``' )
+
     ## end main()
+
+
+def make_easyview_output( buckets_dict: dict ) -> str:
+    """ Prepares easyview output.
+        Called by main() """
+    assert type(buckets_dict) == dict
+    output = ''
+    for key in buckets_dict.keys():
+        output += f'{key}:\n'
+        for item in buckets_dict[key]['unique_values']:
+            output += f'  {item[0]} ({item[1]})\n'
+    return output
 
 
 def add_counts( buckets_dict: dict ) -> dict:
