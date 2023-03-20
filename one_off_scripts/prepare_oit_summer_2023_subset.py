@@ -56,18 +56,26 @@ def main():
             log.debug( f'processing summer-line, ``{summer_line}``' )
         course_code_dict = parse_course_code( summer_line, i )
         buckets_dict: dict = populate_buckets( course_code_dict, buckets_dict )
-    log.debug( f'buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
+    # log.debug( f'buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
     ## prepare bucket counts ----------------------------------------
     # buckets_dict: dict = add_counts( buckets_dict )
+    # log.debug( f'updated_buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
     ## end main()
 
 
 # def add_counts( buckets_dict: dict ) -> dict:
-#     """ Steps...
-#         - Initializes counts list. The counts list will be a list of 
-#         - Iterates through buckets_dict,  """
+#     """ Updates 'unique_set': {'count': 0, 'unique_values': []} """
+#     assert type(buckets_dict) == dict
+#     for key in buckets_dict.keys():
+#         log.debug( f'key, ``{key}``' ) 
+#         unique_values = list( set( buckets_dict[key]['all_values'] ) )
+#         log.debug( f'unique_values, ``{unique_values}``' )
+#         buckets_dict[key]['unique_set']['unique_values'] = unique_values
+#         buckets_dict[key]['unique_set']['count'] = len( unique_values )
+#     return buckets_dict
+
 
 def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
     """ Populates buckets. """
@@ -108,14 +116,47 @@ def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
 def make_buckets() -> dict:
     """ Returns dict of buckets. """
     buckets_dict = {
-        'course_code_institutions': { 'all_values': [], 'unique_set': {} },
-        'course_code_departments': { 'all_values': [], 'unique_set': {} },
-        'course_code_years': { 'all_values': [], 'unique_set': {} },
-        'course_code_terms': { 'all_values': [], 'unique_set': {} },
-        'course_code_sections': { 'all_values': [], 'unique_set': {} },
+        'course_code_institutions': { 
+            'all_values': [], 
+            'unique_values': () },
+        'course_code_departments': { 
+            'all_values': [], 
+            'unique_values': () },
+        'course_code_years': { 
+            'all_values': [], 
+            'unique_values': () },
+        'course_code_terms': { 
+            'all_values': [], 
+            'unique_values': () },
+        'course_code_sections': { 
+            'all_values': [], 
+            'unique_values': () },
         }
     log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
     return buckets_dict
+
+
+# def make_buckets() -> dict:
+#     """ Returns dict of buckets. """
+#     buckets_dict = {
+#         'course_code_institutions': { 
+#             'all_values': [], 
+#             'unique_set': {'count': 0, 'unique_values': []} },
+#         'course_code_departments': { 
+#             'all_values': [], 
+#             'unique_set': {'count': 0, 'unique_values': []} },
+#         'course_code_years': { 
+#             'all_values': [], 
+#             'unique_set': {'count': 0, 'unique_values': []} },
+#         'course_code_terms': { 
+#             'all_values': [], 
+#             'unique_set': {'count': 0, 'unique_values': []} },
+#         'course_code_sections': { 
+#             'all_values': [], 
+#             'unique_set': {'count': 0, 'unique_values': []} },
+#         }
+#     log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
+#     return buckets_dict
 
 
 # def make_buckets() -> dict:
