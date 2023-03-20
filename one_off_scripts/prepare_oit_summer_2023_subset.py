@@ -59,10 +59,23 @@ def main():
     # log.debug( f'buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
     ## prepare bucket counts ----------------------------------------
-    # buckets_dict: dict = add_counts( buckets_dict )
-    # log.debug( f'updated_buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
+    buckets_dict: dict = add_counts( buckets_dict )
+    log.debug( f'updated_buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
     ## end main()
+
+
+def add_counts( buckets_dict: dict ) -> dict:
+    """ Updates 'unique_set': {'count': 0, 'unique_values': []} """
+    assert type(buckets_dict) == dict
+    for key in buckets_dict.keys():
+        log.debug( f'key, ``{key}``' ) 
+        unique_values_from_set = list( set( buckets_dict[key]['all_values'] ) )
+        unique_tuple_list = [ (value, buckets_dict[key]['all_values'].count(value)) for value in unique_values_from_set ]
+        log.debug( f'unique_tuple_list, ``{unique_tuple_list}``' )
+        buckets_dict[key]['unique_values'] = unique_tuple_list
+    # log.debug( f'buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
+    return buckets_dict
 
 
 # def add_counts( buckets_dict: dict ) -> dict:
@@ -118,19 +131,19 @@ def make_buckets() -> dict:
     buckets_dict = {
         'course_code_institutions': { 
             'all_values': [], 
-            'unique_values': () },
+            'unique_values': [] },
         'course_code_departments': { 
             'all_values': [], 
-            'unique_values': () },
+            'unique_values': [] },
         'course_code_years': { 
             'all_values': [], 
-            'unique_values': () },
+            'unique_values': [] },
         'course_code_terms': { 
             'all_values': [], 
-            'unique_values': () },
+            'unique_values': [] },
         'course_code_sections': { 
             'all_values': [], 
-            'unique_values': () },
+            'unique_values': [] },
         }
     log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
     return buckets_dict
