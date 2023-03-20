@@ -64,21 +64,51 @@ def main():
 
     ## prep easyview output -----------------------------------------
     easyview_output = make_easyview_output( buckets_dict )
-    log.debug( f'easyview_output, ``{easyview_output}``' )
+    log.debug( f'easyview_output, ``{pprint.pformat(easyview_output)}``' )
 
     ## end main()
 
 
-def make_easyview_output( buckets_dict: dict ) -> str:
+def make_easyview_output( buckets_dict: dict ) -> dict:
     """ Prepares easyview output.
         Called by main() """
     assert type(buckets_dict) == dict
-    output = ''
+    output_dict = {}
     for key in buckets_dict.keys():
-        output += f'{key}:\n'
-        for item in buckets_dict[key]['unique_values']:
-            output += f'  {item[0]} ({item[1]})\n'
-    return output
+        unsorted_unique_values = buckets_dict[key]['unique_values']
+        sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: x[1], reverse=True )
+        output_dict[key] = sorted_unique_values
+    return output_dict
+
+# def make_easyview_output( buckets_dict: dict ) -> str:
+#     """ Prepares easyview output.
+#         Called by main() """
+#     assert type(buckets_dict) == dict
+#     output = ''
+#     for key in buckets_dict.keys():
+#         # output += f'{key}:\n'
+#         header = f'{key}:'
+#         data = ''
+#         for item in buckets_dict[key]['unique_values']:
+#             data += f'  {item[0]} ({item[1]})\n'
+#         ## sort by count
+#         data = ''.join( sorted( data.split('\n') ) )
+#         output += f'{header}\n{data}'
+
+#             # output += f'  {item[0]} ({item[1]})\n'
+#     return output
+
+
+# def make_easyview_output( buckets_dict: dict ) -> str:
+#     """ Prepares easyview output.
+#         Called by main() """
+#     assert type(buckets_dict) == dict
+#     output = ''
+#     for key in buckets_dict.keys():
+#         output += f'{key}:\n'
+#         for item in buckets_dict[key]['unique_values']:
+#             output += f'  {item[0]} ({item[1]})\n'
+#     return output
 
 
 def add_counts( buckets_dict: dict ) -> dict:
