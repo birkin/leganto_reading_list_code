@@ -22,23 +22,23 @@ OIT_COURSE_LIST_PATH: str = os.environ['LGNT__COURSES_FILEPATH']
 
 def main():
 
-    ## validate OIT file ------------------------------------------------
+    ## validate OIT file --------------------------------------------
     assert is_utf8_encoded(OIT_COURSE_LIST_PATH) == True
     # assert is_tab_separated(OIT_COURSE_LIST_PATH) == True  ## TODO
 
-    ## load OIT file ----------------------------------------------------
+    ## load OIT file ------------------------------------------------
     lines = []
     with open( OIT_COURSE_LIST_PATH, 'r' ) as f:
         lines = f.readlines()
 
-    ## get heading and data lines ---------------------------------------
+    ## get heading and data lines -----------------------------------
     heading_line = lines[0]
     parts = heading_line.split( '\t' )
     parts = [ part.strip() for part in parts ]
     log.debug( f'parts, ``{pprint.pformat(parts)}``' )
     data_lines = lines[1:]
 
-    ## make summer-2023 subset ------------------------------------------
+    ## make summer-2023 subset --------------------------------------
     summer_2023_lines = []
     for i, data_line in enumerate( data_lines ):
         if i < 5:
@@ -49,7 +49,129 @@ def main():
     log.debug( f'summer_2023_lines, ``{pprint.pformat(summer_2023_lines)}``' )
     log.debug( f'len(summer_2023_lines), ``{len(summer_2023_lines)}``' )
 
-    ## set up buckets
+    ## populate course-parts buckets --------------------------------
+    buckets_dict: dict  = make_buckets()
+    for i, summer_line in enumerate( summer_2023_lines ):
+        if i < 5:
+            log.debug( f'processing summer-line, ``{summer_line}``' )
+        course_code_dict = parse_course_code( summer_line, i )
+        buckets_dict: dict = populate_buckets( course_code_dict, buckets_dict )
+    log.debug( f'buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
+
+    ## prepare bucket counts ----------------------------------------
+    # buckets_dict: dict = add_counts( buckets_dict )
+
+    ## end main()
+
+
+# def add_counts( buckets_dict: dict ) -> dict:
+#     """ Steps...
+#         - Initializes counts list. The counts list will be a list of 
+#         - Iterates through buckets_dict,  """
+
+def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
+    """ Populates buckets. """
+    assert type(course_code_dict) == dict
+    assert type(buckets_dict) == dict
+    for key in course_code_dict.keys():
+        if key == 'course_code_institution':
+            buckets_dict['course_code_institutions']['all_values'].append( course_code_dict[key] )
+        elif key == 'course_code_department':
+            buckets_dict['course_code_departments']['all_values'].append( course_code_dict[key] )
+        elif key == 'course_code_year':
+            buckets_dict['course_code_years']['all_values'].append( course_code_dict[key] )
+        elif key == 'course_code_term':
+            buckets_dict['course_code_terms']['all_values'].append( course_code_dict[key] )
+        elif key == 'course_code_section':
+            buckets_dict['course_code_sections']['all_values'].append( course_code_dict[key] )
+    return buckets_dict
+
+
+# def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
+#     """ Populates buckets. """
+#     assert type(course_code_dict) == dict
+#     assert type(buckets_dict) == dict
+#     for key in course_code_dict.keys():
+#         if key == 'course_code_institution':
+#             buckets_dict['course_code_institutions'].append( course_code_dict[key] )
+#         elif key == 'course_code_department':
+#             buckets_dict['course_code_departments'].append( course_code_dict[key] )
+#         elif key == 'course_code_year':
+#             buckets_dict['course_code_years'].append( course_code_dict[key] )
+#         elif key == 'course_code_term':
+#             buckets_dict['course_code_terms'].append( course_code_dict[key] )
+#         elif key == 'course_code_section':
+#             buckets_dict['course_code_sections'].append( course_code_dict[key] )
+#     return buckets_dict
+
+
+def make_buckets() -> dict:
+    """ Returns dict of buckets. """
+    buckets_dict = {
+        'course_code_institutions': { 'all_values': [], 'unique_set': {} },
+        'course_code_departments': { 'all_values': [], 'unique_set': {} },
+        'course_code_years': { 'all_values': [], 'unique_set': {} },
+        'course_code_terms': { 'all_values': [], 'unique_set': {} },
+        'course_code_sections': { 'all_values': [], 'unique_set': {} },
+        }
+    log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
+    return buckets_dict
+
+
+# def make_buckets() -> dict:
+#     """ Returns dict of buckets. """
+#     buckets_dict = {
+#         'course_code_institutions': [],
+#         'course_code_departments': [],
+#         'course_code_years': [],
+#         'course_code_terms': [],
+#         'course_code_sections': [],
+#         }
+#     log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
+#     return buckets_dict
+
+
+def parse_course_code( data_line, i ):
+    """ Parses course-code into dict. """
+    assert type(data_line) == str
+    assert type(i) == int
+    parts = data_line.split( '\t' )
+    parts = [ part.strip() for part in parts ]
+    ## parse course code --------------------------------------------
+    course_code_parts: list = parts[0].split( '.' )
+    if i < 5:
+        log.debug( f'processing course_code_parts, ``{course_code_parts}``' )
+    course_code_dict = {
+        'course_code_institution': course_code_parts[0],
+        'course_code_department': course_code_parts[1],
+        'course_code_number': course_code_parts[2],
+        'course_code_year_and_term': course_code_parts[3],
+        # 'course_code_section': course_code_parts[4] 
+        }
+    ## handle missing section
+    if len(course_code_parts) == 5:
+        course_code_dict['course_code_section'] = course_code_parts[4]
+    else:
+        log.debug( 'adding EMPTY section' )
+        course_code_dict['course_code_section'] = 'EMPTY'
+        # course_code_section_missing_count += 1
+    ## handle year and term
+    course_code_year = course_code_parts[3].split('-')[0]
+    course_code_term = course_code_parts[3].split('-')[1]
+    course_code_dict['course_code_year'] = course_code_year
+    course_code_dict['course_code_term'] = course_code_term
+    if i < 5:
+        log.debug( f'course_code_dict, ``{pprint.pformat(course_code_dict)}``' )
+    return course_code_dict
+
+
+## add if name == main...
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
+
+
+   ## set up buckets
     # missing_institutions = []
     # missing_departments = []
     # missing_numbers = []
@@ -97,45 +219,6 @@ def main():
     #     # if i > 6:
     #     #     break
     #     ## evaluate for summer-2023 --------------------------------------
-    
-    ## end main()
-
-
-def parse_course_code( data_line, i ):
-    """ Parses course-code into dict. """
-    assert type(data_line) == str
-    assert type(i) == int
-    parts = data_line.split( '\t' )
-    parts = [ part.strip() for part in parts ]
-    ## parse course code --------------------------------------------
-    course_code_parts: list = parts[0].split( '.' )
-    if i < 5:
-        log.debug( f'processing course_code_parts, ``{course_code_parts}``' )
-    course_code_dict = {
-        'course_code_institution': course_code_parts[0],
-        'course_code_department': course_code_parts[1],
-        'course_code_number': course_code_parts[2],
-        'course_code_year_and_term': course_code_parts[3],
-        # 'course_code_section': course_code_parts[4] 
-        }
-    ## handle missing section
-    if len(course_code_parts) == 5:
-        course_code_dict['course_code_section'] = course_code_parts[4]
-    else:
-        log.debug( 'adding EMPTY section' )
-        course_code_dict['course_code_section'] = 'EMPTY'
-        # course_code_section_missing_count += 1
-    ## handle year and term
-    course_code_year = course_code_parts[3].split('-')[0]
-    course_code_term = course_code_parts[3].split('-')[1]
-    course_code_dict['course_code_year'] = course_code_year
-    course_code_dict['course_code_term'] = course_code_term
-    if i < 5:
-        log.debug( f'course_code_dict, ``{pprint.pformat(course_code_dict)}``' )
-    return course_code_dict
-
-
-
 
 #     ## checks...
 #     if course_code_dict['course_code_institution'].strip() == '':
@@ -182,8 +265,3 @@ def parse_course_code( data_line, i ):
 
 # brown.afri.0090.2023-fall.s01
 
-
-## add if name == main...
-if __name__ == '__main__':
-    main()
-    sys.exit(0)
