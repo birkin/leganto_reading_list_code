@@ -76,7 +76,11 @@ def make_easyview_output( buckets_dict: dict ) -> dict:
     output_dict = {}
     for key in buckets_dict.keys():
         unsorted_unique_values = buckets_dict[key]['unique_values']
-        sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: x[1], reverse=True )
+        # sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: x[1], reverse=True )
+        ## sort by count and then by string
+        # sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (x[1], x[0]), reverse=True )
+        ## sort by count-descending, and then by string-ascending
+        sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (-x[1], x[0]) )        
         output_dict[key] = sorted_unique_values
     return output_dict
 
