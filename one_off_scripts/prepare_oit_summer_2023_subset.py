@@ -1,4 +1,4 @@
-import logging, os, pprint, sys
+import json, logging, os, pprint, sys
 
 ## setup logging ----------------------------------------------------
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -66,6 +66,12 @@ def main():
     easyview_output = make_easyview_output( buckets_dict )
     log.debug( f'easyview_output, ``{pprint.pformat(easyview_output)}``' )
 
+    ## write summer-2023 subset to file -----------------------------
+    with open( './summer_2023_subset.txt', 'w' ) as f:
+        f.write( heading_line )
+        for line in summer_2023_lines:
+            f.write( line )
+        
     ## end main()
 
 
@@ -82,6 +88,9 @@ def make_easyview_output( buckets_dict: dict ) -> dict:
         ## sort by count-descending, and then by string-ascending
         sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (-x[1], x[0]) )        
         output_dict[key] = sorted_unique_values
+    # jsn = json.dumps( output_dict, indent=2 )
+    # with open( './output.json', 'w' ) as f:
+    #     f.write( jsn )
     return output_dict
 
 # def make_easyview_output( buckets_dict: dict ) -> str:
