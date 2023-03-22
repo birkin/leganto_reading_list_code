@@ -21,6 +21,8 @@ OIT_COURSE_LIST_PATH: str = os.environ['LGNT__COURSES_FILEPATH']
 
 
 def main():
+    """ Controller.
+        Called by if __name__ == '__main__' """
 
     ## validate OIT file --------------------------------------------
     assert is_utf8_encoded(OIT_COURSE_LIST_PATH) == True
@@ -39,6 +41,8 @@ def main():
     data_lines = lines[1:]
 
     ## make summer-2023 subset --------------------------------------
+    skipped_due_to_timeframe = []
+    skipped_due_to_no_instructor = []  # HEREZZ
     summer_2023_lines = []
     for i, data_line in enumerate( data_lines ):
         if i < 5:
@@ -50,7 +54,7 @@ def main():
     log.debug( f'len(summer_2023_lines), ``{len(summer_2023_lines)}``' )
 
     ## populate course-parts buckets --------------------------------
-    buckets_dict: dict  = make_buckets()
+    buckets_dict: dict  = make_buckets()  # returns dict like: ```( course_code_institutions': {'all_values': [], 'unique_values': []}, etc... }```
     for i, summer_line in enumerate( summer_2023_lines ):
         if i < 5:
             log.debug( f'processing summer-line, ``{summer_line}``' )
@@ -93,36 +97,6 @@ def make_easyview_output( buckets_dict: dict ) -> dict:
     #     f.write( jsn )
     return output_dict
 
-# def make_easyview_output( buckets_dict: dict ) -> str:
-#     """ Prepares easyview output.
-#         Called by main() """
-#     assert type(buckets_dict) == dict
-#     output = ''
-#     for key in buckets_dict.keys():
-#         # output += f'{key}:\n'
-#         header = f'{key}:'
-#         data = ''
-#         for item in buckets_dict[key]['unique_values']:
-#             data += f'  {item[0]} ({item[1]})\n'
-#         ## sort by count
-#         data = ''.join( sorted( data.split('\n') ) )
-#         output += f'{header}\n{data}'
-
-#             # output += f'  {item[0]} ({item[1]})\n'
-#     return output
-
-
-# def make_easyview_output( buckets_dict: dict ) -> str:
-#     """ Prepares easyview output.
-#         Called by main() """
-#     assert type(buckets_dict) == dict
-#     output = ''
-#     for key in buckets_dict.keys():
-#         output += f'{key}:\n'
-#         for item in buckets_dict[key]['unique_values']:
-#             output += f'  {item[0]} ({item[1]})\n'
-#     return output
-
 
 def add_counts( buckets_dict: dict ) -> dict:
     """ Updates 'unique_set': {'count': 0, 'unique_values': []} """
@@ -135,18 +109,6 @@ def add_counts( buckets_dict: dict ) -> dict:
         buckets_dict[key]['unique_values'] = unique_tuple_list
     # log.debug( f'buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
     return buckets_dict
-
-
-# def add_counts( buckets_dict: dict ) -> dict:
-#     """ Updates 'unique_set': {'count': 0, 'unique_values': []} """
-#     assert type(buckets_dict) == dict
-#     for key in buckets_dict.keys():
-#         log.debug( f'key, ``{key}``' ) 
-#         unique_values = list( set( buckets_dict[key]['all_values'] ) )
-#         log.debug( f'unique_values, ``{unique_values}``' )
-#         buckets_dict[key]['unique_set']['unique_values'] = unique_values
-#         buckets_dict[key]['unique_set']['count'] = len( unique_values )
-#     return buckets_dict
 
 
 def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
@@ -165,24 +127,6 @@ def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
         elif key == 'course_code_section':
             buckets_dict['course_code_sections']['all_values'].append( course_code_dict[key] )
     return buckets_dict
-
-
-# def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
-#     """ Populates buckets. """
-#     assert type(course_code_dict) == dict
-#     assert type(buckets_dict) == dict
-#     for key in course_code_dict.keys():
-#         if key == 'course_code_institution':
-#             buckets_dict['course_code_institutions'].append( course_code_dict[key] )
-#         elif key == 'course_code_department':
-#             buckets_dict['course_code_departments'].append( course_code_dict[key] )
-#         elif key == 'course_code_year':
-#             buckets_dict['course_code_years'].append( course_code_dict[key] )
-#         elif key == 'course_code_term':
-#             buckets_dict['course_code_terms'].append( course_code_dict[key] )
-#         elif key == 'course_code_section':
-#             buckets_dict['course_code_sections'].append( course_code_dict[key] )
-#     return buckets_dict
 
 
 def make_buckets() -> dict:
@@ -206,42 +150,6 @@ def make_buckets() -> dict:
         }
     log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
     return buckets_dict
-
-
-# def make_buckets() -> dict:
-#     """ Returns dict of buckets. """
-#     buckets_dict = {
-#         'course_code_institutions': { 
-#             'all_values': [], 
-#             'unique_set': {'count': 0, 'unique_values': []} },
-#         'course_code_departments': { 
-#             'all_values': [], 
-#             'unique_set': {'count': 0, 'unique_values': []} },
-#         'course_code_years': { 
-#             'all_values': [], 
-#             'unique_set': {'count': 0, 'unique_values': []} },
-#         'course_code_terms': { 
-#             'all_values': [], 
-#             'unique_set': {'count': 0, 'unique_values': []} },
-#         'course_code_sections': { 
-#             'all_values': [], 
-#             'unique_set': {'count': 0, 'unique_values': []} },
-#         }
-#     log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
-#     return buckets_dict
-
-
-# def make_buckets() -> dict:
-#     """ Returns dict of buckets. """
-#     buckets_dict = {
-#         'course_code_institutions': [],
-#         'course_code_departments': [],
-#         'course_code_years': [],
-#         'course_code_terms': [],
-#         'course_code_sections': [],
-#         }
-#     log.debug( f'initialized buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
-#     return buckets_dict
 
 
 def parse_course_code( data_line, i ):
@@ -374,7 +282,37 @@ if __name__ == '__main__':
 # log.debug( f'course_code_section_missing_count, ``{course_code_section_missing_count}``' )
 
 
+# def make_easyview_output( buckets_dict: dict ) -> str:
+#     """ Prepares easyview output.
+#         Called by main() """
+#     assert type(buckets_dict) == dict
+#     output = ''
+#     for key in buckets_dict.keys():
+#         # output += f'{key}:\n'
+#         header = f'{key}:'
+#         data = ''
+#         for item in buckets_dict[key]['unique_values']:
+#             data += f'  {item[0]} ({item[1]})\n'
+#         ## sort by count
+#         data = ''.join( sorted( data.split('\n') ) )
+#         output += f'{header}\n{data}'
+
+#             # output += f'  {item[0]} ({item[1]})\n'
+#     return output
 
 
+# def make_easyview_output( buckets_dict: dict ) -> str:
+#     """ Prepares easyview output.
+#         Called by main() """
+#     assert type(buckets_dict) == dict
+#     output = ''
+#     for key in buckets_dict.keys():
+#         output += f'{key}:\n'
+#         for item in buckets_dict[key]['unique_values']:
+#             output += f'  {item[0]} ({item[1]})\n'
+#     return output
+
+
+## example course code
 # brown.afri.0090.2023-fall.s01
 
