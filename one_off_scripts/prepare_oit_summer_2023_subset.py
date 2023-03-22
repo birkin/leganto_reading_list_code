@@ -41,15 +41,19 @@ def main():
     data_lines = lines[1:]
 
     ## make summer-2023 subset --------------------------------------
-    skipped_due_to_timeframe = []
-    skipped_due_to_no_instructor = []  # HEREZZ
+    skipped_due_to_no_instructor = []
     summer_2023_lines = []
     for i, data_line in enumerate( data_lines ):
         if i < 5:
             log.debug( f'processing data_line, ``{data_line}``' )
+        line_dict = parse_line( data_line, heading_line, i )
         course_code_dict = parse_course_code( data_line, i )
         if course_code_dict['course_code_year'] == '2023' and course_code_dict['course_code_term'] == 'summer':
-            summer_2023_lines.append( data_line )
+            # if course_code_dict['instructor'].strip() == '':
+            if 1 == 2:
+                skipped_due_to_no_instructor.append( data_line )
+            else:
+                summer_2023_lines.append( data_line )
     log.debug( f'summer_2023_lines, ``{pprint.pformat(summer_2023_lines)}``' )
     log.debug( f'len(summer_2023_lines), ``{len(summer_2023_lines)}``' )
 
@@ -77,6 +81,25 @@ def main():
             f.write( line )
         
     ## end main()
+
+
+def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
+    """ Parses data-line.
+        Called by main() """
+    log.debug( 'starting parse_line()')
+    assert type(data_line) == str
+    assert type(heading_line) == str
+    assert type(line_number) == int
+    parts = data_line.split( '\t' )
+    parts = [ part.strip() for part in parts ]
+    heading_parts = heading_line.split( '\t' )
+    heading_parts = [ part.strip() for part in heading_parts ]
+    line_dict = {}
+    for i, part in enumerate( parts ):
+        line_dict[heading_parts[i]] = part
+    if line_number < 5:
+        log.debug( f'line_dict, ``{pprint.pformat(line_dict)}``' )
+    return line_dict
 
 
 def make_easyview_output( buckets_dict: dict ) -> dict:
