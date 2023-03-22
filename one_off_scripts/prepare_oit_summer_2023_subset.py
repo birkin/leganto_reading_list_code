@@ -49,13 +49,15 @@ def main():
         line_dict = parse_line( data_line, heading_line, i )
         course_code_dict = parse_course_code( data_line, i )
         if course_code_dict['course_code_year'] == '2023' and course_code_dict['course_code_term'] == 'summer':
-            # if course_code_dict['instructor'].strip() == '':
-            if 1 == 2:
+            if line_dict['ALL_INSTRUCTORS'].strip() == '':
+            # if 1 == 2:
                 skipped_due_to_no_instructor.append( data_line )
             else:
                 summer_2023_lines.append( data_line )
     log.debug( f'summer_2023_lines, ``{pprint.pformat(summer_2023_lines)}``' )
     log.debug( f'len(summer_2023_lines), ``{len(summer_2023_lines)}``' )
+    log.debug( f'skipped_due_to_no_instructor, ``{pprint.pformat(skipped_due_to_no_instructor)}``' )
+    log.debug( f'len(skipped_due_to_no_instructor), ``{len(skipped_due_to_no_instructor)}``' )
 
     ## populate course-parts buckets --------------------------------
     buckets_dict: dict  = make_buckets()  # returns dict like: ```( course_code_institutions': {'all_values': [], 'unique_values': []}, etc... }```
