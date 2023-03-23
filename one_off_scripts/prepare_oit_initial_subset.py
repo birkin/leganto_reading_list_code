@@ -29,12 +29,12 @@ OIT_COURSE_LIST_PATH: str = os.environ['LGNT__COURSES_FILEPATH']
 TARGET_SEASON: str = os.environ['LGNT__SEASON']
 TARGET_YEAR: str = os.environ['LGNT__YEAR']
 LEGIT_SECTIONS: str = json.loads( os.environ['LGNT__LEGIT_SECTIONS_JSON'] )
-OIT_SUBSET_OUTPUT_PATH: str = '%s/oit_subset_01.tsv' % os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
+OIT_SUBSET_01_OUTPUT_PATH: str = '%s/oit_subset_01.tsv' % os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
 log.debug( f'OIT_COURSE_LIST_PATH, ``{OIT_COURSE_LIST_PATH}``' )
 log.debug( f'TARGET_SEASON, ``{TARGET_SEASON}``' )
 log.debug( f'TARGET_YEAR, ``{TARGET_YEAR}``' )
 log.debug( f'LEGIT_SECTIONS, ``{LEGIT_SECTIONS}``' )
-log.debug( f'OIT_SUBSET_OUTPUT_PATH, ``{OIT_SUBSET_OUTPUT_PATH}``' )
+log.debug( f'OIT_SUBSET_01_OUTPUT_PATH, ``{OIT_SUBSET_01_OUTPUT_PATH}``' )
 
 
 ## controller -------------------------------------------------------
@@ -67,7 +67,7 @@ def main():
             log.debug( f'processing data_line, ``{data_line}``' )
         line_dict = parse_line( data_line, heading_line, i )
         course_code_dict = parse_course_code( data_line, i )
-        if course_code_dict['course_code_year'] == '2023' and course_code_dict['course_code_term'] == 'summer':
+        if course_code_dict['course_code_year'] == TARGET_YEAR and course_code_dict['course_code_term'] == TARGET_SEASON:
             if line_dict['ALL_INSTRUCTORS'].strip() == '':
             # if 1 == 2:
                 skipped_due_to_no_instructor.append( data_line )
@@ -97,9 +97,9 @@ def main():
     log.debug( f'easyview_output, ``{pprint.pformat(easyview_output)}``' )
 
     ## write summer-2023 subset to file -----------------------------
-    with open( './summer_2023_subset.txt', 'w' ) as f:
+    with open( OIT_SUBSET_01_OUTPUT_PATH, 'w' ) as f:
         f.write( heading_line )
-        for line in summer_2023_lines:
+        for line in subset_lines:
             f.write( line )
         
     ## end main()
