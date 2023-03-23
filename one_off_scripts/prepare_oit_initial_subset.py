@@ -36,8 +36,6 @@ log.debug( f'TARGET_YEAR, ``{TARGET_YEAR}``' )
 log.debug( f'LEGIT_SECTIONS, ``{LEGIT_SECTIONS}``' )
 log.debug( f'OIT_SUBSET_OUTPUT_PATH, ``{OIT_SUBSET_OUTPUT_PATH}``' )
 
-1/0
-
 
 ## controller -------------------------------------------------------
 
@@ -61,9 +59,9 @@ def main():
     log.debug( f'parts, ``{pprint.pformat(parts)}``' )
     data_lines = lines[1:]
 
-    ## make summer-2023 subset --------------------------------------
+    ## make subset --------------------------------------
     skipped_due_to_no_instructor = []
-    summer_2023_lines = []
+    subset_lines = []
     for i, data_line in enumerate( data_lines ):
         if i < 5:
             log.debug( f'processing data_line, ``{data_line}``' )
@@ -74,15 +72,15 @@ def main():
             # if 1 == 2:
                 skipped_due_to_no_instructor.append( data_line )
             else:
-                summer_2023_lines.append( data_line )
-    log.debug( f'summer_2023_lines, ``{pprint.pformat(summer_2023_lines)}``' )
-    log.debug( f'len(summer_2023_lines), ``{len(summer_2023_lines)}``' )
+                subset_lines.append( data_line )
+    log.debug( f'subset_lines, ``{pprint.pformat(subset_lines)}``' )
+    log.debug( f'len(subset_lines), ``{len(subset_lines)}``' )
     log.debug( f'skipped_due_to_no_instructor, ``{pprint.pformat(skipped_due_to_no_instructor)}``' )
     log.debug( f'len(skipped_due_to_no_instructor), ``{len(skipped_due_to_no_instructor)}``' )
 
     ## populate course-parts buckets --------------------------------
     buckets_dict: dict  = make_buckets()  # returns dict like: ```( course_code_institutions': {'all_values': [], 'unique_values': []}, etc... }```
-    for i, summer_line in enumerate( summer_2023_lines ):
+    for i, summer_line in enumerate( subset_lines ):
         if i < 5:
             log.debug( f'processing summer-line, ``{summer_line}``' )
         course_code_dict = parse_course_code( summer_line, i )
