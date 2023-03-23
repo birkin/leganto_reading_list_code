@@ -73,7 +73,8 @@ def main():
     log.debug( f'updated_buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
     ## prep easyview output -----------------------------------------
-    easyview_output = make_easyview_output( buckets_dict )
+    # easyview_output = make_easyview_output( buckets_dict )
+    easyview_output = make_easyview_output( buckets_dict, skipped_due_to_no_instructor )
     log.debug( f'easyview_output, ``{pprint.pformat(easyview_output)}``' )
 
     ## write summer-2023 subset to file -----------------------------
@@ -104,7 +105,7 @@ def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
     return line_dict
 
 
-def make_easyview_output( buckets_dict: dict ) -> dict:
+def make_easyview_output( buckets_dict: dict, skipped_due_to_no_instructor: list ) -> dict:
     """ Prepares easyview output.
         Called by main() """
     assert type(buckets_dict) == dict
@@ -117,10 +118,30 @@ def make_easyview_output( buckets_dict: dict ) -> dict:
         ## sort by count-descending, and then by string-ascending
         sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (-x[1], x[0]) )        
         output_dict[key] = sorted_unique_values
+    output_dict['skipped_due_to_no_instructor'] = len( skipped_due_to_no_instructor )
     # jsn = json.dumps( output_dict, indent=2 )
     # with open( './output.json', 'w' ) as f:
     #     f.write( jsn )
     return output_dict
+
+
+# def make_easyview_output( buckets_dict: dict ) -> dict:
+#     """ Prepares easyview output.
+#         Called by main() """
+#     assert type(buckets_dict) == dict
+#     output_dict = {}
+#     for key in buckets_dict.keys():
+#         unsorted_unique_values = buckets_dict[key]['unique_values']
+#         # sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: x[1], reverse=True )
+#         ## sort by count and then by string
+#         # sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (x[1], x[0]), reverse=True )
+#         ## sort by count-descending, and then by string-ascending
+#         sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (-x[1], x[0]) )        
+#         output_dict[key] = sorted_unique_values
+#     # jsn = json.dumps( output_dict, indent=2 )
+#     # with open( './output.json', 'w' ) as f:
+#     #     f.write( jsn )
+#     return output_dict
 
 
 def add_counts( buckets_dict: dict ) -> dict:
