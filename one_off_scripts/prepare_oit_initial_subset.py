@@ -1,3 +1,12 @@
+"""
+This script creates a subset of the raw OIT course-list file, filtering out:
+- courses that don't match the specified (via envars) season and year.
+- courses that don't match the specified legitimate sections.
+- courses that don't have an instructor.
+
+It creates the subset, and, at the end of the logging, a summary of relevant data.
+"""
+
 import json, logging, os, pprint, sys
 
 ## setup logging ----------------------------------------------------
@@ -17,8 +26,20 @@ from lib.common.validate_oit_file import is_utf8_encoded, is_tab_separated
 
 ## grab env vars ----------------------------------------------------
 OIT_COURSE_LIST_PATH: str = os.environ['LGNT__COURSES_FILEPATH']
-# log.debug( f'OIT_COURSE_LIST_PATH, ``{OIT_COURSE_LIST_PATH}``' )
+TARGET_SEASON: str = os.environ['LGNT__SEASON']
+TARGET_YEAR: str = os.environ['LGNT__YEAR']
+LEGIT_SECTIONS: str = json.loads( os.environ['LGNT__LEGIT_SECTIONS_JSON'] )
+OIT_SUBSET_OUTPUT_PATH: str = '%s/oit_subset_01.tsv' % os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
+log.debug( f'OIT_COURSE_LIST_PATH, ``{OIT_COURSE_LIST_PATH}``' )
+log.debug( f'TARGET_SEASON, ``{TARGET_SEASON}``' )
+log.debug( f'TARGET_YEAR, ``{TARGET_YEAR}``' )
+log.debug( f'LEGIT_SECTIONS, ``{LEGIT_SECTIONS}``' )
+log.debug( f'OIT_SUBSET_OUTPUT_PATH, ``{OIT_SUBSET_OUTPUT_PATH}``' )
 
+1/0
+
+
+## controller -------------------------------------------------------
 
 def main():
     """ Controller.
@@ -85,6 +106,8 @@ def main():
         
     ## end main()
 
+
+## helper functions -------------------------------------------------
 
 def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
     """ Parses data-line.
