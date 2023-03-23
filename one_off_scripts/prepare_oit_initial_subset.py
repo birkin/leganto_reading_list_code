@@ -61,8 +61,10 @@ def main():
 
     ## make subset --------------------------------------
     skipped_due_to_no_instructor = []
+    skipped_sections = []
     subset_lines = []
     for i, data_line in enumerate( data_lines ):
+        data_ok = False
         if i < 5:
             log.debug( f'processing data_line, ``{data_line}``' )
         line_dict = parse_line( data_line, heading_line, i )
@@ -73,31 +75,16 @@ def main():
                 log.debug( 'passed season check' )
                 if course_code_dict['course_code_section'] in LEGIT_SECTIONS:
                     log.debug( 'passed section check' )
-                    if len( line_dict['ALL_INSTRUCTORS'].strip() ) > 0:
-                        log.debug( 'passed instructor check' )
-                        subset_lines.append( data_line )
-                        log.debug( 'added to subset_lines' )
-                    else:
-                        log.debug( 'skipped due to no instructor' )
-                        skipped_due_to_no_instructor.append( data_line )
-    log.debug( f'subset_lines, ``{pprint.pformat(subset_lines)}``' )
-    log.debug( f'len(subset_lines), ``{len(subset_lines)}``' )
-    log.debug( f'skipped_due_to_no_instructor, ``{pprint.pformat(skipped_due_to_no_instructor)}``' )
-    log.debug( f'len(skipped_due_to_no_instructor), ``{len(skipped_due_to_no_instructor)}``' )
-
-    # skipped_due_to_no_instructor = []
-    # subset_lines = []
-    # for i, data_line in enumerate( data_lines ):
-    #     if i < 5:
-    #         log.debug( f'processing data_line, ``{data_line}``' )
-    #     line_dict = parse_line( data_line, heading_line, i )
-    #     course_code_dict = parse_course_code( data_line, i )
-    #     if course_code_dict['course_code_year'] == TARGET_YEAR and course_code_dict['course_code_term'] == TARGET_SEASON:
-    #         if line_dict['ALL_INSTRUCTORS'].strip() == '':
-    #         # if 1 == 2:
-    #             skipped_due_to_no_instructor.append( data_line )
-    #         else:
-    #             subset_lines.append( data_line )
+                    data_ok = True
+                else:
+                    skipped_sections.append( course_code_dict['course_code_section'] )
+                if data_ok == True and len( line_dict['ALL_INSTRUCTORS'].strip() ) > 0:
+                    log.debug( 'passed instructor check' )
+                    subset_lines.append( data_line )
+                    log.debug( 'added to subset_lines' )
+                else:
+                    log.debug( 'skipped due to no instructor' )
+                    skipped_due_to_no_instructor.append( data_line )
     # log.debug( f'subset_lines, ``{pprint.pformat(subset_lines)}``' )
     # log.debug( f'len(subset_lines), ``{len(subset_lines)}``' )
     # log.debug( f'skipped_due_to_no_instructor, ``{pprint.pformat(skipped_due_to_no_instructor)}``' )
@@ -110,6 +97,7 @@ def main():
             log.debug( f'processing summer-line, ``{summer_line}``' )
         course_code_dict = parse_course_code( summer_line, i )
         buckets_dict: dict = populate_buckets( course_code_dict, buckets_dict )
+    buckets_dict['skipped_sections_for_target_year_and_season']['all_values'] = skipped_sections
     # log.debug( f'buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
     ## prepare bucket counts ----------------------------------------
@@ -164,30 +152,11 @@ def make_easyview_output( buckets_dict: dict, skipped_due_to_no_instructor: list
         ## sort by count-descending, and then by string-ascending
         sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (-x[1], x[0]) )        
         output_dict[key] = sorted_unique_values
-    output_dict['skipped_due_to_no_instructor'] = len( skipped_due_to_no_instructor )
+    output_dict['skipped_instructor_count_for_target_year_and_season_and_section'] = len( skipped_due_to_no_instructor )
     # jsn = json.dumps( output_dict, indent=2 )
     # with open( './output.json', 'w' ) as f:
     #     f.write( jsn )
     return output_dict
-
-
-# def make_easyview_output( buckets_dict: dict ) -> dict:
-#     """ Prepares easyview output.
-#         Called by main() """
-#     assert type(buckets_dict) == dict
-#     output_dict = {}
-#     for key in buckets_dict.keys():
-#         unsorted_unique_values = buckets_dict[key]['unique_values']
-#         # sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: x[1], reverse=True )
-#         ## sort by count and then by string
-#         # sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (x[1], x[0]), reverse=True )
-#         ## sort by count-descending, and then by string-ascending
-#         sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (-x[1], x[0]) )        
-#         output_dict[key] = sorted_unique_values
-#     # jsn = json.dumps( output_dict, indent=2 )
-#     # with open( './output.json', 'w' ) as f:
-#     #     f.write( jsn )
-#     return output_dict
 
 
 def add_counts( buckets_dict: dict ) -> dict:
@@ -209,34 +178,37 @@ def populate_buckets( course_code_dict: dict, buckets_dict: dict ) -> dict:
     assert type(buckets_dict) == dict
     for key in course_code_dict.keys():
         if key == 'course_code_institution':
-            buckets_dict['course_code_institutions']['all_values'].append( course_code_dict[key] )
+            buckets_dict['subset_institutions']['all_values'].append( course_code_dict[key] )
         elif key == 'course_code_department':
-            buckets_dict['course_code_departments']['all_values'].append( course_code_dict[key] )
+            buckets_dict['subset_departments']['all_values'].append( course_code_dict[key] )
         elif key == 'course_code_year':
-            buckets_dict['course_code_years']['all_values'].append( course_code_dict[key] )
+            buckets_dict['subset_years']['all_values'].append( course_code_dict[key] )
         elif key == 'course_code_term':
-            buckets_dict['course_code_terms']['all_values'].append( course_code_dict[key] )
+            buckets_dict['subset_terms']['all_values'].append( course_code_dict[key] )
         elif key == 'course_code_section':
-            buckets_dict['course_code_sections']['all_values'].append( course_code_dict[key] )
+            buckets_dict['subset_sections']['all_values'].append( course_code_dict[key] )
     return buckets_dict
 
 
 def make_buckets() -> dict:
     """ Returns dict of buckets. """
     buckets_dict = {
-        'course_code_institutions': { 
+        'subset_institutions': { 
             'all_values': [], 
             'unique_values': [] },
-        'course_code_departments': { 
+        'subset_departments': { 
             'all_values': [], 
             'unique_values': [] },
-        'course_code_years': { 
+        'subset_years': { 
             'all_values': [], 
             'unique_values': [] },
-        'course_code_terms': { 
+        'subset_terms': { 
             'all_values': [], 
             'unique_values': [] },
-        'course_code_sections': { 
+        'subset_sections': { 
+            'all_values': [], 
+            'unique_values': [] },
+        'skipped_sections_for_target_year_and_season': { 
             'all_values': [], 
             'unique_values': [] },
         }
