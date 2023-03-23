@@ -67,16 +67,41 @@ def main():
             log.debug( f'processing data_line, ``{data_line}``' )
         line_dict = parse_line( data_line, heading_line, i )
         course_code_dict = parse_course_code( data_line, i )
-        if course_code_dict['course_code_year'] == TARGET_YEAR and course_code_dict['course_code_term'] == TARGET_SEASON:
-            if line_dict['ALL_INSTRUCTORS'].strip() == '':
-            # if 1 == 2:
-                skipped_due_to_no_instructor.append( data_line )
-            else:
-                subset_lines.append( data_line )
+        if course_code_dict['course_code_year'] == TARGET_YEAR:
+            log.debug( 'passed year check' )
+            if course_code_dict['course_code_term'] == TARGET_SEASON:
+                log.debug( 'passed season check' )
+                if course_code_dict['course_code_section'] in LEGIT_SECTIONS:
+                    log.debug( 'passed section check' )
+                    if len( line_dict['ALL_INSTRUCTORS'].strip() ) > 0:
+                        log.debug( 'passed instructor check' )
+                        subset_lines.append( data_line )
+                        log.debug( 'added to subset_lines' )
+                    else:
+                        log.debug( 'skipped due to no instructor' )
+                        skipped_due_to_no_instructor.append( data_line )
     log.debug( f'subset_lines, ``{pprint.pformat(subset_lines)}``' )
     log.debug( f'len(subset_lines), ``{len(subset_lines)}``' )
     log.debug( f'skipped_due_to_no_instructor, ``{pprint.pformat(skipped_due_to_no_instructor)}``' )
     log.debug( f'len(skipped_due_to_no_instructor), ``{len(skipped_due_to_no_instructor)}``' )
+
+    # skipped_due_to_no_instructor = []
+    # subset_lines = []
+    # for i, data_line in enumerate( data_lines ):
+    #     if i < 5:
+    #         log.debug( f'processing data_line, ``{data_line}``' )
+    #     line_dict = parse_line( data_line, heading_line, i )
+    #     course_code_dict = parse_course_code( data_line, i )
+    #     if course_code_dict['course_code_year'] == TARGET_YEAR and course_code_dict['course_code_term'] == TARGET_SEASON:
+    #         if line_dict['ALL_INSTRUCTORS'].strip() == '':
+    #         # if 1 == 2:
+    #             skipped_due_to_no_instructor.append( data_line )
+    #         else:
+    #             subset_lines.append( data_line )
+    # log.debug( f'subset_lines, ``{pprint.pformat(subset_lines)}``' )
+    # log.debug( f'len(subset_lines), ``{len(subset_lines)}``' )
+    # log.debug( f'skipped_due_to_no_instructor, ``{pprint.pformat(skipped_due_to_no_instructor)}``' )
+    # log.debug( f'len(skipped_due_to_no_instructor), ``{len(skipped_due_to_no_instructor)}``' )
 
     ## populate course-parts buckets --------------------------------
     buckets_dict: dict  = make_buckets()  # returns dict like: ```( course_code_institutions': {'all_values': [], 'unique_values': []}, etc... }```
