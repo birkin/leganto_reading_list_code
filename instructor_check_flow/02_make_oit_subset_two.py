@@ -63,12 +63,27 @@ def main():
     log.debug( f'parts, ``{pprint.pformat(parts)}``' )
     data_lines = lines[1:]
 
+    ## get already-in-leganto lines ---------------------------------
+    already_in_leganto_lines = []
+    with open( ALREADY_IN_LEGANTO_FILEPATH, 'r' ) as f:
+        for line in f:
+            already_in_leganto_lines.append( line.lower().strip() )
+        # already_in_leganto_lines = f.readlines()
+    for i in range( 0, 5 ):
+        log.debug( f'already_in_leganto_lines[{i}], ``{already_in_leganto_lines[i]}``' )
+
     ## make subset --------------------------------------------------
     for i, data_line in enumerate( data_lines ):
-        if i < 5:
-            log.debug( f'processing data_line, ``{data_line}``' )
         line_dict = instructor_common.parse_line( data_line, heading_line, i )
         course_code_dict = instructor_common.parse_course_code( data_line, i )
+        match_try_1 = f'%s.%s' % ( course_code_dict['course_code_department'], course_code_dict['course_code_number'] )
+        match_try_2 = f'%s %s' % ( course_code_dict['course_code_department'], course_code_dict['course_code_number'] )
+        if i < 5:
+            log.debug( f'processing data_line, ``{data_line}``' )
+            log.debug( f'match_try_1, ``{match_try_1}``' )
+            log.debug( f'match_try_2, ``{match_try_2}``' )
+
+
         log.debug( 'HEREZZ' )
         break
 
