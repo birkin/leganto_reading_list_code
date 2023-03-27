@@ -51,6 +51,7 @@ def main():
     assert already_in_leganto_columuns_are_valid(ALREADY_IN_LEGANTO_FILEPATH) == True
 
     ## load oit-subset-01 file --------------------------------------
+    lines = []
     with open( OIT_SUBSET_01_SOURCE_PATH, 'r' ) as f:
         lines = f.readlines()
 
@@ -74,7 +75,7 @@ def main():
 
     ## make subset --------------------------------------------------
     for i, data_line in enumerate( data_lines ):
-        line_dict = instructor_common.parse_line( data_line, heading_line, i )
+        # line_dict = instructor_common.parse_line( data_line, heading_line, i )
         course_code_dict = instructor_common.parse_course_code( data_line, i )
         match_try_1 = f'%s.%s' % ( course_code_dict['course_code_department'], course_code_dict['course_code_number'] )
         match_try_2 = f'%s %s' % ( course_code_dict['course_code_department'], course_code_dict['course_code_number'] )
@@ -82,10 +83,23 @@ def main():
             log.debug( f'processing data_line, ``{data_line}``' )
             log.debug( f'match_try_1, ``{match_try_1}``' )
             log.debug( f'match_try_2, ``{match_try_2}``' )
+        ## check if course is already in leganto --------------------
+        for leganto_line in already_in_leganto_lines:
+            match_found = False
+            if match_try_1 in leganto_line:
+                log.debug( f'found match on ``{match_try_1}``' )
+                match_found = True
+            elif match_try_2 in leganto_line:
+                log.debug( f'found match on ``{match_try_2}``' )
+                match_found = True
+            if match_found == False:
+                new_subset_lines.append( data_line )
+                break            
+    # log.debug( f'new_subset_lines, ``{pprint.pformat(new_subset_lines)}``' )
+    log.debug( f'len(original subset lines), ``{len(lines)}``' )
+    log.debug( f'len(new_subset_lines), ``{len(new_subset_lines)}``' )
 
-
-        log.debug( 'HEREZZ' )
-        break
+    ## end def main() 
 
 
 
