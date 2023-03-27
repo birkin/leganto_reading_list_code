@@ -19,6 +19,7 @@ log.debug( 'logging ready' )
 PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
 from lib.common.validate_oit_file import is_utf8_encoded, is_tab_separated
+from instructor_check_flow import common as instructor_common
 
 ## grab env vars ----------------------------------------------------
 CSV_OUTPUT_DIR_PATH: str = os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
@@ -49,19 +50,32 @@ def main():
     assert is_tab_separated(ALREADY_IN_LEGANTO_FILEPATH) == True
     assert already_in_leganto_columuns_are_valid(ALREADY_IN_LEGANTO_FILEPATH) == True
 
+    ## load oit-subset-01 file --------------------------------------
+    with open( OIT_SUBSET_01_SOURCE_PATH, 'r' ) as f:
+        lines = f.readlines()
+
+    ## get heading and data lines -----------------------------------
+    new_subset_lines = []
+    heading_line = lines[0]
+    new_subset_lines.append( heading_line )
+    parts = heading_line.split( '\t' )
+    parts = [ part.strip() for part in parts ]
+    log.debug( f'parts, ``{pprint.pformat(parts)}``' )
+    data_lines = lines[1:]
+
+    ## make subset --------------------------------------------------
+    for i, data_line in enumerate( data_lines ):
+        if i < 5:
+            log.debug( f'processing data_line, ``{data_line}``' )
+        line_dict = instructor_common.parse_line( data_line, heading_line, i )
+        course_code_dict = instructor_common.parse_course_code( data_line, i )
+        log.debug( 'HEREZZ' )
+        break
+
+
+
     1/0
 
-    # ## load OIT file ------------------------------------------------
-    # lines = []
-    # with open( OIT_COURSE_LIST_PATH, 'r' ) as f:
-    #     lines = f.readlines()
-
-    # ## get heading and data lines -----------------------------------
-    # heading_line = lines[0]
-    # parts = heading_line.split( '\t' )
-    # parts = [ part.strip() for part in parts ]
-    # log.debug( f'parts, ``{pprint.pformat(parts)}``' )
-    # data_lines = lines[1:]
 
     # ## make subset --------------------------------------
     # skipped_due_to_no_instructor = []
@@ -124,6 +138,7 @@ def main():
 
 ## helper functions -------------------------------------------------
 
+
 def already_in_leganto_columuns_are_valid( filepath: str ) -> bool:
     """ Ensures tsv file is as expected.
         Called by main() """
@@ -151,28 +166,13 @@ def already_in_leganto_columuns_are_valid( filepath: str ) -> bool:
     return check_result
 
 
+
+
 if __name__ == '__main__':
     main()
     sys.exit(0)
 
 
-# def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
-#     """ Parses data-line.
-#         Called by main() """
-#     log.debug( 'starting parse_line()')
-#     assert type(data_line) == str
-#     assert type(heading_line) == str
-#     assert type(line_number) == int
-#     parts = data_line.split( '\t' )
-#     parts = [ part.strip() for part in parts ]
-#     heading_parts = heading_line.split( '\t' )
-#     heading_parts = [ part.strip() for part in heading_parts ]
-#     line_dict = {}
-#     for i, part in enumerate( parts ):
-#         line_dict[heading_parts[i]] = part
-#     if line_number < 5:
-#         log.debug( f'line_dict, ``{pprint.pformat(line_dict)}``' )
-#     return line_dict
 
 
 # def make_easyview_output( buckets_dict: dict, skipped_due_to_no_instructor: list ) -> dict:
@@ -252,35 +252,3 @@ if __name__ == '__main__':
 #     return buckets_dict
 
 
-# def parse_course_code( data_line, i ):
-#     """ Parses course-code into dict. """
-#     assert type(data_line) == str
-#     assert type(i) == int
-#     parts = data_line.split( '\t' )
-#     parts = [ part.strip() for part in parts ]
-#     ## parse course code --------------------------------------------
-#     course_code_parts: list = parts[0].split( '.' )
-#     if i < 5:
-#         log.debug( f'processing course_code_parts, ``{course_code_parts}``' )
-#     course_code_dict = {
-#         'course_code_institution': course_code_parts[0],
-#         'course_code_department': course_code_parts[1],
-#         'course_code_number': course_code_parts[2],
-#         'course_code_year_and_term': course_code_parts[3],
-#         # 'course_code_section': course_code_parts[4] 
-#         }
-#     ## handle missing section
-#     if len(course_code_parts) == 5:
-#         course_code_dict['course_code_section'] = course_code_parts[4]
-#     else:
-#         log.debug( 'adding EMPTY section' )
-#         course_code_dict['course_code_section'] = 'EMPTY'
-#         # course_code_section_missing_count += 1
-#     ## handle year and term
-#     course_code_year = course_code_parts[3].split('-')[0]
-#     course_code_term = course_code_parts[3].split('-')[1]
-#     course_code_dict['course_code_year'] = course_code_year
-#     course_code_dict['course_code_term'] = course_code_term
-#     if i < 5:
-#         log.debug( f'course_code_dict, ``{pprint.pformat(course_code_dict)}``' )
-#     return course_code_dict
