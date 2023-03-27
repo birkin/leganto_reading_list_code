@@ -360,11 +360,13 @@ def main():
         for leganto_line in already_in_leganto_lines:
             # log.debug( f'checking leganto_line, ``{leganto_line}`` on match_tries ``{match_try_1}`` and ``{match_try_2}``' )
             if match_try_1 in leganto_line:
-                log.debug( f'found match on ``{match_try_1}``' )
+                log.debug( f'found match on ``{match_try_1}`` for leganto_line, ``{leganto_line}``' )
                 match_found = True
+                break
             elif match_try_2 in leganto_line:
-                log.debug( f'found match on ``{match_try_2}``' )
+                log.debug( f'found match on ``{match_try_2}`` for leganto_line, ``{leganto_line}``' )
                 match_found = True
+                break
         if match_found == False:
             new_subset_lines.append( data_line )
     # log.debug( f'new_subset_lines, ``{pprint.pformat(new_subset_lines)}``' )
