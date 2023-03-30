@@ -20,6 +20,7 @@ PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
 
 ## additional imports -----------------------------------------------
+from lib.common.query_ocra import get_class_id_entries
 from lib.common.validate_oit_file import is_utf8_encoded, is_tab_separated, columns_are_valid
 
 ## grab env vars ----------------------------------------------------
@@ -60,20 +61,37 @@ def main():
     ## build course_code.couse_number dict ---------------------------
     data_holder_dict = build_data_holder_dict( data_lines )
 
-    1/0
 
     ## get class_ids from ocra --------------------------------------
-    ocra_data = {}
+    for ( i, (course_key, course_data_dict) ) in enumerate( data_holder_dict.items() ):
+        log.debug( f'i, ``{i}``')
+        log.debug( f'course_key, ``{course_key}``' )
+        log.debug( f'course_data_dict, ``{pprint.pformat(course_data_dict)}``' )
+        course_code = course_key.split( '.' )[0]
+        course_number = course_key.split( '.' )[1]
+        class_ids: list = get_class_id_entries( course_code, course_number )
+
+        if i > 2:
+            break
+
+    # for (i, something) in enumerate( data_holder_dict.items() ):
+    #     log.debug( f'i, ``{i}``')
+    #     log.debug( f'something, ``{pprint.pformat(something)}``' )
+    #     if i > 2:
+    #         break
+
+    1/0
+
 
     ## with class_ids, get reading-list data ------------------------
 
     ## filter out invalid ocra instructors --------------------------
 
     ## save ocra_data -----------------------------------------------
-    json_filepath = f'{CSV_OUTPUT_DIR_PATH}/ocra_data_for_step_03.json'
-    with open( json_filepath, 'w' ) as f:
-        json.dump( ocra_data, f, indent=2 )
-    log.debug( f'json_filepath, ``{json_filepath}``' )
+    # json_filepath = f'{CSV_OUTPUT_DIR_PATH}/ocra_data_for_step_03.json'
+    # with open( json_filepath, 'w' ) as f:
+    #     json.dump( ocra_data, f, indent=2 )
+    # log.debug( f'json_filepath, ``{json_filepath}``' )
 
     return
 
@@ -106,7 +124,7 @@ def build_data_holder_dict( data_lines ):
         course_number = course_id_parts[2]                  # '0850'
         course_key = f'{course_code}.{course_number}'
         all_instructors_string: str = parts[27]            # 'ALL_INSTRUCTORS'
-        log.debug( f'all_instructors_string, ``{all_instructors_string}``' )
+        # log.debug( f'all_instructors_string, ``{all_instructors_string}``' )
         all_instructors: list = all_instructors_string.split( ',' )
         if len( all_instructors ) > 1:
             log.debug( f'found multiple instructors for course {course_id}' )
