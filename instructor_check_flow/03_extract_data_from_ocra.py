@@ -66,6 +66,7 @@ def main():
     oit_courses_processed = 0  
     count_ocra_courses_with_classes = 0
     count_ocra_courses_without_classes = 0
+    list_of_found_oit_courses = []
     for ( i, (course_key, course_data_dict) ) in enumerate( data_holder_dict.items() ):
         log.debug( f'processing course_key, ``{course_key}``')
         # log.debug( f'i, ``{i}``')
@@ -75,11 +76,14 @@ def main():
         course_number = course_key.split( '.' )[1]
         class_ids: list = get_class_id_entries( course_code, course_number )
         class_ids.sort()
+        ## update data_holder_dict with class_ids -------------------
+        data_holder_dict[course_key]['ocra_class_ids'] = class_ids
+        ## update analyses ------------------------------------------
         if len(class_ids) > 0:
             count_ocra_courses_with_classes += 1
+            list_of_found_oit_courses.append( course_key )
         else:
             count_ocra_courses_without_classes += 1
-        data_holder_dict[course_key]['ocra_class_ids'] = class_ids
         oit_courses_processed += 1
         # if i > 2:
         #     break
@@ -87,6 +91,7 @@ def main():
     log.debug( f'count_ocra_courses_with_classes, ``{count_ocra_courses_with_classes}``' )
     log.debug( f'count_ocra_courses_without_classes, ``{count_ocra_courses_without_classes}``' )
     log.debug( f'oit_courses_processed, ``{oit_courses_processed}``')
+    log.debug( f'list_of_found_oit_courses, ``{pprint.pformat(list_of_found_oit_courses)}``' )
     assert count_ocra_courses_with_classes + count_ocra_courses_without_classes == oit_courses_processed
 
     ## save class_ids data ------------------------------------------
