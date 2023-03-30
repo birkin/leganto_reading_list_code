@@ -58,29 +58,7 @@ def main():
     data_lines = lines[1:]
 
     ## build course_code.couse_number dict ---------------------------
-    data_holder_dict = {}
-    for line in data_lines:
-        parts = line.split( '\t' )
-        parts = [ part.strip() for part in parts ]
-        # log.debug( f'parts, ``{pprint.pformat(parts)}``' )
-        course_id = parts[0]                                # eg 'brown.anth.0850.2023-summer.s01'
-        course_id_segment = course_id.split( '-' )[0]       # 'brown.anth.0850.2023'
-        course_id_parts = course_id_segment.split( '.' )
-        course_code = course_id_parts[1]                    # 'anth'
-        course_number = course_id_parts[2]                  # '0850'
-        course_key = f'{course_code}.{course_number}'
-        all_instructors_string: list = parts[27]            # 'ALL_INSTRUCTORS'
-        log.debug( f'all_instructors_string, ``{all_instructors_string}``' )
-        all_instructors: list = all_instructors_string.split( ',' )
-        if len( all_instructors ) > 1:
-            log.debug( f'found multiple instructors for course {course_id}' )
-        course_parts_dict = {
-            'oit_course_id': course_id,
-            'oit_course_title': parts[1],                   # 'COURSE_TITLE'
-            'oit_all_instructors': all_instructors
-        }
-        data_holder_dict[course_key] = course_parts_dict
-    log.debug( f'data_holder_dict, ``{pprint.pformat(data_holder_dict)}``' )    
+    data_holder_dict = build_data_holder_dict( data_lines )
 
     1/0
 
@@ -98,6 +76,50 @@ def main():
     log.debug( f'json_filepath, ``{json_filepath}``' )
 
     return
+
+    ## end main()
+
+
+## helper functions -------------------------------------------------
+
+def build_data_holder_dict( data_lines ):
+    """ Builds a dict of course_code.course_number keys , with a value-dict containing some oit data.
+        Example content: 
+        {
+            'anth.0530': {
+                'oit_all_instructors': ['140454042'],
+                'oit_course_id': 'brown.anth.0530.2023-summer.s01',
+                'oit_course_title': 'Arch. Psychoactive Substances'
+            },
+            etc...
+        }
+        Called by main() """
+    data_holder_dict = {}
+    for line in data_lines:
+        parts = line.split( '\t' )
+        parts = [ part.strip() for part in parts ]
+        # log.debug( f'parts, ``{pprint.pformat(parts)}``' )
+        course_id = parts[0]                                # eg 'brown.anth.0850.2023-summer.s01'
+        course_id_segment = course_id.split( '-' )[0]       # 'brown.anth.0850.2023'
+        course_id_parts = course_id_segment.split( '.' )
+        course_code = course_id_parts[1]                    # 'anth'
+        course_number = course_id_parts[2]                  # '0850'
+        course_key = f'{course_code}.{course_number}'
+        all_instructors_string: str = parts[27]            # 'ALL_INSTRUCTORS'
+        log.debug( f'all_instructors_string, ``{all_instructors_string}``' )
+        all_instructors: list = all_instructors_string.split( ',' )
+        if len( all_instructors ) > 1:
+            log.debug( f'found multiple instructors for course {course_id}' )
+        course_parts_dict = {
+            'oit_course_id': course_id,
+            'oit_course_title': parts[1],                   # 'COURSE_TITLE'
+            'oit_all_instructors': all_instructors
+        }
+        data_holder_dict[course_key] = course_parts_dict
+    log.debug( f'data_holder_dict, ``{pprint.pformat(data_holder_dict)}``' )    
+    return data_holder_dict
+
+    ## end build_data_holder_dict()
 
 
 if __name__ == '__main__':
