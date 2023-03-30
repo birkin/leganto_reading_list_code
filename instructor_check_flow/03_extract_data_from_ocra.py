@@ -47,7 +47,6 @@ def main():
     assert is_tab_separated(OIT_SUBSET_02_SOURCE_PATH) == True
     assert columns_are_valid(OIT_SUBSET_02_SOURCE_PATH) == True
 
-
     ## load oit-subset-02 file --------------------------------------
     lines = []
     with open( OIT_SUBSET_02_SOURCE_PATH, 'r' ) as f:
@@ -58,46 +57,39 @@ def main():
     parts = heading_line.split( '\t' )
     data_lines = lines[1:]
 
-    # ## iterate through data lines -----------------------------------
-    # ocra_data = {}
-    # for line in data_lines:
-    #     parts = line.split( '\t' )
-    #     parts = [ part.strip() for part in parts ]
-    #     log.debug( f'parts, ``{pprint.pformat(parts)}``' )
-    #     course_id = parts[0]
-    #     ocra_data[course_id] = {}
-    #     ocra_data[course_id]['course_id'] = course_id
-    #     ocra_data[course_id]['course_name'] = parts[1]
-    #     ocra_data[course_id]['instructor_name'] = parts[2]
-    #     ocra_data[course_id]['instructor_email'] = parts[3]
-    #     ocra_data[course_id]['reading_list'] = []
-
     ## build course_code.couse_number dict ---------------------------
     data_holder_dict = {}
     for line in data_lines:
         parts = line.split( '\t' )
         parts = [ part.strip() for part in parts ]
-        log.debug( f'parts, ``{pprint.pformat(parts)}``' )
-        course_id = parts[0]
-        course_code = course_id.split( '-' )[0]
-        course_number = course_id.split( '-' )[1]
+        # log.debug( f'parts, ``{pprint.pformat(parts)}``' )
+        course_id = parts[0]                                # eg 'brown.anth.0850.2023-summer.s01'
+        course_id_segment = course_id.split( '-' )[0]       # 'brown.anth.0850.2023'
+        course_id_parts = course_id_segment.split( '.' )
+        course_code = course_id_parts[1]                    # 'anth'
+        course_number = course_id_parts[2]                  # '0850'
         course_key = f'{course_code}.{course_number}'
-        course_parts_dict = {}
-        # course_parts_dict[]
-        if course_code not in data_holder_dict.keys():
-            data_holder_dict[course_code] = {}
-        data_holder_dict[course_code][course_number] = {}
-        data_holder_dict[course_code][course_number]['course_id'] = course_id
-        data_holder_dict[course_code][course_number]['course_name'] = parts[1]
-        data_holder_dict[course_code][course_number]['instructor_name'] = parts[2]
-        data_holder_dict[course_code][course_number]['instructor_email'] = parts[3]
-        data_holder_dict[course_code][course_number]['reading_list'] = []
-        # zzz
+        all_instructors_string: list = parts[27]            # 'ALL_INSTRUCTORS'
+        log.debug( f'all_instructors_string, ``{all_instructors_string}``' )
+        all_instructors: list = all_instructors_string.split( ',' )
+        if len( all_instructors ) > 1:
+            log.debug( f'found multiple instructors for course {course_id}' )
+        course_parts_dict = {
+            'oit_course_id': course_id,
+            'oit_course_title': parts[1],                   # 'COURSE_TITLE'
+            'oit_all_instructors': all_instructors
+        }
+        data_holder_dict[course_key] = course_parts_dict
+    log.debug( f'data_holder_dict, ``{pprint.pformat(data_holder_dict)}``' )    
 
     1/0
 
-    ## get class_ids from ocra ----------------------------------------
+    ## get class_ids from ocra --------------------------------------
     ocra_data = {}
+
+    ## with class_ids, get reading-list data ------------------------
+
+    ## filter out invalid ocra instructors --------------------------
 
     ## save ocra_data -----------------------------------------------
     json_filepath = f'{CSV_OUTPUT_DIR_PATH}/ocra_data_for_step_03.json'
