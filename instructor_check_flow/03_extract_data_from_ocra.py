@@ -58,40 +58,43 @@ def main():
     parts = heading_line.split( '\t' )
     data_lines = lines[1:]
 
-    ## build course_code.couse_number dict ---------------------------
+    ## build course_code.couse_number dict --------------------------
     data_holder_dict = build_data_holder_dict( data_lines )
 
-
     ## get class_ids from ocra --------------------------------------
+    count_items = len( data_holder_dict.items() )
+    oit_courses_processed = 0  
+    count_ocra_courses_with_classes = 0
+    count_ocra_courses_without_classes = 0
     for ( i, (course_key, course_data_dict) ) in enumerate( data_holder_dict.items() ):
-        log.debug( f'i, ``{i}``')
-        log.debug( f'course_key, ``{course_key}``' )
-        log.debug( f'course_data_dict, ``{pprint.pformat(course_data_dict)}``' )
+        log.debug( f'processing course_key, ``{course_key}``')
+        # log.debug( f'i, ``{i}``')
+        # log.debug( f'course_key, ``{course_key}``' )
+        # log.debug( f'course_data_dict, ``{pprint.pformat(course_data_dict)}``' )
         course_code = course_key.split( '.' )[0]
         course_number = course_key.split( '.' )[1]
         class_ids: list = get_class_id_entries( course_code, course_number )
+        class_ids.sort()
+        if len(class_ids) > 0:
+            count_ocra_courses_with_classes += 1
+        else:
+            count_ocra_courses_without_classes += 1
+        data_holder_dict[course_key]['ocra_class_ids'] = class_ids
+        oit_courses_processed += 1
+        # if i > 2:
+        #     break
+    log.debug( f'data_holder_dict after class_ids update, ``{pprint.pformat(data_holder_dict)}``' )
+    log.debug( f'count_ocra_courses_with_classes, ``{count_ocra_courses_with_classes}``' )
+    log.debug( f'count_ocra_courses_without_classes, ``{count_ocra_courses_without_classes}``' )
+    log.debug( f'oit_courses_processed, ``{oit_courses_processed}``')
+    assert count_ocra_courses_with_classes + count_ocra_courses_without_classes == oit_courses_processed
 
-        if i > 2:
-            break
-
-    # for (i, something) in enumerate( data_holder_dict.items() ):
-    #     log.debug( f'i, ``{i}``')
-    #     log.debug( f'something, ``{pprint.pformat(something)}``' )
-    #     if i > 2:
-    #         break
-
-    1/0
-
-
-    ## with class_ids, get reading-list data ------------------------
-
-    ## filter out invalid ocra instructors --------------------------
-
-    ## save ocra_data -----------------------------------------------
-    # json_filepath = f'{CSV_OUTPUT_DIR_PATH}/ocra_data_for_step_03.json'
-    # with open( json_filepath, 'w' ) as f:
-    #     json.dump( ocra_data, f, indent=2 )
-    # log.debug( f'json_filepath, ``{json_filepath}``' )
+    ## save class_ids data ------------------------------------------
+    json_filepath = f'{JSON_DATA_DIR_PATH}/ocra_data_for_step_03.json'
+    log.debug( f'json_filepath, ``{json_filepath}``' )
+    with open( json_filepath, 'w' ) as f:
+        jsn = json.dumps( data_holder_dict, sort_keys=True, indent=2 )
+        f.write( jsn )
 
     return
 
