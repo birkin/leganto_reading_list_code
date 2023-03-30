@@ -26,6 +26,7 @@ def is_utf8_encoded(file_path):
     log.debug( f'utf8_validity, ``{utf8_validity}``' )
     return utf8_validity
 
+
 def is_tab_separated(file_path):
     with open(file_path, newline='', encoding='utf-8') as file:
         # dialect = csv.Sniffer().sniff(file.read(1024))
@@ -36,9 +37,18 @@ def is_tab_separated(file_path):
         return delimiter_is_tab
 
 
-# file_path = 'example.csv'
-
-# if is_utf8_encoded(file_path) and is_tab_separated(file_path):
-#     print(f'The file {file_path} is both tab-separated and encoded as UTF-8')
-# else:
-#     print(f'The file {file_path} is not both tab-separated and encoded as UTF-8')
+def columns_are_valid( file_path ):
+    line = ''
+    with open( file_path, 'r' ) as f:
+        line = f.readline()
+    parts = line.split( '\t' )
+    stripped_parts = [ part.strip() for part in parts ]
+    try:
+        assert len(stripped_parts) == 34, len(stripped_parts )
+        assert stripped_parts == ['COURSE_CODE', 'COURSE_TITLE', 'SECTION_ID', 'ACAD', 'PROC_DEPT', 'TERM1', 'TERM2', 'TERM3', 'TERM4', 'START_DATE', 'END_DATE', 'NUM_OF_PARTIICIPANTS', 'WEEKLY_HOURS', 'YEAR', 'SEARCH_ID1', 'SEARCH_ID2', 'MULTI_SEARCH_ID', 'INSTR1', 'INSTR2', 'INSTR3', 'INSTR4', 'INSTR5', 'INSTR6', 'INSTR7', 'INSTR8', 'INSTR9', 'INSTR10', 'ALL_INSTRUCTORS', 'OPERATION', 'OLD_COURSE_CODE', 'OLD_COURSE_SECTION', 'SUBMIT_LISTS_BY', 'CAMPUS_AND_PARTICIPANTS', 'READING_LIST_NAME'], stripped_parts
+        column_check = True
+    except:
+        log.exception( 'file not as expected' )
+        column_check = False
+    log.debug( f'column_check, ``{column_check}``' )
+    return column_check

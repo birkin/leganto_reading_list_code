@@ -52,7 +52,6 @@ def main():
     ## get heading and data lines -----------------------------------
     new_subset_lines = []
     heading_line = lines[0]
-    new_subset_lines.append( heading_line )
     parts = heading_line.split( '\t' )
     parts = [ part.strip() for part in parts ]
     log.debug( f'parts, ``{pprint.pformat(parts)}``' )
