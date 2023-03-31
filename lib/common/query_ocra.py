@@ -24,9 +24,11 @@ def get_email_from_bruid( bru_id: str ) -> str:
     ## run query to get email address -------------------------------
     db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
     if modified_bru_id:
-        sql = f"SELECT * FROM `banner_dump` WHERE (`inst_bruid` = '{modified_bru_id}' OR `inst_bruid` = '{bru_id}')"
+        # sql = f"SELECT * FROM `banner_dump` WHERE (`inst_bruid` = '{modified_bru_id}' OR `inst_bruid` = '{bru_id}')"
+        sql = f"SELECT `inst_email`, `inst_bruid` FROM `banner_dump` WHERE (`inst_bruid` = '{modified_bru_id}' OR `inst_bruid` = '{bru_id}')"
     else:
-        sql = f"SELECT * FROM `banner_dump` WHERE `inst_bruid` = '{bru_id}'"
+        # sql = f"SELECT * FROM `banner_dump` WHERE `inst_bruid` = '{bru_id}'"
+        sql = f"SELECT `inst_email`, `inst_bruid` FROM `banner_dump` WHERE `inst_bruid` = '{bru_id}'"
     log.debug( f'sql, ``{sql}``' )
     result_set: list = []
     with db_connection:

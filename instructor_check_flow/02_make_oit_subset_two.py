@@ -189,17 +189,23 @@ def build_data_holder_dict( data_lines ):
 def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
     """ Adds email-addresses to data_holder_dict.
         Called by main() """
-    for course_key, course_parts_dict in data_holder_dict.items():
+    match_count = 0
+    for i, ( course_key, course_parts_dict ) in enumerate( data_holder_dict.items() ):
+        log.debug( f'i, ``{i}``; course_key, ``{course_key}``' )
+        if i >= 2:
+            break
         bru_ids = course_parts_dict['oit_all_instructors']
         log.debug( f'bru_ids, ``{pprint.pformat(bru_ids)}``' )
         email_addresses = []
         email_address_map = {}
         for bru_id in bru_ids:
             email_address = query_ocra.get_email_from_bruid( bru_id )
+            log.debug( f'email_address result-set, ``{email_address}``')
             email_address_map[bru_id] = email_address
             email_addresses.append( email_address )
         course_parts_dict['oit_email_address_map'] = email_address_map
         course_parts_dict['oit_email_addresses'] = email_addresses
+    log.debug( 'end of email lookup' )
     log.debug( f'data_holder_dict, ``{pprint.pformat(data_holder_dict)}``' )    
     return data_holder_dict
 
