@@ -192,7 +192,7 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
     match_count = 0
     for i, ( course_key, course_parts_dict ) in enumerate( data_holder_dict.items() ):
         log.debug( f'i, ``{i}``; course_key, ``{course_key}``' )
-        if i >= 2:
+        if i >= 20:
             break
         bru_ids = course_parts_dict['oit_all_instructors']
         log.debug( f'bru_ids, ``{pprint.pformat(bru_ids)}``' )
@@ -203,7 +203,7 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
             log.debug( f'email_address result-set, ``{email_address}``')
             email_address_map[bru_id] = email_address
             email_addresses.append( email_address )
-        course_parts_dict['oit_email_address_map'] = email_address_map
+        course_parts_dict['oit_bruid_to_email_map'] = email_address_map
         course_parts_dict['oit_email_addresses'] = email_addresses
     log.debug( 'end of email lookup' )
     log.debug( f'data_holder_dict, ``{pprint.pformat(data_holder_dict)}``' )    
