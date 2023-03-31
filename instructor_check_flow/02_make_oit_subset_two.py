@@ -18,8 +18,11 @@ log.debug( 'logging ready' )
 ## update sys.path for project imports  -----------------------------
 PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
-from lib.common.validate_oit_file import is_utf8_encoded, is_tab_separated
+
+## additional imports -----------------------------------------------
 from instructor_check_flow import common as instructor_common
+from lib.common import query_ocra
+from lib.common import validate_oit_file
 
 ## grab env vars ----------------------------------------------------
 CSV_OUTPUT_DIR_PATH: str = os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
@@ -40,8 +43,8 @@ def main():
         Called by if __name__ == '__main__' """
 
     ## validate already-in-leganto file -----------------------------
-    assert is_utf8_encoded(ALREADY_IN_LEGANTO_FILEPATH) == True
-    assert is_tab_separated(ALREADY_IN_LEGANTO_FILEPATH) == True
+    assert validate_oit_file.is_utf8_encoded(ALREADY_IN_LEGANTO_FILEPATH) == True
+    assert validate_oit_file.is_tab_separated(ALREADY_IN_LEGANTO_FILEPATH) == True
     assert already_in_leganto_columuns_are_valid(ALREADY_IN_LEGANTO_FILEPATH) == True
 
     ## load oit-subset-01 file --------------------------------------
@@ -192,7 +195,7 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
         email_addresses = []
         email_address_map = {}
         for bru_id in bru_ids:
-            email_address = get_email_address( bru_id )
+            email_address = query_ocra.get_email_from_bruid( bru_id )
             email_address_map[bru_id] = email_address
             email_addresses.append( email_address )
         course_parts_dict['oit_email_address_map'] = email_address_map
@@ -201,12 +204,12 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
     return data_holder_dict
 
 
-def get_email_address( bru_id: str ) -> str:
-    """ Returns email-address for instructor.
-        Called by add_emails_to_data_holder_dict() """
-    email_address = ''
-    log.debug( f'email_address, ``{email_address}``' )
-    return email_address
+# def get_email_address( bru_id: str ) -> str:
+#     """ Returns email-address for instructor.
+#         Called by add_emails_to_data_holder_dict() """
+#     email_address = ''
+#     log.debug( f'email_address, ``{email_address}``' )
+#     return email_address
 
     ## end get_email_address()
 
