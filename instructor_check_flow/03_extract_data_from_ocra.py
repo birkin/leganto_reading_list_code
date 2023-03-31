@@ -58,7 +58,7 @@ def main():
     parts = heading_line.split( '\t' )
     data_lines = lines[1:]
 
-    ## build course_code.couse_number dict --------------------------
+    ## build course_code.course_number dict -------------------------
     data_holder_dict = build_data_holder_dict( data_lines )
 
     ## get class_ids from ocra --------------------------------------

@@ -1,6 +1,6 @@
 """
 This script creates a subset of "oit_subset_01.tsv" which will be called "oit_subset_02.tsv".
-- it will contain courses from "oit_subset_01.tsv" that are not in the "in_leganto.csv" file.
+- it will contain courses from "oit_subset_01.tsv" that are not in the "in_leganto.tsv" file.
 """
 
 import json, logging, os, pprint, sys
@@ -56,6 +56,16 @@ def main():
     parts = [ part.strip() for part in parts ]
     log.debug( f'parts, ``{pprint.pformat(parts)}``' )
     data_lines = lines[1:]
+
+    ## build course_code.course_number dict -------------------------
+    data_holder_dict = build_data_holder_dict( data_lines )
+
+    ## add emails to data_holder_dict -------------------------------
+    data_holder_dict = add_emails_to_data_holder_dict( data_holder_dict )
+
+
+    1/0
+
 
     ## get already-in-leganto lines ---------------------------------
     already_in_leganto_lines = []
@@ -113,22 +123,92 @@ def already_in_leganto_columuns_are_valid( filepath: str ) -> bool:
         line = f.readline()
     parts = line.split( '\t' )
     stripped_parts = [ part.strip() for part in parts ]
+    log.debug( f'stripped_parts, ``{stripped_parts}``' )
     if stripped_parts == [
-        'Course ID',
-        'Course Instructor',
-        'Number Of Citations',
-        'Course Section',
-        'Course Name',
-        'Current Course Start Date',
-        'Reading List Code',
-        'Course Modification Date',
-        'Reading List Name',
-        'Course Instructor Primary Identifier'    
+        'Reading List Id', 
+        'Reading List Owner', 
+        'Academic Department', 
+        'Reading List Code',                        # when good, like: "brown.pols.1420.2023-spring.s01"
+        'Reading List Name',                        # sometimes contains strings, eg: "HIST 1120" or "ENVS1232"
+        'Course Code',                              # sometimes contains the `Reading List Code` value, or a string-segment like "EAST 0141"
+        'Course Section', 
+        'Course Name', 
+        'Course Instructor', 
+        'Course Instructor Identifier', 
+        'Course Instructor With Primary Identifier', 
+        'Course Instructor Preferred Email'         # if not empty, contains one email-address, or multiple email-addresses, separated by a semi-colon.
         ]:
         check_result = True
-    # log.debug( f'parts, ``{pprint.pformat(parts)}``' )
     log.debug( f'check_result, ``{check_result}``' )
     return check_result
+
+
+def build_data_holder_dict( data_lines ):
+    """ Builds a dict of course_code.course_number keys , with a value-dict containing some oit data.
+        Example content: 
+        {
+            'anth.0530': {
+                'oit_all_instructors': ['140454042'],
+                'oit_course_id': 'brown.anth.0530.2023-summer.s01',
+                'oit_course_title': 'Arch. Psychoactive Substances'
+            },
+            etc...
+        }
+        Called by main() """
+    data_holder_dict = {}
+    for line in data_lines:
+        parts = line.split( '\t' )
+        parts = [ part.strip() for part in parts ]
+        # log.debug( f'parts, ``{pprint.pformat(parts)}``' )
+        course_id = parts[0]                                # eg 'brown.anth.0850.2023-summer.s01'
+        course_id_segment = course_id.split( '-' )[0]       # 'brown.anth.0850.2023'
+        course_id_parts = course_id_segment.split( '.' )
+        course_code = course_id_parts[1]                    # 'anth'
+        course_number = course_id_parts[2]                  # '0850'
+        course_key = f'{course_code}.{course_number}'
+        all_instructors_string: str = parts[27]            # 'ALL_INSTRUCTORS'
+        # log.debug( f'all_instructors_string, ``{all_instructors_string}``' )
+        all_instructors: list = all_instructors_string.split( ',' )
+        if len( all_instructors ) > 1:
+            log.debug( f'found multiple instructors for course {course_id}' )
+        course_parts_dict = {
+            'oit_course_id': course_id,
+            'oit_course_title': parts[1],                   # 'COURSE_TITLE'
+            'oit_all_instructors': all_instructors
+        }
+        data_holder_dict[course_key] = course_parts_dict
+    log.debug( f'initial data_holder_dict (partial), ``{pprint.pformat(data_holder_dict)[0:500]}...``' )    
+    return data_holder_dict
+
+    ## end build_data_holder_dict()
+
+
+def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
+    """ Adds email-addresses to data_holder_dict.
+        Called by main() """
+    for course_key, course_parts_dict in data_holder_dict.items():
+        bru_ids = course_parts_dict['oit_all_instructors']
+        log.debug( f'bru_ids, ``{pprint.pformat(bru_ids)}``' )
+        email_addresses = []
+        email_address_map = {}
+        for bru_id in bru_ids:
+            email_address = get_email_address( bru_id )
+            email_address_map[bru_id] = email_address
+            email_addresses.append( email_address )
+        course_parts_dict['oit_email_address_map'] = email_address_map
+        course_parts_dict['oit_email_addresses'] = email_addresses
+    log.debug( f'data_holder_dict, ``{pprint.pformat(data_holder_dict)}``' )    
+    return data_holder_dict
+
+
+def get_email_address( bru_id: str ) -> str:
+    """ Returns email-address for instructor.
+        Called by add_emails_to_data_holder_dict() """
+    email_address = ''
+    log.debug( f'email_address, ``{email_address}``' )
+    return email_address
+
+    ## end get_email_address()
 
 
 if __name__ == '__main__':
