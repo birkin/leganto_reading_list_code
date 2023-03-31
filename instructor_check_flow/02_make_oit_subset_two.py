@@ -189,11 +189,10 @@ def build_data_holder_dict( data_lines ):
 def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
     """ Adds email-addresses to data_holder_dict.
         Called by main() """
-    match_count = 0
     for i, ( course_key, course_parts_dict ) in enumerate( data_holder_dict.items() ):
         log.debug( f'i, ``{i}``; course_key, ``{course_key}``' )
-        if i >= 20:
-            break
+        # if i >= 10:  # for testing
+        #     break
         bru_ids = course_parts_dict['oit_all_instructors']
         log.debug( f'bru_ids, ``{pprint.pformat(bru_ids)}``' )
         email_addresses = []
@@ -202,10 +201,23 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
             email_address = query_ocra.get_email_from_bruid( bru_id )
             log.debug( f'email_address result-set, ``{email_address}``')
             email_address_map[bru_id] = email_address
-            email_addresses.append( email_address )
+            if email_address:
+                email_addresses.append( email_address )
         course_parts_dict['oit_bruid_to_email_map'] = email_address_map
         course_parts_dict['oit_email_addresses'] = email_addresses
     log.debug( 'end of email lookup' )
+    ## update analysis ----------------------------------------------
+    meta_dict = {
+        'number_of_courses': len( data_holder_dict ),
+        'number_of_courses_with_multiple_instructors': 0,
+        'number_of_courses_for_which_email_addresses_were_found': 0,
+    }
+    for ( key, data_dict_value ) in data_holder_dict.items():
+        if len( data_dict_value.get('oit_all_instructors', []) ) > 1:
+            meta_dict['number_of_courses_with_multiple_instructors'] += 1
+        if len( data_dict_value.get('oit_email_addresses', []) ) > 0:
+            meta_dict['number_of_courses_for_which_email_addresses_were_found'] += 1
+    data_holder_dict['__meta__'] = meta_dict
     log.debug( f'data_holder_dict, ``{pprint.pformat(data_holder_dict)}``' )    
     return data_holder_dict
 
