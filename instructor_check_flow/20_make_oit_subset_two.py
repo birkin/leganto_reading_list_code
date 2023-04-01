@@ -69,13 +69,15 @@ def main():
         }
 
     ## get already-in-leganto lines ---------------------------------
-    already_in_leganto_lines = []
-    with open( ALREADY_IN_LEGANTO_FILEPATH, 'r' ) as f:
-        for line in f:
-            already_in_leganto_lines.append( line.lower().strip() )
-        # already_in_leganto_lines = f.readlines()
-    for i in range( 0, 5 ):
-        log.debug( f'a few already_in_leganto_lines[{i}], ``{already_in_leganto_lines[i]}``' )
+    already_in_leganto_lines = load_already_in_leganto_lines()
+    already_in_leganto_dict_lines = load_already_in_leganto_dict_lines( already_in_leganto_lines )
+    # already_in_leganto_lines = []
+    # with open( ALREADY_IN_LEGANTO_FILEPATH, 'r' ) as f:
+    #     for line in f:
+    #         already_in_leganto_lines.append( line.lower().strip() )
+    #     # already_in_leganto_lines = f.readlines()
+    # for i in range( 0, 5 ):
+    #     log.debug( f'a few already_in_leganto_lines[{i}], ``{already_in_leganto_lines[i]}``' )
 
 
     1/0
@@ -117,6 +119,51 @@ def main():
 
 
 ## helper functions -------------------------------------------------
+
+
+def load_already_in_leganto_lines() -> list:
+    already_in_leganto_lines = []
+    with open( ALREADY_IN_LEGANTO_FILEPATH, 'r' ) as f:
+        for line in f:
+            already_in_leganto_lines.append( line.lower() )
+        # already_in_leganto_lines = f.readlines()
+    for i in range( 0, 5 ):
+        log.debug( f'a few already_in_leganto_lines[{i}], ``{already_in_leganto_lines[i]}``' )
+    return already_in_leganto_lines
+
+
+def load_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
+    """ Returns list of dicts, one for each line in already_in_leganto_lines. 
+        Called by main(). """
+    keys = [
+        'Reading List Id', 
+        'Reading List Owner', 
+        'Academic Department', 
+        'Reading List Code',                        # when good, like: "brown.pols.1420.2023-spring.s01"
+        'Reading List Name',                        # sometimes contains strings, eg: "HIST 1120" or "ENVS1232"
+        'Course Code',                              # sometimes contains the `Reading List Code` value, or a string-segment like "EAST 0141"
+        'Course Section', 
+        'Course Name', 
+        'Course Instructor', 
+        'Course Instructor Identifier', 
+        'Course Instructor With Primary Identifier', 
+        'Course Instructor Preferred Email'         # if not empty, contains one email-address, or multiple email-addresses, separated by a semi-colon.
+        ]
+    already_in_leganto_dict_lines = []
+    for i, line in enumerate( already_in_leganto_lines ):
+        log.debug( f'line, ``{line}``' )
+        line_dict = {}
+        parts = line.split( '\t' )
+        log.debug( f'parts, ``{parts}``' )
+        assert len( parts ) == len( keys ), len( parts )
+        stripped_parts = [ part.strip() for part in parts ]
+        assert len( stripped_parts ) == len( keys ), len( stripped_parts )
+        line_dict[keys[i]] = stripped_parts[i]
+        already_in_leganto_dict_lines.append( line_dict )
+    for i in range( 0, 5 ):
+        log.debug( f'a few already_in_leganto_dict_lines[{i}], ``{already_in_leganto_dict_lines[i]}``' )
+    return already_in_leganto_dict_lines
+
 
 
 ## entry point ------------------------------------------------------
