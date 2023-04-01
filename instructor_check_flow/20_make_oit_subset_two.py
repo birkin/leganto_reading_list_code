@@ -71,13 +71,6 @@ def main():
     ## get already-in-leganto lines ---------------------------------
     already_in_leganto_lines = load_already_in_leganto_lines()
     already_in_leganto_dict_lines = load_already_in_leganto_dict_lines( already_in_leganto_lines )
-    # already_in_leganto_lines = []
-    # with open( ALREADY_IN_LEGANTO_FILEPATH, 'r' ) as f:
-    #     for line in f:
-    #         already_in_leganto_lines.append( line.lower().strip() )
-    #     # already_in_leganto_lines = f.readlines()
-    # for i in range( 0, 5 ):
-    #     log.debug( f'a few already_in_leganto_lines[{i}], ``{already_in_leganto_lines[i]}``' )
 
 
     1/0
@@ -150,20 +143,27 @@ def load_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
         'Course Instructor Preferred Email'         # if not empty, contains one email-address, or multiple email-addresses, separated by a semi-colon.
         ]
     already_in_leganto_dict_lines = []
-    for i, line in enumerate( already_in_leganto_lines ):
-        log.debug( f'line, ``{line}``' )
+    for ( i, line ) in enumerate( already_in_leganto_lines ):
+        # log.debug( f'i, ``{i}``; line, ``{line}``' )
+        if i == 0:
+            continue
         line_dict = {}
+        ## split line into parts ------------------------------------
         parts = line.split( '\t' )
-        log.debug( f'parts, ``{parts}``' )
+        # log.debug( f'parts, ``{parts}``' )
         assert len( parts ) == len( keys ), len( parts )
         stripped_parts = [ part.strip() for part in parts ]
         assert len( stripped_parts ) == len( keys ), len( stripped_parts )
-        line_dict[keys[i]] = stripped_parts[i]
+        ## build line-dict ------------------------------------------
+        for j, key in enumerate( keys ):
+            line_dict[keys[j]] = stripped_parts[j]
+        ## append line-dict to list ---------------------------------
         already_in_leganto_dict_lines.append( line_dict )
     for i in range( 0, 5 ):
         log.debug( f'a few already_in_leganto_dict_lines[{i}], ``{already_in_leganto_dict_lines[i]}``' )
     return already_in_leganto_dict_lines
 
+    ## end def load_already_in_leganto_dict_lines()
 
 
 ## entry point ------------------------------------------------------
