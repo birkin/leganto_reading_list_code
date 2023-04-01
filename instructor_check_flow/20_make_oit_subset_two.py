@@ -71,13 +71,24 @@ def main():
         'OIT_courses_removed_list': [],
         }
 
-    ## get already-in-leganto lines ---------------------------------
+    ## prepare already-in-leganto data for comparison ---------------
     already_in_leganto_lines = load_already_in_leganto_lines()
     already_in_leganto_dict_lines = prep_already_in_leganto_dict_lines( already_in_leganto_lines )
-    meta['number_of_already_in_leganto_courses'] = len( already_in_leganto_dict_lines )
-    # for item in already_in_leganto_dict_lines:
-    #     if item['instructor_email'] == '':
-    #         meta['number_of_already_in_leganto_courses_without_email'] += 1
+    update_meta_with_already_in_leganto_data( already_in_leganto_dict_lines, meta )
+    # log.debug( f'meta, ``{pprint.pformat(meta)}``' )
+
+    ## run comparison ------------------------------------------------
+    # post_instructor_check_data_holder_dict = {}
+    # for i, item in enumerate( data_holder_dict.items() ):
+    #     course_code, data_lines = item
+    #     log.debug( f'processing course_code, ``{course_code}``' )
+    #     post_instructor_check_data_holder_dict[course_code] = []
+    #     for data_line in data_lines:
+    #         match_found = check_for_match( data_line, already_in_leganto_dict_lines )
+    #         if match_found == False:
+    #             post_instructor_check_data_holder_dict[course_code].append( data_line )
+    #         else:
+    #             meta['number_of_courses_removed'] += 1
 
         
 
@@ -136,6 +147,7 @@ def load_already_in_leganto_lines() -> list:
 
 def prep_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
     """ Returns list of dicts, one for each line in already_in_leganto_lines. 
+        Makes it easier to work with the data.
         Called by main(). """
     keys = [
         'Reading List Id', 
@@ -179,6 +191,18 @@ def prep_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
     return already_in_leganto_dict_lines
 
     ## end def load_already_in_leganto_dict_lines()
+
+
+def update_meta_with_already_in_leganto_data( already_in_leganto_dict_lines: list, meta: dict ) -> None:
+    """ Updates meta-dict with data from already_in_leganto_dict_lines.
+        Keeps main() cleaner by doing this here.
+        Called by main(). """
+    meta['number_of_already_in_leganto_courses'] = len( already_in_leganto_dict_lines )
+    for item in already_in_leganto_dict_lines:
+        if item['email_list'] == ['']:
+            meta['number_of_already_in_leganto_courses_without_email'] += 1
+    return
+    # log.debug( f'meta, ``{pprint.pformat(meta)}``' )
 
 
 ## entry point ------------------------------------------------------
