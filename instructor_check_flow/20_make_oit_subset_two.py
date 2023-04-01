@@ -64,13 +64,22 @@ def main():
     meta = {
         'description': 'Removes courses from "oit_data_01b.json" if the course is already in Leganto with the same instructor. Saves result as "oit_data_02.json".',
         'number_of_courses_below': 0,
+        'number_of_already_in_leganto_courses': 0,
+        'number_of_already_in_leganto_courses_without_email': 0,
+        'number_of_courses_removed': 0,
         'OIT_courses_removed_count': 0,
         'OIT_courses_removed_list': [],
         }
 
     ## get already-in-leganto lines ---------------------------------
     already_in_leganto_lines = load_already_in_leganto_lines()
-    already_in_leganto_dict_lines = load_already_in_leganto_dict_lines( already_in_leganto_lines )
+    already_in_leganto_dict_lines = prep_already_in_leganto_dict_lines( already_in_leganto_lines )
+    meta['number_of_already_in_leganto_courses'] = len( already_in_leganto_dict_lines )
+    # for item in already_in_leganto_dict_lines:
+    #     if item['instructor_email'] == '':
+    #         meta['number_of_already_in_leganto_courses_without_email'] += 1
+
+        
 
 
     1/0
@@ -125,7 +134,7 @@ def load_already_in_leganto_lines() -> list:
     return already_in_leganto_lines
 
 
-def load_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
+def prep_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
     """ Returns list of dicts, one for each line in already_in_leganto_lines. 
         Called by main(). """
     keys = [
@@ -159,8 +168,14 @@ def load_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
             line_dict[keys[j]] = stripped_parts[j]
         ## append line-dict to list ---------------------------------
         already_in_leganto_dict_lines.append( line_dict )
+    for line_dct in already_in_leganto_dict_lines:
+        email_string = line_dct['Course Instructor Preferred Email']
+        emails: list = email_string.split( ';' )
+        stripped_emails = [ eml.strip() for eml in emails ]
+        line_dct['email_list'] = stripped_emails
     for i in range( 0, 5 ):
         log.debug( f'a few already_in_leganto_dict_lines[{i}], ``{already_in_leganto_dict_lines[i]}``' )
+    log.debug( f'already_in_leganto_dict_lines, ``{pprint.pformat(already_in_leganto_dict_lines)}``' )
     return already_in_leganto_dict_lines
 
     ## end def load_already_in_leganto_dict_lines()
