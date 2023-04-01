@@ -56,9 +56,9 @@ def main():
     assert validate_files.already_in_leganto_columns_valid( ALREADY_IN_LEGANTO_FILEPATH ) == True
 
     ## load "oit_data_01b.json" file --------------------------------
-    data_holder_dict = {}
+    source_data_holder_dict = {}
     with open( STEP_1p5_SOURCE_PATH, 'r' ) as f:
-        data_holder_dict = json.loads( f.read() )
+        source_data_holder_dict = json.loads( f.read() )
 
     ## initialize _meta_ data ----------------------------------------
     meta = {
@@ -66,7 +66,6 @@ def main():
         'number_of_courses_below': 0,
         'number_of_already_in_leganto_courses': 0,
         'number_of_already_in_leganto_courses_without_email': 0,
-        'number_of_courses_removed': 0,
         'OIT_courses_removed_count': 0,
         'OIT_courses_removed_list': [],
         }
@@ -78,20 +77,33 @@ def main():
     # log.debug( f'meta, ``{pprint.pformat(meta)}``' )
 
     ## run comparison ------------------------------------------------
-    # post_instructor_check_data_holder_dict = {}
-    # for i, item in enumerate( data_holder_dict.items() ):
-    #     course_code, data_lines = item
-    #     log.debug( f'processing course_code, ``{course_code}``' )
-    #     post_instructor_check_data_holder_dict[course_code] = []
-    #     for data_line in data_lines:
-    #         match_found = check_for_match( data_line, already_in_leganto_dict_lines )
-    #         if match_found == False:
-    #             post_instructor_check_data_holder_dict[course_code].append( data_line )
-    #         else:
-    #             meta['number_of_courses_removed'] += 1
-
-        
-
+    post_instructor_check_data_holder_dict = {}
+    for i, ( oit_course_code_key, data_value ) in enumerate( source_data_holder_dict.items() ):
+        if i < 5:
+            log.debug( f'oit_course_code_key, ``{oit_course_code_key}``' )
+            log.debug( f'data_value, ``{data_value}``' )
+        if oit_course_code_key == '__meta__':
+            log.debug( 'skipping `__meta__`' )
+            continue
+        ## get oit email-list ----------------------------------------
+        oit_email_list = data_value['oit_email_addresses']
+        ## check each OIT email-and-course against leganto data -----
+        match_found = False
+        for oit_email in oit_email_list:
+            match_found = check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lines )
+            if match_found == True:
+                meta['OIT_courses_removed_count'] += 1
+                meta['OIT_courses_removed_list'].append( course_code_key )
+                break
+        if match_found == True:
+            log.debug( 'continuing' )
+            continue
+        else:
+            log.debug( f'no match found, so adding course, ``{oit_course_code_key}`` -- to post_instructor_check_data_holder_dict' )
+            post_instructor_check_data_holder_dict[oit_course_code_key] = data_value
+    post_instructor_check_data_holder_dict['__meta__'] = meta
+    log.debug( f'post_instructor_check_data_holder_dict, ``{pprint.pformat(post_instructor_check_data_holder_dict)}``' )
+    
 
     1/0
 
@@ -187,7 +199,7 @@ def prep_already_in_leganto_dict_lines( already_in_leganto_lines ) -> list:
         line_dct['email_list'] = stripped_emails
     for i in range( 0, 5 ):
         log.debug( f'a few already_in_leganto_dict_lines[{i}], ``{already_in_leganto_dict_lines[i]}``' )
-    log.debug( f'already_in_leganto_dict_lines, ``{pprint.pformat(already_in_leganto_dict_lines)}``' )
+    # log.debug( f'already_in_leganto_dict_lines, ``{pprint.pformat(already_in_leganto_dict_lines)}``' )
     return already_in_leganto_dict_lines
 
     ## end def load_already_in_leganto_dict_lines()
