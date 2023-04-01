@@ -22,7 +22,7 @@ log.debug( 'logging ready' )
 ## update sys.path for project imports  -----------------------------
 PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
-from lib.common.validate_oit_file import is_utf8_encoded, is_tab_separated
+from lib.common.validate_files import is_utf8_encoded, is_tab_separated
 
 ## grab env vars ----------------------------------------------------
 OIT_COURSE_LIST_PATH: str = os.environ['LGNT__COURSES_FILEPATH']

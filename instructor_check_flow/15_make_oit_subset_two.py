@@ -25,7 +25,7 @@ sys.path.append( PROJECT_CODE_DIR )
 ## additional imports -----------------------------------------------
 from instructor_check_flow import common as instructor_common
 from lib.common import query_ocra
-from lib.common import validate_oit_file
+from lib.common import validate_files
 
 ## grab env vars ----------------------------------------------------
 CSV_OUTPUT_DIR_PATH: str = os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
@@ -46,8 +46,8 @@ def main():
         Called by if __name__ == '__main__' """
 
     ## validate oit-subset-01 file ----------------------------------
-    assert validate_oit_file.is_utf8_encoded(OIT_SUBSET_01_SOURCE_PATH) == True
-    assert validate_oit_file.is_tab_separated(OIT_SUBSET_01_SOURCE_PATH) == True
+    assert validate_files.is_utf8_encoded(OIT_SUBSET_01_SOURCE_PATH) == True
+    assert validate_files.is_tab_separated(OIT_SUBSET_01_SOURCE_PATH) == True
 
     ## load oit-subset-01 file --------------------------------------
     lines = []
