@@ -102,6 +102,10 @@ def main():
         else:
             log.debug( f'no match found, so adding course, ``{oit_course_code_key}`` -- to post_instructor_check_data_holder_dict' )
             post_instructor_check_data_holder_dict[oit_course_code_key] = data_value
+
+    ## update meta ---------------------------------------------------
+    meta['number_of_courses_originally'] = len( source_data_holder_dict.keys() ) - 1        # -1 for `__meta__`
+    meta['number_of_courses_below'] = len( post_instructor_check_data_holder_dict.keys() )  # no need to exclude `__meta__`, because it hasn't been added yet
     post_instructor_check_data_holder_dict['__meta__'] = meta
     log.debug( f'post_instructor_check_data_holder_dict, ``{pprint.pformat(post_instructor_check_data_holder_dict)}``' )
 
