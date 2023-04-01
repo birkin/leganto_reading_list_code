@@ -1,6 +1,15 @@
 """
-This script creates a subset of "oit_subset_01.tsv" which will be called "oit_subset_02.tsv".
-- it will contain courses from "oit_subset_01.tsv" that are not in the "in_leganto.tsv" file.
+This script:
+- loads the "oit_data_01b.json" into a data-holder-dict.
+- produces a subset of the data-holder-dict -- "oit_subset_02.tsv" -- which will be used to create reading-lists.
+
+The logic...
+- If there is an OIT course with OIT-instructor-X -- and that OIT course is not in Leganto -- I _WILL_ try to create an OCRA reading-list.
+- If there is an OIT course with OIT-instructor-X -- and that OIT course is in Leganto (one or more times), but none of the Leganto course-entries are with instructor-X -- I _WILL_ try to create an OCRA reading-list.
+- If there is an OIT course with OIT-instructor-X and that OIT course is in Leganto with instructor-X -- I _WILL-NOT_ try to create an OCRA reading-list.
+
+Another way of saying this...
+The new subset file will remove courses from the original subset file if the course is already in Leganto with the same instructor.
 """
 
 import json, logging, os, pprint, sys
@@ -20,21 +29,22 @@ PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
 
 ## additional imports -----------------------------------------------
-from instructor_check_flow import common as instructor_common
-from lib.common import query_ocra
-from lib.common import validate_oit_file
+# from instructor_check_flow import common as instructor_common
+# from lib.common import query_ocra
+# from lib.common import validate_oit_file
 
 ## grab env vars ----------------------------------------------------
-CSV_OUTPUT_DIR_PATH: str = os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
+JSON_DATA_DIR_PATH: str = os.environ['LGNT__JSON_DATA_DIR_PATH']
 ALREADY_IN_LEGANTO_FILEPATH: str = os.environ['LGNT__ALREADY_IN_LEGANTO_FILEPATH']
-log.debug( f'CSV_OUTPUT_DIR_PATH, ``{CSV_OUTPUT_DIR_PATH}``' )
+log.debug( f'JSON_DATA_DIR_PATH, ``{JSON_DATA_DIR_PATH}``')
 log.debug( f'ALREADY_IN_LEGANTO_FILEPATH, ``{ALREADY_IN_LEGANTO_FILEPATH}``')
 
 ## constants --------------------------------------------------------
-OIT_SUBSET_01_SOURCE_PATH = f'{CSV_OUTPUT_DIR_PATH}/oit_subset_01.tsv'
-OIT_SUBSET_02_OUTPUT_PATH = f'{CSV_OUTPUT_DIR_PATH}/oit_subset_02.tsv'
-log.debug( f'OIT_SUBSET_01_SOURCE_PATH, ``{OIT_SUBSET_01_SOURCE_PATH}``' )
-log.debug( f'OIT_SUBSET_02_OUTPUT_PATH, ``{OIT_SUBSET_02_OUTPUT_PATH}``' )
+STEP_1p5_SOURCE_PATH = f'{JSON_DATA_DIR_PATH}/oit_data_01b.json'
+STEP_2p0_OUTPUT_PATH = f'{JSON_DATA_DIR_PATH}/oit_data_02.json'
+log.debug( f'STEP_1p5_SOURCE_PATH, ``{STEP_1p5_SOURCE_PATH}``' )
+log.debug( f'STEP_2p0_OUTPUT_PATH, ``{STEP_2p0_OUTPUT_PATH}``' )
+
 
 ## controller -------------------------------------------------------
 
