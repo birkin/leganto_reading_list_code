@@ -21,7 +21,7 @@ sys.path.append( PROJECT_CODE_DIR )
 
 ## additional imports -----------------------------------------------
 from lib.common.query_ocra import get_class_id_entries
-from lib.common.validate_oit_file import is_utf8_encoded, is_tab_separated, columns_are_valid
+from lib.common.validate_files import is_utf8_encoded, is_tab_separated, columns_are_valid
 
 ## grab env vars ----------------------------------------------------
 CSV_OUTPUT_DIR_PATH: str = os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
