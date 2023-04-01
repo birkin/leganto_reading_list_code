@@ -64,6 +64,7 @@ def main():
     meta = {
         'description': 'Removes courses from "oit_data_01b.json" if the course is already in Leganto with the same instructor. Saves result as "oit_data_02.json".',
         'number_of_courses_below': 0,
+        'number_of_courses_originally': 0,
         'number_of_already_in_leganto_courses': 0,
         'number_of_already_in_leganto_courses_without_email': 0,
         'OIT_courses_removed_count': 0,
