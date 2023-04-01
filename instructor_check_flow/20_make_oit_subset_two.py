@@ -109,41 +109,9 @@ def main():
     post_instructor_check_data_holder_dict['__meta__'] = meta
     log.debug( f'post_instructor_check_data_holder_dict, ``{pprint.pformat(post_instructor_check_data_holder_dict)}``' )
 
-
-    1/0
-
-
-    ## make subset --------------------------------------------------
-    for i, data_line in enumerate( data_lines ):
-        course_code_dict = instructor_common.parse_course_code( data_line, i )
-        match_try_1 = f'%s.%s' % ( course_code_dict['course_code_department'], course_code_dict['course_code_number'] )
-        match_try_2 = f'%s %s' % ( course_code_dict['course_code_department'], course_code_dict['course_code_number'] )
-        # log.debug( f'processing data_line, ``{data_line}``' )
-        # log.debug( f'match_try_1, ``{match_try_1}``' )
-        # log.debug( f'match_try_2, ``{match_try_2}``' )
-        ## check if course is already in leganto --------------------
-        match_found = False
-        for leganto_line in already_in_leganto_lines:
-            # log.debug( f'checking leganto_line, ``{leganto_line}`` on match_tries ``{match_try_1}`` and ``{match_try_2}``' )
-            if match_try_1 in leganto_line:
-                log.debug( f'found match on ``{match_try_1}`` for leganto_line, ``{leganto_line}``' )
-                match_found = True
-                break
-            elif match_try_2 in leganto_line:
-                log.debug( f'found match on ``{match_try_2}`` for leganto_line, ``{leganto_line}``' )
-                match_found = True
-                break
-        if match_found == False:
-            new_subset_lines.append( data_line )
-    # log.debug( f'new_subset_lines, ``{pprint.pformat(new_subset_lines)}``' )
-    log.debug( f'len(original subset lines), ``{len(lines)}``' )
-    log.debug( f'len(new_subset_lines), ``{len(new_subset_lines)}``' )
-
-    ## write oit_subset_02 to file -----------------------------
-    with open( OIT_SUBSET_02_OUTPUT_PATH, 'w' ) as f:
-        f.write( heading_line )
-        for line in new_subset_lines:
-            f.write( line )
+    ## save "oit_data_02.json" file ----------------------------------
+    with open( STEP_2p0_OUTPUT_PATH, 'w' ) as f:
+        f.write( json.dumps( post_instructor_check_data_holder_dict, sort_keys=True, indent=2 ) )
 
     ## end def main() 
 
