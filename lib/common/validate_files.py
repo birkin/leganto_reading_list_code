@@ -1,6 +1,4 @@
-""" Validates that OIT file is tab-delimted, and that it is also encoded as utf-8. 
-    Based on ChatGPT, 2023-Feb-28, prompt:
-    "Write a python script that could validate that a file is both comma-separated and encoded as UTF-8." """
+""" Validates encoding, delimiter, and column-names of files. """
     
 import csv, logging, os
 
@@ -37,7 +35,7 @@ def is_tab_separated(file_path):
         return delimiter_is_tab
 
 
-def columns_are_valid( file_path ):
+def OIT_columns_are_valid( file_path: str ) -> bool:
     line = ''
     with open( file_path, 'r' ) as f:
         line = f.readline()
@@ -52,3 +50,31 @@ def columns_are_valid( file_path ):
         column_check = False
     log.debug( f'column_check, ``{column_check}``' )
     return column_check
+
+def already_in_leganto_columns_valid( filepath: str ) -> bool:
+    """ Ensures tsv file is as expected.
+        Called by main() """
+    check_result = False
+    line = ''
+    with open( filepath, 'r' ) as f:
+        line = f.readline()
+    parts = line.split( '\t' )
+    stripped_parts = [ part.strip() for part in parts ]
+    log.debug( f'stripped_parts, ``{stripped_parts}``' )
+    if stripped_parts == [
+        'Reading List Id', 
+        'Reading List Owner', 
+        'Academic Department', 
+        'Reading List Code',                        # when good, like: "brown.pols.1420.2023-spring.s01"
+        'Reading List Name',                        # sometimes contains strings, eg: "HIST 1120" or "ENVS1232"
+        'Course Code',                              # sometimes contains the `Reading List Code` value, or a string-segment like "EAST 0141"
+        'Course Section', 
+        'Course Name', 
+        'Course Instructor', 
+        'Course Instructor Identifier', 
+        'Course Instructor With Primary Identifier', 
+        'Course Instructor Preferred Email'         # if not empty, contains one email-address, or multiple email-addresses, separated by a semi-colon.
+        ]:
+        check_result = True
+    log.debug( f'check_result, ``{check_result}``' )
+    return check_result
