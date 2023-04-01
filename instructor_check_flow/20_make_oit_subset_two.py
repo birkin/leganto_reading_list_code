@@ -93,7 +93,7 @@ def main():
             match_found = check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lines )
             if match_found == True:
                 meta['OIT_courses_removed_count'] += 1
-                meta['OIT_courses_removed_list'].append( course_code_key )
+                meta['OIT_courses_removed_list'].append( oit_course_code_key )
                 break
         if match_found == True:
             log.debug( 'continuing' )
@@ -103,7 +103,7 @@ def main():
             post_instructor_check_data_holder_dict[oit_course_code_key] = data_value
     post_instructor_check_data_holder_dict['__meta__'] = meta
     log.debug( f'post_instructor_check_data_holder_dict, ``{pprint.pformat(post_instructor_check_data_holder_dict)}``' )
-    
+
 
     1/0
 
@@ -216,6 +216,31 @@ def update_meta_with_already_in_leganto_data( already_in_leganto_dict_lines: lis
     return
     # log.debug( f'meta, ``{pprint.pformat(meta)}``' )
 
+
+def check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lines ):
+    """ Returns True if match found, else False.
+        Called by main(). """
+    dept_part = oit_course_code_key.split( '.' )[0]
+    num_part = oit_course_code_key.split( '.' )[1]
+    match_try_1 = f'%s.%s' % ( dept_part, num_part )
+    match_try_2 = f'%s %s' % ( dept_part, num_part )
+    match_try_3 = f'%s%s' % ( dept_part, num_part )
+    course_code_and_instructor_match_found_result = False
+    for leganto_item in already_in_leganto_dict_lines:
+        course_code_match_found = False
+        if match_try_1 in leganto_item['Reading List Code'] or match_try_1 in leganto_item['Reading List Name'] or match_try_1 in leganto_item['Course Code']:
+            course_code_match_found = True
+        elif match_try_2 in leganto_item['Reading List Code'] or match_try_2 in leganto_item['Reading List Name'] or match_try_2 in leganto_item['Course Code']:
+            course_code_match_found = True
+        elif match_try_3 in leganto_item['Reading List Code'] or match_try_3 in leganto_item['Reading List Name'] or match_try_3 in leganto_item['Course Code']:
+            course_code_match_found = True
+        if course_code_match_found:
+            leganto_email_addresses = leganto_item['email_list']
+            if oit_email in leganto_email_addresses:
+                course_code_and_instructor_match_found_result = True
+                break
+    log.debug( f'course_code_and_instructor_match_found_result, ``{course_code_and_instructor_match_found_result}``' )
+    return course_code_and_instructor_match_found_result
 
 ## entry point ------------------------------------------------------
 
