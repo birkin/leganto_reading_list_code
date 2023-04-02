@@ -96,6 +96,8 @@ output-file: "json_data/oit_data_04.json"
 
 description:
 - For each remaining course: this step queries ocra on each class_id to get reading-list-data.
+- It queries OCRA on article, audio, book, ebook, excerpt, tracks, video, and website results.
+- Courses that have no reading-list-data are removed.
 
 ---
 
@@ -104,7 +106,7 @@ description:
 
 script: "instructor_check_flow/50_create_reading_lists.py"
 
-source-file: "json_data/oit_data_03.json"
+source-file: "json_data/oit_data_04.json"
 
 output-files: "csv_output/get-reading-list-pattern.tsv"
 
