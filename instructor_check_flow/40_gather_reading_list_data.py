@@ -154,7 +154,7 @@ def main():
     ## delete no-ocra-match courses ---------------------------------
     for course_key in meta['courses_with_no_ocra_data']:
         del updated_data_holder_dict[course_key]
-    meta['number_of_courses_below'] = len( updated_data_holder_dict )
+    meta['number_of_courses_below'] = len( updated_data_holder_dict ) - 1 # -1 for meta
 
     log.debug( f'updated_data_holder_dict, ``{pprint.pformat(updated_data_holder_dict)}``' )
 
