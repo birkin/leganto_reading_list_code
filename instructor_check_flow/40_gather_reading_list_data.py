@@ -21,8 +21,7 @@ PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
 
 ## additional imports -----------------------------------------------
-from lib.common.query_ocra import get_class_id_entries
-# from lib.common.validate_files import is_utf8_encoded, is_tab_separated, columns_are_valid
+from lib import readings_extractor, readings_processor
 
 ## grab env vars ----------------------------------------------------
 JSON_DATA_DIR_PATH: str = os.environ['LGNT__JSON_DATA_DIR_PATH']
@@ -53,33 +52,50 @@ def main():
         }
     
     ## process courses ----------------------------------------------
+    updated_data_holder_dict = {}
     for ( i, (course_key, course_data_dict) ) in enumerate( data_holder_dict.items() ):
         log.debug( f'processing course_key, ``{course_key}``')
         if course_key == '__meta__':
             continue
-        # log.debug( f'i, ``{i}``')
-        # log.debug( f'course_key, ``{course_key}``' )
-        # log.debug( f'course_data_dict, ``{pprint.pformat(course_data_dict)}``' )
-        ## get class_ids ---------------------------------------------
-        relevant_course_classids = []
-        for ( class_id_key, email_val ) in course_data_dict['ocra_class_id_to_instructor_email_map_for_matches']:
-            relevant_course_classids.append( class_id_key )
+        ## add basic course data to new data-holder -----------------
+        basic_course_data = {
+            'ocra_class_id_to_instructor_email_map_for_matches': course_data_dict['ocra_class_id_to_instructor_email_map_for_matches'],
+            'oit_bruid_to_email_map': course_data_dict['oit_bruid_to_email_map'],
+            'oit_course_id': course_data_dict['oit_course_id'],
+            'oit_course_title': course_data_dict['oit_course_title'],
+            'status': 'not_yet_processed',
+        }
+        updated_data_holder_dict[course_key] = basic_course_data
+        ## switch to new data-holder --------------------------------
+        course_data_dict = updated_data_holder_dict[course_key]
+        ## add inverted email-match map -----------------------------
+        existing_classid_to_email_map = course_data_dict['ocra_class_id_to_instructor_email_map_for_matches']
+        inverted_ocra_classid_email_map = make_inverted_ocra_classid_email_map( existing_classid_to_email_map )
+        course_data_dict['inverted_ocra_classid_email_map'] = inverted_ocra_classid_email_map
+        log.debug( f'course_data_dict, ``{pprint.pformat(course_data_dict)}``' )
 
-        ## ocra book data -------------------------------------------
-        book_results: list = readings_extractor.get_book_readings( class_id )
-        ## ocra all-artcles data ------------------------------------
-        all_articles_results: list = readings_extractor.get_all_articles_readings( class_id )
-        ## ocra filtered article data -------------------------------
-        filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
-        article_results = filtered_articles_results['article_results']
-        audio_results = filtered_articles_results['audio_results']          # from article-table; TODO rename
-        ebook_results = filtered_articles_results['ebook_results'] 
-        excerpt_results = filtered_articles_results['excerpt_results']
-        video_results = filtered_articles_results['video_results']          
-        website_results = filtered_articles_results['website_results']      
-        log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
-        ## ocra tracks data -----------------------------------------
-        tracks_results: list = readings_extractor.get_tracks_data( class_id )
+        # ## get class_ids --------------------------------------------
+        # relevant_course_classids = []
+        # for ( class_id_key, email_val ) in course_data_dict['ocra_class_id_to_instructor_email_map_for_matches'].items():
+        #     relevant_course_classids.append( class_id_key )
+        #     ## process class_ids ------------------------------------
+        #     all_results = []
+        #     for class_id in relevant_course_classids:
+        #         ## ocra book data -------------------------------------------
+        #         book_results: list = readings_extractor.get_book_readings( class_id )
+        #         ## ocra all-artcles data ------------------------------------
+        #         all_articles_results: list = readings_extractor.get_all_articles_readings( class_id )
+        #         ## ocra filtered article data -------------------------------
+        #         filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
+        #         article_results = filtered_articles_results['article_results']
+        #         audio_results = filtered_articles_results['audio_results']          # from article-table; TODO rename
+        #         ebook_results = filtered_articles_results['ebook_results'] 
+        #         excerpt_results = filtered_articles_results['excerpt_results']
+        #         video_results = filtered_articles_results['video_results']          
+        #         website_results = filtered_articles_results['website_results']      
+        #         log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
+        #         ## ocra tracks data -----------------------------------------
+        #         tracks_results: list = readings_extractor.get_tracks_data( class_id )
 
         if i > 2:
             break
@@ -96,6 +112,33 @@ def main():
     return
 
     ## end main()
+
+
+## helper functions ---------------------------------------------
+
+
+def make_inverted_ocra_classid_email_map( existing_classid_to_email_map ) -> dict:
+    """ Converts `existing_classid_to_email_map` to `inverted_ocra_classid_email_map
+        Takes a dict like:
+            {   '10638': 'person_A@brown.edu',
+                '8271': 'person_A@brown.edu',
+                '8500': 'person_B@brown.edu'
+                '8845': 'person_A@brown.edu' }
+        ...and returns a dict like:
+            {   'person_A@brown.edu': '10638',
+                'person_B@brown.edu': '8500'  }
+        Allows for multiple class_ids per email, and returns the highest (latest) class_id. 
+        Called by main() """
+    ## convert keys to integers and sort them -----------------------
+    int_keys = sorted( [int(key) for key in existing_classid_to_email_map.keys()] )
+    temp_int_dict = {}
+    for key in int_keys:
+        temp_int_dict[key] = existing_classid_to_email_map[str(key)]
+    inverted_ocra_classid_email_map = {}
+    for ( class_id_key, email_val ) in temp_int_dict.items():
+        inverted_ocra_classid_email_map[email_val] = str( class_id_key )
+    log.debug( f'inverted_ocra_classid_email_map, ``{pprint.pformat(inverted_ocra_classid_email_map)}``' )
+    return inverted_ocra_classid_email_map
 
 
 if __name__ == '__main__':
