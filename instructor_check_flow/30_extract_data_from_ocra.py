@@ -51,16 +51,11 @@ def main():
         'datetime_stamp': datetime.datetime.now().isoformat(),
         'description': 'Starts with "oit_data_02.json". Produces "oit_data_03.json". Adds "ocra_class_ids" list to each entry. Removes OIT courses that have no class_ids.',
         'number_of_courses_below': 0,
-        'number_of_courses_originally': 0,
-        'OIT_courses_removed_count': 0,
-        'OIT_courses_removed_list': [],
+        'number_of_courses_originally': len( data_holder_dict.items() ) - 1,  # -1 for the '__meta__' entry
+        'oit_courses_removed_count': 0,
+        'oit_courses_removed_list': [],
         }
     ## get class_ids from ocra --------------------------------------
-    count_items = len( data_holder_dict.items() )
-    oit_courses_processed = 0  
-    count_ocra_courses_with_classes = 0
-    count_ocra_courses_without_classes = 0
-    list_of_found_oit_courses = []
     for ( i, (course_key, course_data_dict) ) in enumerate( data_holder_dict.items() ):
         log.debug( f'processing course_key, ``{course_key}``')
         if course_key == '__meta__':
@@ -76,16 +71,16 @@ def main():
         data_holder_dict[course_key]['ocra_class_ids'] = class_ids
         ## update meta-counts ---------------------------------------
         if len(class_ids) == 0:
-            meta['OIT_courses_removed_count'] += 1
-            meta['OIT_courses_removed_list'].append( course_key )
-        if i > 2:
-            break
-    # log.debug( f'data_holder_dict after class_ids update, ``{pprint.pformat(data_holder_dict)}``' )
-    # log.debug( f'count_ocra_courses_with_classes, ``{count_ocra_courses_with_classes}``' )
-    # log.debug( f'count_ocra_courses_without_classes, ``{count_ocra_courses_without_classes}``' )
-    # log.debug( f'oit_courses_processed, ``{oit_courses_processed}``')
-    # log.debug( f'list_of_found_oit_courses, ``{pprint.pformat(list_of_found_oit_courses)}``' )
-    # assert count_ocra_courses_with_classes + count_ocra_courses_without_classes == oit_courses_processed
+            log.debug( f'course_key, ``{course_key}`` has no class_ids' )
+            meta['oit_courses_removed_count'] += 1
+            meta['oit_courses_removed_list'].append( course_key )
+        # if i > 2:
+        #     break
+
+    ## remove OIT courses that have no class_ids --------------------
+    for course_key in meta['oit_courses_removed_list']:
+        del data_holder_dict[course_key]
+    meta['number_of_courses_below'] = len( data_holder_dict.items() ) - 1  # -1 for the '__meta__' entry
 
     ## update meta --------------------------------------------------
     data_holder_dict['__meta__'] = meta
@@ -98,9 +93,6 @@ def main():
     return
 
     ## end main()
-
-
-## helper functions -------------------------------------------------
 
 
 if __name__ == '__main__':
