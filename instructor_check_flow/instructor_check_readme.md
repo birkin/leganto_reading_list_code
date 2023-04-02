@@ -70,7 +70,6 @@ description:
 
 # Step 3b -- get OCRA emails
 
-HEREZZ
 script: "instructor_check_flow/35_get_ocra_emails.py"
 
 source-file: "json_data/oit_data_03.json"
@@ -80,11 +79,16 @@ output-file: "json_data/oit_data_03b.json"
 description:
 - For each remaining OIT course, this script queries OCRA on all the course's "class_ids" to get the OCRA email-address for the class_id.
 - courses where there is no match between any of the OIT instructors and OCRA instructors are removed.
+    - You can see the courses removed in the __meta__ section "oit_courses_removed_list".
+    - A course is removed if there is no match between the "oit_email_addresses" and the "ocra_class_id_to_instructor_email_map" fields.
+- Reading-list lookups will be done on the class-ids in the "ocra_class_id_to_instructor_email_map_for_matches" field.
 
 ---
 
 
 # Step 4 -- gather reading-list-data
+
+HEREZZ
 
 script: "instructor_check_flow/40_get_reading_list_data.py"
 
