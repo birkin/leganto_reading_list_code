@@ -93,8 +93,8 @@ def main():
                 if ocra_instructor_email == oit_email:
                     ocra_class_id_to_instructor_email_map_for_matches[class_id] = ocra_instructor_email
         data_holder_dict[course_key]['ocra_class_id_to_instructor_email_map_for_matches'] = ocra_class_id_to_instructor_email_map_for_matches
-        if i > 2:
-            break
+        # if i > 2:
+        #     break
 
     ## remove courses that have no matches --------------------------
     filtered_data_holder_dict = {}
@@ -108,8 +108,8 @@ def main():
             removal_dict = { course_key: course_data_dict }
             meta['oit_courses_removed_list'].append( removal_dict )
             meta['oit_courses_removed_count'] += 1
-        if i > 2:
-            break
+        # if i > 2:
+        #     break
 
     ## update meta --------------------------------------------------
     meta['number_of_courses_originally'] = len( data_holder_dict.items() ) - 1  # -1 for the '__meta__' entry
