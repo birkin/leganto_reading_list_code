@@ -54,6 +54,9 @@ source-file: "json_data/oit_data_02.json"
 
 output-file: "json_data/oit_data_03.json"
 
+TODO:
+- After I see how to include instructor-data with the various OCRA queries, decide whether to include the instructor as part of the reading-list-data-queries --- or grab all reading-list-data, and then filter out non-relevant entries based on instructor. 
+
 description:
 - This step will query OCRA for each course in the data-holder-dict, and add the OCRA data to the data-holder-dict.
 - It will then remove any reading-list entries where the instructor is not one of the OIT-course instructors.
