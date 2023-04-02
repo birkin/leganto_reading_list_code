@@ -16,6 +16,7 @@ The output-file will be used as the source-file for the next 'create data-holder
 
 ---
 
+
 # Step 1b -- create data-holder-dict
 
 script: "instructor_check_flow/15_make_oit_subset_two.py"
@@ -31,6 +32,7 @@ description:
 - The output-file will be used as the source-file for the next 'Leganto lookup' step.
 
 ---
+
 
 # Step 2 -- Leganto lookup
 
@@ -48,30 +50,44 @@ description:
 
 ---
 
-# Step 3 -- OCRA lookups
+
+# Step 3 -- OCRA class_id lookups
 
 script: "instructor_check_flow/30_extract_data_from_ocra.py"
-
-HEREZZ
 
 source-file: "json_data/oit_data_02.json"
 
 output-file: "json_data/oit_data_03.json"
 
-TODO:
-- After I see how to include instructor-data with the various OCRA queries, decide whether to include the instructor as part of the reading-list-data-queries --- or grab all reading-list-data, and then filter out non-relevant entries based on instructor. 
-
 description:
-- This step will query OCRA for each course in the data-holder-dict, and add the OCRA data to the data-holder-dict.
-- It will then remove any reading-list entries where the instructor is not one of the OIT-course instructors.
-- It will then remove any course without any reading-list data.
+- This step queries ocra for each remaining OIT course to get "class_ids".
+- Courses with no class_ids are removed.
+- The class_ids will be used in the next step to get reading-list-data.
+
 
 ---
 
 
-# Step 4 -- Create reading-lists
+# Step 4 -- gather reading-list-data
 
-script: "instructor_check_flow/40_create_reading_lists.py"
+script: "instructor_check_flow/40_get_reading_list_data.py"
+
+source-file: "json_data/oit_data_03.json"
+
+output-file: "json_data/oit_data_04.json"
+
+description:
+- This step queries ocra on each class_id to get reading-list-data.
+
+TODO:
+- After I see how to include instructor-data with the various OCRA queries, decide whether to include the instructor as part of the reading-list-data-queries --- or grab all reading-list-data, and then filter out non-relevant entries based on instructor. 
+
+---
+
+
+# Step 5 -- Create reading-list files
+
+script: "instructor_check_flow/50_create_reading_lists.py"
 
 source-file: "json_data/oit_data_03.json"
 
