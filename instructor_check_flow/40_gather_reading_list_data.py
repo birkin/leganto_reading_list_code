@@ -73,29 +73,28 @@ def main():
         inverted_ocra_classid_email_map = make_inverted_ocra_classid_email_map( existing_classid_to_email_map )
         course_data_dict['inverted_ocra_classid_email_map'] = inverted_ocra_classid_email_map
         log.debug( f'course_data_dict, ``{pprint.pformat(course_data_dict)}``' )
+        ## get class_ids --------------------------------------------
+        relevant_course_classids = inverted_ocra_classid_email_map.values()
+        log.debug( f'relevant_course_classids, ``{pprint.pformat(relevant_course_classids)}``' )
 
-        # ## get class_ids --------------------------------------------
-        # relevant_course_classids = []
-        # for ( class_id_key, email_val ) in course_data_dict['ocra_class_id_to_instructor_email_map_for_matches'].items():
-        #     relevant_course_classids.append( class_id_key )
-        #     ## process class_ids ------------------------------------
-        #     all_results = []
-        #     for class_id in relevant_course_classids:
-        #         ## ocra book data -------------------------------------------
-        #         book_results: list = readings_extractor.get_book_readings( class_id )
-        #         ## ocra all-artcles data ------------------------------------
-        #         all_articles_results: list = readings_extractor.get_all_articles_readings( class_id )
-        #         ## ocra filtered article data -------------------------------
-        #         filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
-        #         article_results = filtered_articles_results['article_results']
-        #         audio_results = filtered_articles_results['audio_results']          # from article-table; TODO rename
-        #         ebook_results = filtered_articles_results['ebook_results'] 
-        #         excerpt_results = filtered_articles_results['excerpt_results']
-        #         video_results = filtered_articles_results['video_results']          
-        #         website_results = filtered_articles_results['website_results']      
-        #         log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
-        #         ## ocra tracks data -----------------------------------------
-        #         tracks_results: list = readings_extractor.get_tracks_data( class_id )
+        ## process relevant class_ids ------------------------------------
+        all_results = []
+        for class_id in relevant_course_classids:
+            ## ocra book data -------------------------------------------
+            book_results: list = readings_extractor.get_book_readings( class_id )
+            ## ocra all-artcles data ------------------------------------
+            all_articles_results: list = readings_extractor.get_all_articles_readings( class_id )
+            ## ocra filtered article data -------------------------------
+            filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
+            article_results = filtered_articles_results['article_results']
+            audio_results = filtered_articles_results['audio_results']          # from article-table; TODO rename
+            ebook_results = filtered_articles_results['ebook_results'] 
+            excerpt_results = filtered_articles_results['excerpt_results']
+            video_results = filtered_articles_results['video_results']          
+            website_results = filtered_articles_results['website_results']      
+            log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
+            ## ocra tracks data -----------------------------------------
+            tracks_results: list = readings_extractor.get_tracks_data( class_id )
 
         if i > 2:
             break
