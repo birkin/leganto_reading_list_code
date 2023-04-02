@@ -70,3 +70,26 @@ def get_class_id_entries( course_department_code: str, course_number: str ) -> l
             log.debug( f'more than one class-id found for course_id, ``{course_department_code}.{course_number}``' )
     log.debug( f'class_id_list, ``{class_id_list}``' )
     return class_id_list
+
+
+def get_ocra_instructor_email_from_classid( class_id ):
+    """ Returns email address for given class_id.
+        Called by... instructor_check_flow/35_get_ocra_instructor_emails.py """
+    ## run query to get email address -------------------------------
+    db_connection: pymysql.connections.Connection = db_stuff.get_db_connection()  # connection configured to return rows in dictionary format
+    sql = f"SELECT classes.classid, instructors.facultyid, instructors.email FROM reserves.classes, reserves.instructors WHERE classes.facultyid = instructors.facultyid AND classid = {class_id}"
+    log.debug( f'sql, ``{sql}``' )
+    result_set: list = []
+    with db_connection:
+        with db_connection.cursor() as db_cursor:
+            db_cursor.execute( sql )
+            result_set = list( db_cursor.fetchall() )  # list() only needed for pylance type-checking
+            assert type(result_set) == list
+    log.debug( f'result_set, ``{result_set}``' )
+    emails = []
+    for entry in result_set:
+        email = entry.get( 'email', None )
+        if email:
+            emails.append( email )
+    log.debug( f'emails, ``{emails}``' )
+    return emails
