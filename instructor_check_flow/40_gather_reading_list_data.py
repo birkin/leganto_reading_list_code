@@ -78,8 +78,11 @@ def main():
         log.debug( f'relevant_course_classids, ``{pprint.pformat(relevant_course_classids)}``' )
 
         ## process relevant class_ids ------------------------------------
-        all_results = []
+        all_course_results = {}
         for class_id in relevant_course_classids:
+            ## ------------------------------------------------------
+            ## GET OCRA DATA ----------------------------------------
+            ## ------------------------------------------------------            
             ## ocra book data -------------------------------------------
             book_results: list = readings_extractor.get_book_readings( class_id )
             ## ocra all-artcles data ------------------------------------
@@ -96,9 +99,55 @@ def main():
             ## ocra tracks data -----------------------------------------
             tracks_results: list = readings_extractor.get_tracks_data( class_id )
 
+            ## combine results ------------------------------------------
+            classid_results = {
+                'book_results': book_results,
+                'article_results': article_results,
+                'audio_results': audio_results,
+                'ebook_results': ebook_results,
+                'excerpt_results': excerpt_results,
+                'video_results': video_results,
+                'website_results': website_results,
+                'tracks_results': tracks_results,
+            }
+            all_course_results[class_id] = classid_results
+
+
+            # ## ------------------------------------------------------
+            # ## MAP OCRA DATA TO LEGANTO DATA ------------------------           
+            # ## ------------------------------------------------------
+            # ## leganto article data ---------------------------------
+            # leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            # ## leganto audio data (from article-table) --------------
+            # leg_audios: list = readings_processor.map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            # ## leganto book data ------------------------------------            
+            # leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+            # ## leganto ebook data -----------------------------------
+            # leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            # ## leganto excerpt data ---------------------------------
+            # leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            # ## leganto video data -----------------------------------
+            # leg_videos: list = readings_processor.map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            # ## leganto website data ---------------------------------
+            # leg_websites: list = readings_processor.map_websites( website_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
+            # ## leganto tracks data ----------------------------------
+            # leg_tracks: list = readings_processor.map_tracks( tracks_results, course_id, leganto_course_id, leganto_section_id, leganto_course_title )
+            # ## leganto combined data --------------------------------
+            # # all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites + leg_audios + leg_videos
+            # # all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_videos + leg_websites  
+            # all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_tracks + leg_videos + leg_websites  
+            # if all_course_results == []:
+            #     all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+
+        course_data_dict['ocra_course_data'] = all_course_results
+        # log.debug( f'ocra_course_data, ``{pprint.pformat(course_data_dict["ocra_course_data"])}``')
+
         if i > 2:
             break
 
+    ## end for loop
+
+    log.debug( f'updated_data_holder_dict, ``{pprint.pformat(updated_data_holder_dict)}``' )
 
     ## update meta --------------------------------------------------
     data_holder_dict['__meta__'] = meta
