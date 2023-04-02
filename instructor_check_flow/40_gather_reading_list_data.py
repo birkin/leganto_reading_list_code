@@ -21,7 +21,7 @@ PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
 
 ## additional imports -----------------------------------------------
-from lib import readings_extractor, readings_processor
+from lib import readings_extractor
 
 ## grab env vars ----------------------------------------------------
 JSON_DATA_DIR_PATH: str = os.environ['LGNT__JSON_DATA_DIR_PATH']
@@ -48,11 +48,14 @@ def main():
     meta = {
         'datetime_stamp': datetime.datetime.now().isoformat(),
         'description': 'Starts with "oit_data_03b.json". Produces "oit_data_04.json". Extracts reading-list data from ocra database for each class_id.',
+        'number_of_courses_originally': len( data_holder_dict ) - 1, # -1 for meta
         'number_of_courses_below': 0,
+        'courses_with_no_ocra_data': [],
         }
     
     ## process courses ----------------------------------------------
     updated_data_holder_dict = {}
+    updated_data_holder_dict['__meta__'] = meta
     for ( i, (course_key, course_data_dict) ) in enumerate( data_holder_dict.items() ):
         log.debug( f'processing course_key, ``{course_key}``')
         if course_key == '__meta__':
@@ -85,19 +88,42 @@ def main():
             ## ------------------------------------------------------            
             ## ocra book data -------------------------------------------
             book_results: list = readings_extractor.get_book_readings( class_id )
+            if book_results:
+                for book_result in book_results:
+                    if book_result['bk_updated']:
+                        book_result['bk_updated'] = book_result['bk_updated'].isoformat()
+                    if book_result['request_date']:
+                        book_result['request_date'] = book_result['request_date'].isoformat()
+                    if book_result['needed_by']:
+                        book_result['needed_by'] = book_result['needed_by'].isoformat()
+                    if book_result['date_printed']:
+                        book_result['date_printed'] = book_result['date_printed'].isoformat()
             ## ocra all-artcles data ------------------------------------
             all_articles_results: list = readings_extractor.get_all_articles_readings( class_id )
             ## ocra filtered article data -------------------------------
-            filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
+            filtered_articles_results: dict = filter_article_table_results(all_articles_results)
+            for type_key, result_value in filtered_articles_results.items():
+                if result_value:
+                    for result in result_value:
+                        if result['art_updated']:
+                            result['art_updated'] = result['art_updated'].isoformat()
+                        if result['date']:
+                            result['date'] = result['date'].isoformat()
+                        if result['date_due']:
+                            result['date_due'] = result['date_due'].isoformat()
+                        if result['request_date']:
+                            result['request_date'] = result['request_date'].isoformat()
+                        if result['date_printed']:
+                            result['date_printed'] = result['date_printed'].isoformat()
             article_results = filtered_articles_results['article_results']
             audio_results = filtered_articles_results['audio_results']          # from article-table; TODO rename
             ebook_results = filtered_articles_results['ebook_results'] 
             excerpt_results = filtered_articles_results['excerpt_results']
             video_results = filtered_articles_results['video_results']          
             website_results = filtered_articles_results['website_results']      
-            log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
+            # log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
             ## ocra tracks data -----------------------------------------
-            tracks_results: list = readings_extractor.get_tracks_data( class_id )
+            tracks_results: list = readings_extractor.get_tracks_data( class_id )                
 
             ## combine results ------------------------------------------
             classid_results = {
@@ -112,49 +138,34 @@ def main():
             }
             all_course_results[class_id] = classid_results
 
-
-            # ## ------------------------------------------------------
-            # ## MAP OCRA DATA TO LEGANTO DATA ------------------------           
-            # ## ------------------------------------------------------
-            # ## leganto article data ---------------------------------
-            # leg_articles: list = readings_processor.map_articles( article_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto audio data (from article-table) --------------
-            # leg_audios: list = readings_processor.map_audio_files( audio_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto book data ------------------------------------            
-            # leg_books: list = readings_processor.map_books( book_results, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
-            # ## leganto ebook data -----------------------------------
-            # leg_ebooks: list = readings_processor.map_ebooks( ebook_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto excerpt data ---------------------------------
-            # leg_excerpts: list = readings_processor.map_excerpts( excerpt_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto video data -----------------------------------
-            # leg_videos: list = readings_processor.map_videos( video_results, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto website data ---------------------------------
-            # leg_websites: list = readings_processor.map_websites( website_results, course_id, leganto_course_id, cdl_checker, leganto_section_id, leganto_course_title, settings )
-            # ## leganto tracks data ----------------------------------
-            # leg_tracks: list = readings_processor.map_tracks( tracks_results, course_id, leganto_course_id, leganto_section_id, leganto_course_title )
-            # ## leganto combined data --------------------------------
-            # # all_course_results: list = leg_articles + leg_books + leg_ebooks + leg_excerpts + leg_websites + leg_audios + leg_videos
-            # # all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_videos + leg_websites  
-            # all_course_results: list = leg_articles + leg_audios + leg_books + leg_ebooks + leg_excerpts + leg_tracks + leg_videos + leg_websites  
-            # if all_course_results == []:
-            #     all_course_results: list = [ readings_processor.map_empty(leganto_course_id, leganto_section_id, leganto_course_title) ]
+            ## end for-class_id loop...
 
         course_data_dict['ocra_course_data'] = all_course_results
-        # log.debug( f'ocra_course_data, ``{pprint.pformat(course_data_dict["ocra_course_data"])}``')
+        ocra_data_found_check = check_for_ocra_data( all_course_results )
+        if ocra_data_found_check == False:
+            meta['courses_with_no_ocra_data'].append( course_key )
+        course_data_dict['status'] = 'processed'
 
-        if i > 2:
-            break
+        # if i > 2:
+        #     break
 
-    ## end for loop
+    ## end for-course loop...
+
+    ## delete no-ocra-match courses ---------------------------------
+    for course_key in meta['courses_with_no_ocra_data']:
+        del updated_data_holder_dict[course_key]
+    meta['number_of_courses_below'] = len( updated_data_holder_dict )
 
     log.debug( f'updated_data_holder_dict, ``{pprint.pformat(updated_data_holder_dict)}``' )
 
-    ## update meta --------------------------------------------------
-    data_holder_dict['__meta__'] = meta
-
-    ## save class_ids data ------------------------------------------
+    ## save ---------------------------------------------------------
     with open( JSON_DATA_OUTPUT_PATH, 'w' ) as f:
-        jsn = json.dumps( data_holder_dict, sort_keys=True, indent=2 )
+        try:
+            jsn = json.dumps( updated_data_holder_dict, sort_keys=True, indent=2 )
+        except Exception as e:
+            message = f'problem with json.dumps(); e, ``{e}``'
+            log.exception( message )
+            raise Exception( message )
         f.write( jsn )
 
     return
@@ -187,6 +198,67 @@ def make_inverted_ocra_classid_email_map( existing_classid_to_email_map ) -> dic
         inverted_ocra_classid_email_map[email_val] = str( class_id_key )
     log.debug( f'inverted_ocra_classid_email_map, ``{pprint.pformat(inverted_ocra_classid_email_map)}``' )
     return inverted_ocra_classid_email_map
+
+
+def filter_article_table_results( all_articles_results ):
+    """ Takes all article results and puts them in proper buckets.
+        Called by main() """
+    assert type(all_articles_results) == list
+    log.debug( f'count of all_articles_results, ``{len(all_articles_results)}``' )
+    ( article_results, audio_results, ebook_results, excerpt_results, video_results, website_results ) = ( [], [], [], [], [], [] )
+    for result in all_articles_results:
+        if 'format' in result.keys():
+            if result['format'].strip() == 'article':
+                article_results.append( result )
+            elif result['format'].strip() == 'audio':
+                audio_results.append( result )
+            elif result['format'].strip() == 'ebook':
+                ebook_results.append( result )
+            elif result['format'].strip() == 'excerpt':
+                excerpt_results.append( result )
+            elif result['format'].strip() == 'video':
+                video_results.append( result )
+            elif result['format'].strip() == 'website':
+                website_results.append( result )
+            else:
+                log.debug( f'unknown format, ``{result["format"]}``' )
+        else:   # no format
+            log.debug( f'no format, ``{result}``' )
+    log.debug( f'count of article_results, ``{len(article_results)}``' )
+    log.debug( f'count of audio_results, ``{len(audio_results)}``' )
+    log.debug( f'count of ebook_results, ``{len(ebook_results)}``' )
+    log.debug( f'count of excerpt_results, ``{len(excerpt_results)}``' )
+    log.debug( f'count of video_results, ``{len(video_results)}``' )
+    log.debug( f'count of website_results, ``{len(website_results)}``' )
+    filtered_results = {
+        'article_results': article_results,
+        'audio_results': audio_results,
+        'ebook_results': ebook_results,
+        'excerpt_results': excerpt_results,
+        'video_results': video_results,
+        'website_results': website_results }    
+    # log.debug( f'filtered_results, ``{pprint.pformat(filtered_results)}``' )
+    return filtered_results  
+
+    ## end def filter_article_table_results()  
+
+
+def check_for_ocra_data( all_course_results ):
+    """ Checks if there's any ocra data in the course_results.
+        all_course_results is a dict like:
+            { '1234': 
+                {'article_results': [], 'book_results: [], etc...},
+              '2468': 
+                {'article_results': [], 'book_results: [], etc...},
+            }
+        Called by main() """
+    ocra_data_found_check = False
+    for ( class_id, classid_results ) in all_course_results.items():
+        for ( format, format_results ) in classid_results.items():
+            if len(format_results) > 0:
+                ocra_data_found_check = True
+    log.debug( f'ocra_data_found_check, ``{ocra_data_found_check}``' )
+    return ocra_data_found_check
 
 
 if __name__ == '__main__':
