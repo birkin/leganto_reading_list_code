@@ -26,11 +26,14 @@ from lib.common.query_ocra import get_class_id_entries
 # from lib.common.validate_files import is_utf8_encoded, is_tab_separated, columns_are_valid
 
 ## grab env vars ----------------------------------------------------
+CSV_OUTPUT_DIR_PATH: str = os.environ['LGNT__CSV_OUTPUT_DIR_PATH']
 JSON_DATA_DIR_PATH: str = os.environ['LGNT__JSON_DATA_DIR_PATH']
+# TRACKER_FILEPATH: str = os.environ['LGNT__TRACKER_FILEPATH']
+log.debug( f'CSV_OUTPUT_DIR_PATH, ``{CSV_OUTPUT_DIR_PATH}``' )
 log.debug( f'JSON_DATA_DIR_PATH, ``{JSON_DATA_DIR_PATH}``' )
+# log.debug( f'TRACKER_FILEPATH, ``{TRACKER_FILEPATH}``' )
 
 ## constants --------------------------------------------------------
-HEREZZ
 OIT_SUBSET_02_SOURCE_PATH = f'{CSV_OUTPUT_DIR_PATH}/oit_subset_02.tsv'
 JSON_DATA_OUTPUT_PATH = f'{JSON_DATA_DIR_PATH}/ocra_data_for_step_03.json'
 log.debug( f'OIT_SUBSET_02_SOURCE_PATH, ``{OIT_SUBSET_02_SOURCE_PATH}``' )

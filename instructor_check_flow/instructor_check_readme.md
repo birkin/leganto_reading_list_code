@@ -12,6 +12,8 @@ This takes the full OIT course list, and produces a subset of courses for Summer
 - courses that either have no section, or have a section other than "s01".
 - courses that have no instructor.
 
+The output-file will be used as the source-file for the next 'create data-holder-dict' step.
+
 ---
 
 # Step 1b -- create data-holder-dict
@@ -26,6 +28,7 @@ description:
 - This takes the initial "oit_subset_01.tsv" file, and creates a data-holder-dict of relevant data. 
 - It also takes the OIT bru_id(s), and looks for the relevant instructor email-address(es) in OCRA, creating, for each data-holder-dict item, a bru_id-to-email-address map field, and an email-addresses field.
 - OIT entries that have no email-address match are eliminated.
+- The output-file will be used as the source-file for the next 'Leganto lookup' step.
 
 ---
 
@@ -41,6 +44,7 @@ description:
 - This takes the data-holder-dict from "oit_data_01b.json", and looks for a matching entry in Leganto.
 - The new subset file will remove courses from the original subset file if the course is already in Leganto with the same instructor.
     - Otherwise, the OIT course will be kept for the next step of doing OCRA reading-list-data lookups.
+- The output-file will be used as the source-file for the next 'OCRA lookups' step.
 
 ---
 
