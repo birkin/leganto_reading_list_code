@@ -88,8 +88,6 @@ description:
 
 # Step 4 -- gather reading-list-data
 
-HEREZZ
-
 script: "instructor_check_flow/40_get_reading_list_data.py"
 
 source-file: "json_data/oit_data_03b.json"
@@ -97,7 +95,7 @@ source-file: "json_data/oit_data_03b.json"
 output-file: "json_data/oit_data_04.json"
 
 description:
-- This step queries ocra on each class_id to get reading-list-data.
+- For each remaining course: this step queries ocra on each class_id to get reading-list-data.
 
 ---
 

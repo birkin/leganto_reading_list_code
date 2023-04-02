@@ -1,8 +1,7 @@
 """
-- This script iterates through "json_data/oit_data_03.json" OIT-courses.
-- It looks up each class_id in the ocra database.
-- Goal: to store reading-list data.
-- TODO: figure out where to filter on instructor.
+- This script iterates through "json_data/oit_data_03b.json" OIT-courses.
+- For each course's instructor-matching class-ids, it looks up the class_id in the ocra database.
+- It pulls out book, article, audio, ebook, excerpt, video, website, and tracks reading-list data.
 """
 
 import datetime, json, logging, os, pprint, sys
@@ -30,7 +29,7 @@ JSON_DATA_DIR_PATH: str = os.environ['LGNT__JSON_DATA_DIR_PATH']
 log.debug( f'JSON_DATA_DIR_PATH, ``{JSON_DATA_DIR_PATH}``' )
 
 ## constants --------------------------------------------------------
-JSON_DATA_SOURCE_PATH = f'{JSON_DATA_DIR_PATH}/oit_data_03.json'
+JSON_DATA_SOURCE_PATH = f'{JSON_DATA_DIR_PATH}/oit_data_03b.json'
 JSON_DATA_OUTPUT_PATH = f'{JSON_DATA_DIR_PATH}/oit_data_04.json'
 log.debug( f'JSON_DATA_SOURCE_PATH, ``{JSON_DATA_SOURCE_PATH}``' )
 log.debug( f'JSON_DATA_OUTPUT_PATH, ``{JSON_DATA_OUTPUT_PATH}``' )
@@ -49,13 +48,11 @@ def main():
     ## initialize meta ----------------------------------------------
     meta = {
         'datetime_stamp': datetime.datetime.now().isoformat(),
-        'description': 'Starts with "oit_data_02.json". Produces "oit_data_03.json". Adds "ocra_class_ids" list to each entry. Removes OIT courses that have no class_ids.',
+        'description': 'Starts with "oit_data_03b.json". Produces "oit_data_04.json". Extracts reading-list data from ocra database for each class_id.',
         'number_of_courses_below': 0,
-        'number_of_courses_originally': len( data_holder_dict.items() ) - 1,  # -1 for the '__meta__' entry
-        'oit_courses_removed_count': 0,
-        'oit_courses_removed_list': [],
         }
-    ## get class_ids from ocra --------------------------------------
+    
+    ## process courses ----------------------------------------------
     for ( i, (course_key, course_data_dict) ) in enumerate( data_holder_dict.items() ):
         log.debug( f'processing course_key, ``{course_key}``')
         if course_key == '__meta__':
@@ -63,24 +60,30 @@ def main():
         # log.debug( f'i, ``{i}``')
         # log.debug( f'course_key, ``{course_key}``' )
         # log.debug( f'course_data_dict, ``{pprint.pformat(course_data_dict)}``' )
-        course_code = course_key.split( '.' )[0]
-        course_number = course_key.split( '.' )[1]
-        class_ids: list = get_class_id_entries( course_code, course_number )
-        class_ids.sort()
-        ## update data_holder_dict with class_ids -------------------
-        data_holder_dict[course_key]['ocra_class_ids'] = class_ids
-        ## update meta-counts ---------------------------------------
-        if len(class_ids) == 0:
-            log.debug( f'course_key, ``{course_key}`` has no class_ids' )
-            meta['oit_courses_removed_count'] += 1
-            meta['oit_courses_removed_list'].append( course_key )
-        # if i > 2:
-        #     break
+        ## get class_ids ---------------------------------------------
+        relevant_course_classids = []
+        for ( class_id_key, email_val ) in course_data_dict['ocra_class_id_to_instructor_email_map_for_matches']:
+            relevant_course_classids.append( class_id_key )
 
-    ## remove OIT courses that have no class_ids --------------------
-    for course_key in meta['oit_courses_removed_list']:
-        del data_holder_dict[course_key]
-    meta['number_of_courses_below'] = len( data_holder_dict.items() ) - 1  # -1 for the '__meta__' entry
+        ## ocra book data -------------------------------------------
+        book_results: list = readings_extractor.get_book_readings( class_id )
+        ## ocra all-artcles data ------------------------------------
+        all_articles_results: list = readings_extractor.get_all_articles_readings( class_id )
+        ## ocra filtered article data -------------------------------
+        filtered_articles_results: dict = readings_processor.filter_article_table_results(all_articles_results)
+        article_results = filtered_articles_results['article_results']
+        audio_results = filtered_articles_results['audio_results']          # from article-table; TODO rename
+        ebook_results = filtered_articles_results['ebook_results'] 
+        excerpt_results = filtered_articles_results['excerpt_results']
+        video_results = filtered_articles_results['video_results']          
+        website_results = filtered_articles_results['website_results']      
+        log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
+        ## ocra tracks data -----------------------------------------
+        tracks_results: list = readings_extractor.get_tracks_data( class_id )
+
+        if i > 2:
+            break
+
 
     ## update meta --------------------------------------------------
     data_holder_dict['__meta__'] = meta
