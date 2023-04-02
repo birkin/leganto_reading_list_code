@@ -53,7 +53,7 @@ description:
 
 # Step 3 -- OCRA class_id lookups
 
-script: "instructor_check_flow/30_extract_data_from_ocra.py"
+script: "instructor_check_flow/30_get_ocra_classids.py"
 
 source-file: "json_data/oit_data_02.json"
 
@@ -68,19 +68,32 @@ description:
 ---
 
 
+# Step 3b -- get OCRA emails
+
+HEREZZ
+script: "instructor_check_flow/35_get_ocra_emails.py"
+
+source-file: "json_data/oit_data_03.json"
+
+output-file: "json_data/oit_data_03b.json"
+
+description:
+- For each remaining OIT course, this script queries OCRA on all the course's "class_ids" to get the OCRA email-address for the class_id.
+- courses where there is no match between any of the OIT instructors and OCRA instructors are removed.
+
+---
+
+
 # Step 4 -- gather reading-list-data
 
 script: "instructor_check_flow/40_get_reading_list_data.py"
 
-source-file: "json_data/oit_data_03.json"
+source-file: "json_data/oit_data_03b.json"
 
 output-file: "json_data/oit_data_04.json"
 
 description:
 - This step queries ocra on each class_id to get reading-list-data.
-
-TODO:
-- After I see how to include instructor-data with the various OCRA queries, decide whether to include the instructor as part of the reading-list-data-queries --- or grab all reading-list-data, and then filter out non-relevant entries based on instructor. 
 
 ---
 
