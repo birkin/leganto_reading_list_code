@@ -108,7 +108,7 @@ script: "instructor_check_flow/50_create_reading_lists.py"
 
 source-file: "json_data/oit_data_04.json"
 
-output-files: "csv_output/2023_summer/list_year-month-dayThour-minute-second.tsv"
+output-files: "csv_output/2023_summer/list_DATE-TIME.tsv"
 
 description:
 - This step creates a reading-list for each course in the source-json file.
