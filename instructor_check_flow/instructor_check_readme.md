@@ -124,7 +124,7 @@ description:
 - course-count from original OIT file (2023-March-31-Friday): 1,4727
     - (see file "a__OIT_course_list...")
 - course-count from initial OIT subset: 67
-    - filtered out courses not matching season-year (2023-summer), or not having section "s01", or not having an instructor.
+    - filtered out courses not matching season-year (2023-summer), and not having section "s01", and not having an instructor.
     - (see file "b__oit_subset_01.tsv")
 - course-count for remaining OIT courses for which an email-address could be found from OCRA: 65
     - (see file "c__oit_data_01b.json")
