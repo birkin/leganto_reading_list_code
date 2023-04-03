@@ -61,19 +61,18 @@ def main():
         data_holder_dict = json.loads( f.read() )
 
     ## initialize meta ----------------------------------------------
-    meta = {
-        'datetime_stamp': datetime.datetime.now().isoformat(),
-        'description': f'Starts with "oit_data_04.json". Produces "{TSV_DATA_OUTPUT_PATH}" file. Defines necessary leganto fields and assembles the data. Then writes it to a .tsv file.',
-        'number_of_courses_in_reading_list_file': len( data_holder_dict ) - 1, # -1 for meta
-        'number_of_courses_below': 0,
-        }
+    # meta = {
+    #     'datetime_stamp': datetime.datetime.now().isoformat(),
+    #     'description': f'Starts with "oit_data_04.json". Produces "{TSV_DATA_OUTPUT_PATH}" file. Defines necessary leganto fields and assembles the data. Then writes it to a .tsv file.',
+    #     'number_of_courses_in_reading_list_file': len( data_holder_dict ) - 1, # -1 for meta
+    #     'number_of_courses_below': 0,
+    #     }
     
     ## initialize leganto fields ------------------------------------
-    reading_list_lines = []
-    leganto_dict_template = {}
-    leganto_fields = leganto_final_processor.get_headers()
-    for field in leganto_fields:
-        leganto_dict_template[field] = ''
+    # leganto_dict_template = {}
+    # leganto_fields = leganto_final_processor.get_headers()
+    # for field in leganto_fields:
+    #     leganto_dict_template[field] = ''
     
     ## process courses ----------------------------------------------
     all_courses_enhanced_data = []
@@ -83,11 +82,11 @@ def main():
         log.debug( f'processing course_key, ``{course_key}``')
         log.debug( f'processing course_data_val, ``{pprint.pformat(course_data_val)}``')
 
-        ## get ocra data ----------------------------------------------
+        ## get ocra data --------------------------------------------
         ocra_course_data: dict = course_data_val['ocra_course_data']  # { 'class_id_1234': {'articles': [], 'audios': [], etc...}, 'class_id_2468': {'articles': [], 'audios': [], etc...} }
         log.debug( f'ocra_course_data, ``{pprint.pformat(ocra_course_data)}``' )
 
-        ## combine all same-formats -----------------------------------  # cuz there could be multiple class_id results for a course
+        ## combine all same-formats ---------------------------------  # cuz there could be multiple class_id results for a course
         combined_course_data_dict = combine_course_data( ocra_course_data )
         
         ## prepare data for enhancements ----------------------------
@@ -133,36 +132,16 @@ def main():
         course_enhanced_data: list = enhanced_articles + enhanced_audios + enhanced_books + enhanced_ebooks + enhanced_excerpts + enhanced_tracks + enhanced_videos + enhanced_websites
         all_courses_enhanced_data = all_courses_enhanced_data + course_enhanced_data
 
-        # leganto_dct = leganto_dict_template.copy()
-        # leganto_dct['citation_author'] = leganto_final_processor.clean_citation_author( course_data_dict.get( 'citation_author', '' ) ) 
-        # leganto_dct['citation_doi'] = course_data_dict.get( 'citation_doi', '' )
-        # leganto_dct['coursecode'] = course_data_dict['oit_course_id']
+        # if i > 2:
+        #     break
 
-        ## add to reading_list_lines --------------------------------
-        # reading_list_lines.append( leganto_dct )
+        # end for-course loop...
 
-        if i > 2:
-            break
-
+    ## apply final leganto processing -------------------------------
     leganto_data: list = prep_leganto_data( all_courses_enhanced_data, settings )
-
-    log.debug( f'reading_list_lines, ``{pprint.pformat(reading_list_lines, sort_dicts=False)}``' )
-
-    ## end for-course loop...
-
-    ## delete no-ocra-match courses ---------------------------------
 
     ## save ---------------------------------------------------------
     csv_maker.create_csv( leganto_data, leganto_final_processor.get_headers() )
-
-    # with open( JSON_DATA_OUTPUT_PATH, 'w' ) as f:
-    #     try:
-    #         jsn = json.dumps( updated_data_holder_dict, sort_keys=True, indent=2 )
-    #     except Exception as e:
-    #         message = f'problem with json.dumps(); e, ``{e}``'
-    #         log.exception( message )
-    #         raise Exception( message )
-    #     f.write( jsn )
 
     return
 
