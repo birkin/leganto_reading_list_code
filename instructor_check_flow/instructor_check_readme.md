@@ -108,9 +108,10 @@ script: "instructor_check_flow/50_create_reading_lists.py"
 
 source-file: "json_data/oit_data_04.json"
 
-output-files: "csv_output/get-reading-list-pattern.tsv"
+output-files: "csv_output/2023_summer/list_year-month-dayThour-minute-second.tsv"
 
 description:
-- This step will create a reading-list for each course in the data-holder-dict.
+- This step creates a reading-list for each course in the source-json file.
+- The OCRA data is enhanced by things like a CDL lookup, and reserves-uploader filename searches.
 
 ---
