@@ -126,7 +126,8 @@ description:
 - course-count from initial OIT subset: 67
     - filtered out courses not matching season-year (2023-summer), and not having section "s01", and not having an instructor.
     - (see file "b__oit_subset_01.tsv")
-- course-count for remaining OIT courses for which an email-address could be found from OCRA: 65
+- course-count for remaining OIT courses for which an email-address could not be found from OCRA: 65
+    - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see file "c__oit_data_01b.json")
 - course-count for remaining OIT courses after Leganto check: 64
     - one course was removed because the course was already in Leganto with the same instructor.
