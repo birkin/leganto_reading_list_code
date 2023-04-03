@@ -22,6 +22,7 @@ PROJECT_CODE_DIR = os.environ['LGNT__PROJECT_CODE_DIR']
 sys.path.append( PROJECT_CODE_DIR )
 
 ## additional imports -----------------------------------------------
+from lib import csv_maker
 from lib import leganto_final_processor
 
 ## grab env vars ----------------------------------------------------
@@ -60,12 +61,12 @@ def main():
     ## initialize leganto fields ------------------------------------
     reading_list_lines = []
     leganto_dict_template = {}
-    leganto_list_header_dict = {}
+    # leganto_list_header_dict = {}
     leganto_fields = leganto_final_processor.get_headers()
     for field in leganto_fields:
         leganto_dict_template[field] = ''
-        leganto_list_header_dict[field] = field
-    reading_list_lines.append( leganto_list_header_dict )
+        # leganto_list_header_dict[field] = field
+    # reading_list_lines.append( leganto_list_header_dict )
     # log.debug( f'reading_list_lines, ``{pprint.pformat(reading_list_lines, sort_dicts=False)}``' )
     
     ## process courses ----------------------------------------------
@@ -85,7 +86,7 @@ def main():
 
         if i > 2:
             break
-        
+
     log.debug( f'reading_list_lines, ``{pprint.pformat(reading_list_lines, sort_dicts=False)}``' )
 
     ## end for-course loop...
@@ -93,6 +94,8 @@ def main():
     ## delete no-ocra-match courses ---------------------------------
 
     ## save ---------------------------------------------------------
+    csv_maker.create_csv( reading_list_lines, leganto_final_processor.get_headers() )
+
     # with open( JSON_DATA_OUTPUT_PATH, 'w' ) as f:
     #     try:
     #         jsn = json.dumps( updated_data_holder_dict, sort_keys=True, indent=2 )

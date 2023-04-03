@@ -35,10 +35,10 @@ def create_csv( data: list, headers: list ) -> None:
             cleaned_data.append( entry )
     
     # output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.csv'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469.csv`
-    output_filename: str = f'reading_list_{datetime.datetime.now().isoformat()}.txt'.replace( ':', '-' )  # produces, eg, `reading_list_2022-09-06T10-59-04.345469.csv`
+    output_filename: str = f'list_{datetime.datetime.now().isoformat()}.tsv'.replace( ':', '-' )[:22]  # produces, eg, `reading_list_2022-09-06T10-59-04.34.tsv`
     log.debug( f'output_filename, ``{output_filename}``' ) 
 
-    output_filepath: str = f'{CSV_OUTPUT_DIR_PATH}/{output_filename}'
+    output_filepath: str = f'{CSV_OUTPUT_DIR_PATH}/2023_summer/{output_filename}'
 
     ## open a new file for writing - if file exists, contents will be erased
     csvfile = open( output_filepath, 'w' )
