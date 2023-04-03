@@ -115,3 +115,31 @@ description:
 - The OCRA data is enhanced by things like a CDL lookup, and reserves-uploader filename searches.
 
 ---
+
+
+# Summary...
+
+(As of 2023-April-3-Monday)
+
+- course-count from original OIT file (2023-March-31-Friday): 1,4727
+    - (see file "a__OIT_course_list...")
+- course-count from initial OIT subset: 67
+    - filtered out courses not matching season-year (2023-summer), or not having section "s01", or not having an instructor.
+    - (see file "b__oit_subset_01.tsv")
+- course-count for remaining OIT courses for which an email-address could be found from OCRA: 65
+    - (see file "c__oit_data_01b.json")
+- course-count for remaining OIT courses after Leganto check: 64
+    - one course was removed because the course was already in Leganto with the same instructor.
+    - (see file "d__oit_data_02.json")
+    - (see file "d__already_in_leganto...tsv")
+- course-count for remaining OIT courses after OCRA class_id lookup: 30
+    - a "class_id" is required to do OCRA reading-list lookups.
+    - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
+    - (see file "e__oit_data_03.json")
+- course-count for remaining OIT courses after matching all OIT-instructors against all OCRA-instructors -- on each course: 12
+    - (see file "f__oit_data_03b.json")
+- course-count for remaining OIT courses after removing courses with no reading-list-data: 8
+    - (see file "g__oit_data_04.json")
+- actual reading-list: see file "h__list_2023-04-02...tsv"
+
+---
