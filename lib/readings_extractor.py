@@ -75,7 +75,7 @@ def get_excerpt_readings( class_id: str ) -> list:
 
 
 
-def get_movies( class_id: str ) -> list:
+def get_movies_data( class_id: str ) -> list:
     db_connection = db_stuff.get_db_connection()
     sql = f'SELECT * FROM movie_requests WHERE movie_requests.classid = {int(class_id)} ORDER BY movie_requests.title ASC;'
     log.debug( f'sql, ``{sql}``' )

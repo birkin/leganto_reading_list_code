@@ -123,7 +123,19 @@ def main():
             website_results = filtered_articles_results['website_results']      
             # log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
             ## movies data ----------------------------------------------
-            movies_results: list = readings_extractor.get_movies_data( class_id )            
+            movies_results: list = readings_extractor.get_movies_data( class_id )    
+            if movies_results:
+                for movie_result in movies_results:
+                    if movie_result['screening_date']:
+                        movie_result['screening_date'] = movie_result['screening_date'].isoformat()
+                    if movie_result['end_date']:
+                        try:
+                            movie_result['end_date'] = movie_result['end_date'].isoformat()
+                        except Exception as e:
+                            log.warning( f'problem with end_date, ``{movie_result["end_date"]}``; error, ``{e}``' )
+                            movie_result['end_date'] = None
+                    if movie_result['request_date']:
+                        movie_result['request_date'] = movie_result['request_date'].isoformat()
             ## ocra tracks data -----------------------------------------
             tracks_results: list = readings_extractor.get_tracks_data( class_id )
 
@@ -134,6 +146,7 @@ def main():
                 'audio_results': audio_results,
                 'ebook_results': ebook_results,
                 'excerpt_results': excerpt_results,
+                'movies_results': movies_results,
                 'video_results': video_results,
                 'website_results': website_results,
                 'tracks_results': tracks_results,
