@@ -122,8 +122,10 @@ def main():
             video_results = filtered_articles_results['video_results']          
             website_results = filtered_articles_results['website_results']      
             # log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
+            ## movies data ----------------------------------------------
+            movies_results: list = readings_extractor.get_movies_data( class_id )            
             ## ocra tracks data -----------------------------------------
-            tracks_results: list = readings_extractor.get_tracks_data( class_id )                
+            tracks_results: list = readings_extractor.get_tracks_data( class_id )
 
             ## combine results ------------------------------------------
             classid_results = {
@@ -146,8 +148,8 @@ def main():
             meta['courses_with_no_ocra_data'].append( course_key )
         course_data_dict['status'] = 'processed'
 
-        # if i > 2:
-        #     break
+        if i > 2:
+            break
 
     ## end for-course loop...
 

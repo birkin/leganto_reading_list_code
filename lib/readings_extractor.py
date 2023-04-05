@@ -71,7 +71,28 @@ def get_excerpt_readings( class_id: str ) -> list:
         log.debug( f'\n\nexcerpt, ``{entry}``')
     log.debug( '\n\n----------' )
     return result_set
+
+
+
+
+def get_movies( class_id: str ) -> list:
+    db_connection = db_stuff.get_db_connection()
+    sql = f'SELECT * FROM movie_requests WHERE movie_requests.classid = {int(class_id)} ORDER BY movie_requests.title ASC;'
+    log.debug( f'sql, ``{sql}``' )
+    result_set: list = []
+    with db_connection:
+        with db_connection.cursor() as db_cursor:
+            db_cursor.execute( sql )
+            result_set = list( db_cursor.fetchall() )
+            assert type(result_set) == list
+    log.debug( '\n\n----------\nmovies\n----------' )
+    for entry in result_set:
+        log.debug( f'\n\nmovie, ``{entry}``')
+    log.debug( '\n\n----------' )
+    return result_set
     
+
+
 
 def get_tracks_data( class_id: str ) -> list:
     db_connection = db_stuff.get_db_connection()
