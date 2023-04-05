@@ -30,6 +30,7 @@ def create_csv( data: list, headers: list ) -> None:
         entry: dict = entry
         # if 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND' in entry['reading_list_library_note']:
         if 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND' in entry['citation_library_note']:
+            log.debug( f'skipping this entry, ``{entry}``')
             pass
         else:
             cleaned_data.append( entry )

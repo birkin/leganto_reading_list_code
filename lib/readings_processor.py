@@ -94,6 +94,9 @@ def map_movie( initial_movie_data: dict, leganto_course_id: str, leganto_section
     mapped_movie_data: dict = MAPPED_CATEGORIES.copy()
     mapped_movie_data['citation_author'] = initial_movie_data.get( 'director', '' )
     mapped_movie_data['citation_isbn'] = ''
+
+    mapped_movie_data['citation_library_note'] = 'foo'  # add note to staff with sierra bib-url here
+    
     mapped_movie_data['citation_publication_date'] = ''
     mapped_movie_data['citation_secondary_type'] = 'VD'
     mapped_movie_data['citation_source1'] = ''
