@@ -79,6 +79,39 @@ def filter_article_table_results( all_articles_results ):
     ## end def filter_article_table_results()  
 
 
+## movies ------------------------------------------------------------
+
+def map_movies( movie_results: list, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> list:
+    mapped_books = []
+    for movie_result in movie_results:
+        mapped_book: dict = map_book( movie_result, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
+        mapped_books.append( mapped_book )
+    log.debug( f'mapped_books, ``{pprint.pformat(mapped_books)}``' )
+    return mapped_books
+
+def map_movie( initial_movie_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> dict:
+    log.debug( f'initial_movie_data, ``{pprint.pformat(initial_movie_data)}``' )
+    mapped_movie_data: dict = MAPPED_CATEGORIES.copy()
+    mapped_movie_data['citation_author'] = initial_movie_data.get( 'director', '' )
+    mapped_movie_data['citation_isbn'] = ''
+    mapped_movie_data['citation_publication_date'] = ''
+    mapped_movie_data['citation_secondary_type'] = 'VD'
+    mapped_movie_data['citation_source1'] = ''
+    ( bib_url, old_bib_id ) = ( '', initial_movie_data.get('bibid', '') )
+    log.debug( f'bib_url, ``{bib_url}``; old_bib_id, ``{old_bib_id}``' )
+    if old_bib_id:
+        bib_url = f'https://search.library.brown.edu/catalog/{old_bib_id}'
+    mapped_movie_data['citation_source2'] = bib_url
+    mapped_movie_data['citation_source3'] = ''
+    mapped_movie_data['citation_title'] = initial_movie_data.get('title').strip()  HEREZZ
+    mapped_movie_data['coursecode'] = leganto_course_id
+    mapped_movie_data['reading_list_name'] = leganto_course_title
+    mapped_movie_data['external_system_id'] = ''
+    mapped_movie_data['section_id'] = leganto_section_id
+    log.debug( f'mapped_movie_data, ``{pprint.pformat(mapped_movie_data)}``' )
+    return mapped_movie_data
+
+
 ## tracks -----------------------------------------------------------
 
 def map_tracks( track_results: list, course_id: str, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> list:

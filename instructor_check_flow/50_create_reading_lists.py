@@ -102,6 +102,14 @@ def main():
         combined_excerpts = combined_course_data_dict['ocra_excerpts']
         enhanced_excerpts: list = readings_processor.map_excerpts( combined_excerpts, course_id, oit_course_id, cdl_checker, oit_section_id, oit_title, settings )
 
+
+
+        ## enhance movies -------------------------------------------
+        combined_movies = combined_course_data_dict['ocra_movies']
+        enhanced_movies: list = readings_processor.map_movies( combined_movies, oit_course_id, cdl_checker, oit_section_id, oit_title, settings )
+
+
+
         ## enhance tracks -------------------------------------------
         combined_tracks = combined_course_data_dict['ocra_tracks']
         enhanced_tracks: list = readings_processor.map_tracks( combined_tracks, course_id, oit_course_id, oit_section_id, oit_title )
