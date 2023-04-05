@@ -59,20 +59,6 @@ def main():
     data_holder_dict = {}
     with open( JSON_DATA_SOURCE_PATH, 'r' ) as f:
         data_holder_dict = json.loads( f.read() )
-
-    ## initialize meta ----------------------------------------------
-    # meta = {
-    #     'datetime_stamp': datetime.datetime.now().isoformat(),
-    #     'description': f'Starts with "oit_data_04.json". Produces "{TSV_DATA_OUTPUT_PATH}" file. Defines necessary leganto fields and assembles the data. Then writes it to a .tsv file.',
-    #     'number_of_courses_in_reading_list_file': len( data_holder_dict ) - 1, # -1 for meta
-    #     'number_of_courses_below': 0,
-    #     }
-    
-    ## initialize leganto fields ------------------------------------
-    # leganto_dict_template = {}
-    # leganto_fields = leganto_final_processor.get_headers()
-    # for field in leganto_fields:
-    #     leganto_dict_template[field] = ''
     
     ## process courses ----------------------------------------------
     all_courses_enhanced_data = []
@@ -180,6 +166,7 @@ def combine_course_data( ocra_course_data ) -> dict:
     combined_books = []
     combined_ebooks = []
     combined_excerpts = []
+    combined_movies = []
     combined_tracks = []
     combined_videos = []
     combined_websites = []
@@ -191,6 +178,7 @@ def combine_course_data( ocra_course_data ) -> dict:
         combined_books += results_dict_val['book_results']
         combined_ebooks += results_dict_val['ebook_results']
         combined_excerpts += results_dict_val['excerpt_results']
+        combined_movies += results_dict_val['movie_results']
         combined_tracks += results_dict_val['tracks_results']
         combined_videos += results_dict_val['video_results']
         combined_websites += results_dict_val['website_results']
@@ -200,6 +188,7 @@ def combine_course_data( ocra_course_data ) -> dict:
         'ocra_books': combined_books,
         'ocra_ebooks': combined_ebooks,
         'ocra_excerpts': combined_excerpts,
+        'ocra_movies': combined_movies,
         'ocra_tracks': combined_tracks,
         'ocra_videos': combined_videos,
         'ocra_websites': combined_websites,
