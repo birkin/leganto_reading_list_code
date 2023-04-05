@@ -161,8 +161,8 @@ def main():
             meta['courses_with_no_ocra_data'].append( course_key )
         course_data_dict['status'] = 'processed'
 
-        if i > 2:
-            break
+        # if i > 2:
+        #     break
 
     ## end for-course loop...
 
