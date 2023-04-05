@@ -81,15 +81,15 @@ def filter_article_table_results( all_articles_results ):
 
 ## movies ------------------------------------------------------------
 
-def map_movies( movie_results: list, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> list:
-    mapped_books = []
+def map_movies( movie_results: list, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> list:
+    mapped_movies = []
     for movie_result in movie_results:
-        mapped_book: dict = map_book( movie_result, leganto_course_id, leganto_section_id, leganto_course_title, cdl_checker )
-        mapped_books.append( mapped_book )
-    log.debug( f'mapped_books, ``{pprint.pformat(mapped_books)}``' )
-    return mapped_books
+        mapped_movie: dict = map_movie( movie_result, leganto_course_id, leganto_section_id, leganto_course_title )
+        mapped_movies.append( mapped_movie )
+    log.debug( f'mapped_movies, ``{pprint.pformat(mapped_movies)}``' )
+    return mapped_movies
 
-def map_movie( initial_movie_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str, cdl_checker ) -> dict:
+def map_movie( initial_movie_data: dict, leganto_course_id: str, leganto_section_id: str, leganto_course_title: str ) -> dict:
     log.debug( f'initial_movie_data, ``{pprint.pformat(initial_movie_data)}``' )
     mapped_movie_data: dict = MAPPED_CATEGORIES.copy()
     mapped_movie_data['citation_author'] = initial_movie_data.get( 'director', '' )
@@ -103,7 +103,7 @@ def map_movie( initial_movie_data: dict, leganto_course_id: str, leganto_section
         bib_url = f'https://search.library.brown.edu/catalog/{old_bib_id}'
     mapped_movie_data['citation_source2'] = bib_url
     mapped_movie_data['citation_source3'] = ''
-    mapped_movie_data['citation_title'] = initial_movie_data.get('title').strip()  HEREZZ
+    mapped_movie_data['citation_title'] = initial_movie_data.get('title', '').strip()
     mapped_movie_data['coursecode'] = leganto_course_id
     mapped_movie_data['reading_list_name'] = leganto_course_title
     mapped_movie_data['external_system_id'] = ''

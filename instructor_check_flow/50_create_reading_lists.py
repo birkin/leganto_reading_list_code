@@ -106,7 +106,7 @@ def main():
 
         ## enhance movies -------------------------------------------
         combined_movies = combined_course_data_dict['ocra_movies']
-        enhanced_movies: list = readings_processor.map_movies( combined_movies, oit_course_id, cdl_checker, oit_section_id, oit_title, settings )
+        enhanced_movies: list = readings_processor.map_movies( combined_movies, oit_course_id, oit_section_id, oit_title )
 
 
 
@@ -123,7 +123,8 @@ def main():
         enhanced_websites: list = readings_processor.map_websites( combined_websites, course_id, oit_course_id, cdl_checker, oit_section_id, oit_title, settings )
 
         ## combine data ---------------------------------------------
-        course_enhanced_data: list = enhanced_articles + enhanced_audios + enhanced_books + enhanced_ebooks + enhanced_excerpts + enhanced_tracks + enhanced_videos + enhanced_websites
+        # course_enhanced_data: list = enhanced_articles + enhanced_audios + enhanced_books + enhanced_ebooks + enhanced_excerpts + enhanced_tracks + enhanced_videos + enhanced_websites
+        course_enhanced_data: list = enhanced_articles + enhanced_audios + enhanced_books + enhanced_ebooks + enhanced_excerpts + enhanced_movies + enhanced_tracks + enhanced_videos + enhanced_websites
         all_courses_enhanced_data = all_courses_enhanced_data + course_enhanced_data
 
         # if i > 2:
