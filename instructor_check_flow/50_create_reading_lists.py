@@ -187,7 +187,7 @@ def combine_course_data( ocra_course_data ) -> dict:
         combined_books += results_dict_val['book_results']
         combined_ebooks += results_dict_val['ebook_results']
         combined_excerpts += results_dict_val['excerpt_results']
-        combined_movies += results_dict_val['movie_results']
+        combined_movies += results_dict_val['movies_results']
         combined_tracks += results_dict_val['tracks_results']
         combined_videos += results_dict_val['video_results']
         combined_websites += results_dict_val['website_results']
