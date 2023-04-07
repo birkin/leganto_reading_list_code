@@ -95,21 +95,21 @@ def map_movie( initial_movie_data: dict, leganto_course_id: str, leganto_section
     mapped_movie_data['citation_author'] = initial_movie_data.get( 'director', '' )
     mapped_movie_data['citation_isbn'] = ''
 
-    mapped_movie_data['citation_library_note'] = 'foo'  # add note to staff with sierra bib-url here
-    
+    ( bib_url, old_bib_id ) = ( '', initial_movie_data.get('bibno', '') )
+    log.debug( f'bib_url, ``{bib_url}``; old_bib_id, ``{old_bib_id}``' )
+    if old_bib_id:
+        bib_url = f'Possibly useful: <https://search.library.brown.edu/catalog/{old_bib_id}> (will redirect to BruKnow)'
+    mapped_movie_data['citation_library_note'] = bib_url
+
     mapped_movie_data['citation_publication_date'] = ''
     mapped_movie_data['citation_secondary_type'] = 'VD'
     mapped_movie_data['citation_source1'] = ''
-    ( bib_url, old_bib_id ) = ( '', initial_movie_data.get('bibid', '') )
-    log.debug( f'bib_url, ``{bib_url}``; old_bib_id, ``{old_bib_id}``' )
-    if old_bib_id:
-        bib_url = f'https://search.library.brown.edu/catalog/{old_bib_id}'
-    mapped_movie_data['citation_source2'] = bib_url
+    mapped_movie_data['citation_source2'] = ''
     mapped_movie_data['citation_source3'] = ''
     mapped_movie_data['citation_title'] = initial_movie_data.get('title', '').strip()
     mapped_movie_data['coursecode'] = leganto_course_id
     mapped_movie_data['reading_list_name'] = leganto_course_title
-    mapped_movie_data['external_system_id'] = ''
+    mapped_movie_data['external_system_id'] = 'NOT-APPLICABLE-FOR-MOVIES'
     mapped_movie_data['section_id'] = leganto_section_id
     log.debug( f'mapped_movie_data, ``{pprint.pformat(mapped_movie_data)}``' )
     return mapped_movie_data

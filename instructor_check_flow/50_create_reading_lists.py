@@ -237,7 +237,6 @@ def prep_leganto_data( basic_data: list, settings: dict ) -> list:
         row_dict['citation_volume'] = result['citation_volume']
         row_dict['coursecode'] = leganto_final_processor.calculate_leganto_course_code( result['coursecode'] )
         row_dict['reading_list_code'] = row_dict['coursecode'] if result['external_system_id'] else ''
-        # row_dict['citation_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source1'], result['citation_source2'], result['citation_source3'], result['external_system_id'] )
         row_dict['citation_library_note'] = leganto_final_processor.calculate_leganto_staff_note( result['citation_source1'], result['citation_source2'], result['citation_source3'], result['external_system_id'], result.get('citation_library_note', '') )
         if row_dict['citation_library_note'] == 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND':
             result['external_system_id'] = 'NO-OCRA-BOOKS/ARTICLES/EXCERPTS-FOUND'  # so this will appear in the staff spreadsheet
