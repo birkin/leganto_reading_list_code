@@ -7,7 +7,7 @@ This script creates a subset of the raw OIT course-list file, filtering out:
 It creates the subset, and, at the end of the logging, a summary of relevant data.
 """
 
-import json, logging, os, pprint, sys
+import datetime, json, logging, os, pprint, sys
 
 ## setup logging ----------------------------------------------------
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -115,7 +115,9 @@ def main():
 
     ## write json summary -------------------------------------------
     with open( JSON_SUMMARY_PATH, 'w' ) as f:
-        json.dump( easyview_output, f, indent=2 )
+        # json.dump( easyview_output, f, indent=2 )
+        jsn = json.dumps( easyview_output, sort_keys=True, indent=2 )
+        f.write( jsn )
 
     ## write summer-2023 subset to file -----------------------------
     with open( OIT_SUBSET_01_OUTPUT_PATH, 'w' ) as f:
@@ -159,6 +161,13 @@ def make_easyview_output( buckets_dict: dict, skipped_due_to_no_instructor: list
         sorted_unique_values = sorted( unsorted_unique_values, key=lambda x: (-x[1], x[0]) )        
         output_dict[key] = sorted_unique_values
     output_dict['skipped_instructor_count_for_target_year_and_season_and_section'] = len( skipped_due_to_no_instructor )
+    output_dict['__meta__'] = {
+        'description': "Unlike the other json files, this file is just a summary-file for the production of the `oit_subset_01.tsv` subset-file. That subset-file only contains courses for the target season/year/section, and which have an instructor.",
+        'file_input': 'the all-OIT-courses file',
+        'file_output': 'oit_subset_01.tsv',
+        'timestamp': datetime.datetime.now().isoformat(),
+    }
+
     log.debug( f'output_dict, ``{pprint.pformat(output_dict)}``' )
     return output_dict
 
