@@ -110,7 +110,7 @@ def main():
     log.debug( f'updated_buckets_dict, ``{pprint.pformat(buckets_dict)}``' )
 
     ## prep easyview output -----------------------------------------
-    easyview_output = make_easyview_output( buckets_dict, skipped_due_to_no_instructor )
+    easyview_output = make_easyview_output( buckets_dict, skipped_due_to_no_instructor, len(data_lines), len(subset_lines) )
     log.debug( f'easyview_output, ``{pprint.pformat(easyview_output)}``' )
 
     ## write json summary -------------------------------------------
@@ -149,7 +149,11 @@ def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
     return line_dict
 
 
-def make_easyview_output( buckets_dict: dict, skipped_due_to_no_instructor: list ) -> dict:
+def make_easyview_output( 
+        buckets_dict: dict, 
+        skipped_due_to_no_instructor: list,
+        count_original: int,
+        count_subset: int ) -> dict:
     """ Prepares easyview output.
         Takes category-key and all-list-values and makes a 'unique_values' key with the data being
             ... a list of tuples, each tuple being ( value, count ).
@@ -163,6 +167,8 @@ def make_easyview_output( buckets_dict: dict, skipped_due_to_no_instructor: list
     output_dict['skipped_instructor_count_for_target_year_and_season_and_section'] = len( skipped_due_to_no_instructor )
     output_dict['__meta__'] = {
         'description': "Unlike the other json files, this file is just a summary-file for the production of the `oit_subset_01.tsv` subset-file. That subset-file only contains courses for the target season/year/section, and which have an instructor.",
+        'course_count_original': count_original,
+        'course_count_subset': count_subset,
         'file_input': 'the all-OIT-courses file',
         'file_output': 'oit_subset_01.tsv',
         'timestamp': datetime.datetime.now().isoformat(),
