@@ -119,16 +119,25 @@ description:
 
 # Summary...
 
-(As of 2023-April-3-Monday)
+(As of 2023-April-12-Wednesday)
 
-- course-count from original OIT file (2023-March-31-Friday): 1,4727
+- course-count from original OIT file (2023-March-31-Friday): 1,4991
     - (see file "a__OIT_course_list...")
-- course-count from initial OIT subset: 67
-    - filtered out courses not matching season-year (2023-summer), and not having section "s01", and not having an instructor.
-    - (see file "b__oit_subset_01.tsv")
-- course-count for remaining OIT courses for which an email-address could not be found from OCRA: 65
+
+- course-count from initial OIT subset: 1111
+    - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
+    - (see output-file "b__oit_subset_01.tsv")
+    - (see summary-file "b__oit_data_01a_summary.json")
+
+- course-count for remaining OIT courses for which an email-address could not be found from OCRA: 1000
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see file "c__oit_data_01b.json")
+
+---
+
+
+Older notes from summer-2023 work...
+
 - course-count for remaining OIT courses after Leganto check: 64
     - one course was removed because the course was already in Leganto with the same instructor.
     - (see file "d__oit_data_02.json")
