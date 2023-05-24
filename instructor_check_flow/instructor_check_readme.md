@@ -148,8 +148,8 @@ Older notes from summer-2023 work...
     - (see file "e__oit_data_03.json")
 - course-count for remaining OIT courses after matching all OIT-instructors against all OCRA-instructors -- on each course: 12
     - (see file "f__oit_data_03b.json")
-- course-count for remaining OIT courses after removing courses with no reading-list-data: 8
+- course-count for remaining OIT courses after removing courses with no reading-list-data: 10
     - (see file "g__oit_data_04.json")
-- actual reading-list: see file "h__list_2023-04-02...tsv"
+- actual reading-list: see file "h__list_2023-04...tsv"
 
 ---
