@@ -48,6 +48,9 @@ description:
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b1__oit_data_01a_summary.json")
 
+- course-count after filtering out courses with no email-address match: 1,117
+    - I used OCRA to find email-addresses from the OIT Bru-ID.
+    - (see output-file "c__oit_data_01b.json")
 
 ---
 
@@ -56,23 +59,6 @@ description:
 Everything below this line is old, and needs to be updated...
 
 ---
-
----
-
-
-# Step 1b -- create data-holder-dict
-
-script: "instructor_check_flow/15_make_oit_subset_two.py"
-
-source-file: "csv_output/oit_subset_01.tsv"
-
-output-file: "json_data/oit_data_01b.json"
-
-description:
-- This takes the initial "oit_subset_01.tsv" file, and creates a data-holder-dict of relevant data. 
-- It also takes the OIT bru_id(s), and looks for the relevant instructor email-address(es) in OCRA, creating, for each data-holder-dict item, a bru_id-to-email-address map field, and an email-addresses field.
-- OIT entries that have no email-address match are eliminated.
-- The output-file will be used as the source-file for the next 'Leganto lookup' step.
 
 ---
 
