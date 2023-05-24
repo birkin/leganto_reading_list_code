@@ -5,6 +5,8 @@ This script creates a subset of the raw OIT course-list file, filtering out:
 - courses that don't have an instructor.
 
 It creates the subset, and, at the end of the logging, a summary of relevant data.
+
+Usage: % python ./instructor_check_flow/10_prepare_oit_initial_subset.py
 """
 
 import datetime, json, logging, os, pprint, sys

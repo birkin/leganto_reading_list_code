@@ -4,15 +4,58 @@ script: "instructor_check_flow/10_prepare_oit_initial_subset.py"
 
 source-file: N/A
 
-output-file: "csv_output/oit_subset_01.tsv"
+output-files: 
+- "csv_output/oit_subset_01.tsv"
+- "json_data/oit_data_01b.json"
 
 description:
-This takes the full OIT course list, and produces a subset of courses for Summer 2023, eliminating:
-- courses that are not offered in specified season-year (ie summer 2023).
+This takes the full OIT course list, and produces a subset of courses for Fall 2023, eliminating:
+- courses that are not offered in specified season-year (ie fall 2023).
 - courses that either have no section, or have a section other than "s01".
 - courses that have no instructor.
 
 The output-file will be used as the source-file for the next 'create data-holder-dict' step.
+
+---
+
+
+# Step 1b -- create data-holder-dict
+
+script: "instructor_check_flow/15_make_oit_subset_two.py"
+
+source-file: "csv_output/oit_subset_01.tsv"
+
+output-file: "json_data/oit_data_01b.json"
+
+description:
+- This takes the initial "oit_subset_01.tsv" file, and creates a data-holder-dict of relevant data. 
+- It also takes the OIT bru_id(s), and looks for the relevant instructor email-address(es) in OCRA, creating, for each data-holder-dict item, a bru_id-to-email-address map field, and an email-addresses field.
+- OIT entries that have no email-address match are eliminated.
+- The output-file will be used as the source-file for the next 'Leganto lookup' step.
+
+---
+
+
+# Summary...
+
+(As of 2023-May-24-Wednesday)
+
+- course-count from original OIT file (2023-May-24-Wednesday): 14,187
+    - (see file "a__OIT_course_list...")
+
+- course-count from initial OIT subset: 1,235
+    - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
+    - (see output-file "b__oit_subset_01.tsv")
+    - (see summary-file "b1__oit_data_01a_summary.json")
+
+
+---
+
+---
+
+Everything below this line is old, and needs to be updated...
+
+---
 
 ---
 
