@@ -36,6 +36,23 @@ description:
 ---
 
 
+# Step 2 -- Leganto lookup
+
+script: "instructor_check_flow/20_make_oit_subset_two.py"
+
+source-file: "json_data/oit_data_01b.json"
+
+output-file: "json_data/oit_data_02.json"
+
+description:
+- This takes the data-holder-dict from "oit_data_01b.json", and looks for a matching entry in Leganto.
+- The new subset file will remove courses from the original subset file if the course is already in Leganto with the same instructor.
+    - Otherwise, the OIT course will be kept for the next step of doing OCRA reading-list-data lookups.
+- The output-file will be used as the source-file for the next 'OCRA lookups' step.
+
+---
+
+
 # Summary...
 
 (As of 2023-May-24-Wednesday)
@@ -52,6 +69,11 @@ description:
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
+- course-count for remaining OIT courses after Leganto check: 1,083
+    - 34 courses were removed because the course was already in Leganto with the same instructor.
+    - (see file "d__oit_data_02.json")
+    - (see file "d__already_in_leganto...tsv")
+
 ---
 
 ---
@@ -63,21 +85,6 @@ Everything below this line is old, and needs to be updated...
 ---
 
 
-# Step 2 -- Leganto lookup
-
-script: "instructor_check_flow/20_make_oit_subset_two.py"
-
-source-file: "json_data/oit_data_01b.json"
-
-output-file: "json_data/oit_data_02.json"
-
-description:
-- This takes the data-holder-dict from "oit_data_01b.json", and looks for a matching entry in Leganto.
-- The new subset file will remove courses from the original subset file if the course is already in Leganto with the same instructor.
-    - Otherwise, the OIT course will be kept for the next step of doing OCRA reading-list-data lookups.
-- The output-file will be used as the source-file for the next 'OCRA lookups' step.
-
----
 
 
 # Step 3 -- OCRA class_id lookups
@@ -148,29 +155,10 @@ description:
 
 # Summary...
 
-(As of 2023-April-12-Wednesday)
-
-- course-count from original OIT file (2023-March-31-Friday): 1,4991
-    - (see file "a__OIT_course_list...")
-
-- course-count from initial OIT subset: 1111
-    - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
-    - (see output-file "b__oit_subset_01.tsv")
-    - (see summary-file "b__oit_data_01a_summary.json")
-
-- course-count for remaining OIT courses for which an email-address could not be found from OCRA: 1000
-    - I used OCRA to find email-addresses from the OIT Bru-ID.
-    - (see file "c__oit_data_01b.json")
-
----
 
 
 Older notes from summer-2023 work...
 
-- course-count for remaining OIT courses after Leganto check: 64
-    - one course was removed because the course was already in Leganto with the same instructor.
-    - (see file "d__oit_data_02.json")
-    - (see file "d__already_in_leganto...tsv")
 - course-count for remaining OIT courses after OCRA class_id lookup: 30
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
