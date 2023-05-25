@@ -1,3 +1,31 @@
+# Summary...
+
+(Processing the Fall 2023 reading-lists.)
+
+- course-count from original OIT file (2023-May-24-Wednesday): 14,187
+    - (see file "a__OIT_course_list...")
+
+- course-count from initial OIT subset: 1,235
+    - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
+    - (see output-file "b__oit_subset_01.tsv")
+    - (see summary-file "b1__oit_data_01a_summary.json")
+
+- course-count after filtering out courses with no email-address match: 1,117
+    - I used OCRA to find email-addresses from the OIT Bru-ID.
+    - (see output-file "c__oit_data_01b.json")
+
+- course-count for remaining OIT courses after Leganto check: 1,083
+    - 34 courses were removed because the course was already in Leganto with the same instructor.
+    - (see file "d__oit_data_02.json")
+    - (see file "d__already_in_leganto...tsv")
+
+- course-count for remaining OIT courses after OCRA class_id lookups: 430
+    - 653 courses were removed because there were no OCRA class_ids found.
+    - (see file "e__oit_data_03.json")
+
+---
+
+
 # Step 1 -- Initial OIT subset
 
 script: "instructor_check_flow/10_prepare_oit_initial_subset.py"
@@ -53,40 +81,6 @@ description:
 ---
 
 
-# Summary...
-
-(As of 2023-May-24-Wednesday)
-
-- course-count from original OIT file (2023-May-24-Wednesday): 14,187
-    - (see file "a__OIT_course_list...")
-
-- course-count from initial OIT subset: 1,235
-    - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
-    - (see output-file "b__oit_subset_01.tsv")
-    - (see summary-file "b1__oit_data_01a_summary.json")
-
-- course-count after filtering out courses with no email-address match: 1,117
-    - I used OCRA to find email-addresses from the OIT Bru-ID.
-    - (see output-file "c__oit_data_01b.json")
-
-- course-count for remaining OIT courses after Leganto check: 1,083
-    - 34 courses were removed because the course was already in Leganto with the same instructor.
-    - (see file "d__oit_data_02.json")
-    - (see file "d__already_in_leganto...tsv")
-
----
-
----
-
-Everything below this line is old, and needs to be updated...
-
----
-
----
-
-
-
-
 # Step 3 -- OCRA class_id lookups
 
 script: "instructor_check_flow/30_get_ocra_classids.py"
@@ -100,8 +94,19 @@ description:
 - Courses with no class_ids are removed.
 - The class_ids will be used in the next step to get reading-list-data.
 
+---
+
 
 ---
+
+---
+
+Everything below this line is old, and needs to be updated...
+
+---
+
+---
+
 
 
 # Step 3b -- get OCRA emails
