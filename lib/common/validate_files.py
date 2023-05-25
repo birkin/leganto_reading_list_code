@@ -71,10 +71,38 @@ def already_in_leganto_columns_valid( filepath: str ) -> bool:
         'Course Section', 
         'Course Name', 
         'Course Instructor', 
-        'Course Instructor Identifier', 
+        'Course Instructor Primary Identifier', 
         'Course Instructor With Primary Identifier', 
         'Course Instructor Preferred Email'         # if not empty, contains one email-address, or multiple email-addresses, separated by a semi-colon.
         ]:
         check_result = True
     log.debug( f'check_result, ``{check_result}``' )
     return check_result
+
+# def already_in_leganto_columns_valid( filepath: str ) -> bool:
+#     """ Ensures tsv file is as expected.
+#         Called by main() """
+#     check_result = False
+#     line = ''
+#     with open( filepath, 'r' ) as f:
+#         line = f.readline()
+#     parts = line.split( '\t' )
+#     stripped_parts = [ part.strip() for part in parts ]
+#     log.debug( f'stripped_parts, ``{stripped_parts}``' )
+#     if stripped_parts == [
+#         'Reading List Id', 
+#         'Reading List Owner', 
+#         'Academic Department', 
+#         'Reading List Code',                        # when good, like: "brown.pols.1420.2023-spring.s01"
+#         'Reading List Name',                        # sometimes contains strings, eg: "HIST 1120" or "ENVS1232"
+#         'Course Code',                              # sometimes contains the `Reading List Code` value, or a string-segment like "EAST 0141"
+#         'Course Section', 
+#         'Course Name', 
+#         'Course Instructor', 
+#         'Course Instructor Identifier', 
+#         'Course Instructor With Primary Identifier', 
+#         'Course Instructor Preferred Email'         # if not empty, contains one email-address, or multiple email-addresses, separated by a semi-colon.
+#         ]:
+#         check_result = True
+#     log.debug( f'check_result, ``{check_result}``' )
+#     return check_result

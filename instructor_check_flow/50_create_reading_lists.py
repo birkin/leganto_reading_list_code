@@ -37,7 +37,7 @@ log.debug( f'CSV_DATA_DIR_PATH, ``{CSV_DATA_DIR_PATH}``' )
 ## globals ----------------------------------------------------------
 JSON_DATA_SOURCE_PATH = f'{JSON_DATA_DIR_PATH}/oit_data_04.json'
 datetimestamp = datetime.datetime.now().isoformat().replace( ':', '-' )[0:2]  # two decimal places is enough
-TSV_DATA_OUTPUT_PATH = f'{CSV_DATA_DIR_PATH}/2023_summer/list_{datetimestamp}.tsv'
+TSV_DATA_OUTPUT_PATH = f'{CSV_DATA_DIR_PATH}/2023_fall/list_{datetimestamp}.tsv'
 log.debug( f'JSON_DATA_SOURCE_PATH, ``{JSON_DATA_SOURCE_PATH}``' )
 log.debug( f'TSV_DATA_OUTPUT_PATH, ``{TSV_DATA_OUTPUT_PATH}``' )
 

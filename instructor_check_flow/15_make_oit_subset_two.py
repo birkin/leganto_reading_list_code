@@ -3,6 +3,7 @@ This script...
 - Starts with subset "oit_subset_01.tsv", which removes courses that aren't the target season/year/section, and have no instructor.
 - It creates a data-holder-dict of relevant data from the oit_subset_01.tsv file.
 - It looks up the OIT bru-id in OCRA to get the instructor email-address (for the subsequent step to check if the instructor is in Leganto).
+    - If no instructor email address is found, the course is eliminated.
 - It saves the output to a json file to be used in the next step.
 """
 
@@ -68,6 +69,9 @@ def main():
     ## add emails to data_holder_dict -------------------------------
     data_holder_dict = add_emails_to_data_holder_dict( data_holder_dict )
 
+    ## remove entries with no email ---------------------------------
+    data_holder_dict = remove_entries_with_no_email( data_holder_dict )
+
     ## write data-holder-dict to file -------------------------------
     with open( STEP_1p5_OUTPUT_PATH, 'w' ) as f:
         jsn = json.dumps( data_holder_dict, sort_keys=True, indent=2 )
@@ -77,6 +81,25 @@ def main():
 
 
 ## helper functions -------------------------------------------------
+def remove_entries_with_no_email( data_holder_dict ):
+    """ Removes entries from data_holder_dict that have no email.
+        Called by main() """
+    assert type( data_holder_dict ) == dict
+    log.debug( f'len(data_holder_dict), ``{len(data_holder_dict)}``' )
+    new_data_holder_dict = {}
+    for course_key, course_parts_dict in data_holder_dict.items():
+        if course_key == '__meta__':
+            new_data_holder_dict[course_key] = course_parts_dict
+        else:
+        # try:
+            if course_parts_dict['oit_email_addresses'] != []:
+                new_data_holder_dict[course_key] = course_parts_dict
+        # except:
+        #     log.debug( f'course_key, ``{course_key}``' )
+        #     log.debug( f'course_parts_dict, ``{pprint.pformat(course_parts_dict)}``' )
+        #     raise Exception( 'problem with course_parts_dict' )
+    log.debug( f'len(new_data_holder_dict), ``{len(new_data_holder_dict)}``' )
+    return new_data_holder_dict
 
 
 def build_data_holder_dict( data_lines ):
@@ -141,9 +164,9 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
     log.debug( 'end of email lookup' )
     ## update analysis ----------------------------------------------
     meta_dict = {'description': '''Loads data from the oit-subset-01 file, which which removes courses that aren't the target season/year/section, and have no instructor. This step builds this data-holder-dict, adds email-addresses to it by looking up the OIT bru_id in OCRA to get email addresses, and saves it as a json-file.''',
-        'number_of_courses': len( data_holder_dict ),
-        'number_of_courses_with_multiple_instructors': 0,
+        'number_of_courses_previously': len( data_holder_dict ),
         'number_of_courses_for_which_email_addresses_were_found': 0,
+        'number_of_courses_with_multiple_instructors': 0,
     }
     for ( key, data_dict_value ) in data_holder_dict.items():
         if len( data_dict_value.get('oit_all_instructors', []) ) > 1:

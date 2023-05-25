@@ -123,8 +123,15 @@ def main():
             website_results = filtered_articles_results['website_results']      
             # log.debug( f'website_results, ``{pprint.pformat(website_results)}``' )
             ## ocra tracks data -----------------------------------------
-            tracks_results: list = readings_extractor.get_tracks_data( class_id )                
-
+            tracks_results: list = readings_extractor.get_tracks_data( class_id )   
+            if tracks_results:
+                for result in tracks_results:
+                    if result['procdate']:
+                        result['procdate'] = result['procdate'].isoformat()
+                    if result['timing']:
+                        result['timing'] = str( result['timing'] )  # i.e., converts datetime.timedelta(seconds=17) to '0:00:17'
+                    else:
+                        result['timing'] = ''
             ## combine results ------------------------------------------
             classid_results = {
                 'book_results': book_results,
