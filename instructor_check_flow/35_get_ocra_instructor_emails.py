@@ -49,7 +49,7 @@ def main():
     ## initialize meta ----------------------------------------------
     meta = {
         'datetime_stamp': datetime.datetime.now().isoformat(),
-        'description': 'Starts with "oit_data_03.json". Produces "oit_data_03.bjson". Adds ocra-instructor-emails to each course-entry class_id. Removes OIT courses that have no intersection between any oit-instructor and any ocra-instructor.',
+        'description': 'Starts with `oit_data_03.json`. Produces `oit_data_03.bjson`. Adds ocra-instructor-emails to each course-entry class_id. Removes OIT courses that have no intersection between any oit-instructor and any ocra-instructor.',
         'number_of_courses_below': 0,
         'number_of_courses_originally': len( data_holder_dict.items() ) - 1,  # -1 for the '__meta__' entry
         'oit_courses_removed_count': 0,
