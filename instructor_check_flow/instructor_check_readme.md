@@ -29,6 +29,11 @@
     - 177 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
     - (see file "f__oit_data_03b.json")
 
+- course-count for remaining OIT courses after removing courses with no reading-list-data: 202
+    - 51 courses were removed because there was no reading-list-data found.
+    - (see file "g__oit_data_04.json")
+
+- actual reading-list: see file "h__list_2023-05...tsv"
 
 ---
 
@@ -104,18 +109,6 @@ description:
 ---
 
 
----
-
----
-
-Everything below this line is old, and needs to be updated...
-
----
-
----
-
-
-
 # Step 3b -- get OCRA emails
 
 script: "instructor_check_flow/35_get_ocra_emails.py"
@@ -164,15 +157,4 @@ description:
 
 ---
 
-
-# Summary...
-
-
-
-Older notes from summer-2023 work...
-
-- course-count for remaining OIT courses after removing courses with no reading-list-data: 10
-    - (see file "g__oit_data_04.json")
-- actual reading-list: see file "h__list_2023-04...tsv"
-
----
+[END]
