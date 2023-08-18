@@ -5,10 +5,9 @@
 The "see file 'name-of-file'" entries refer to google-doc file-names.
 
 - course-count from original OIT file (2023-Aug-18-Friday): 14,355
-    - course-count subset: 1,282
     - (see file "a__OIT_course_list...")
 
-- OLD -- course-count from initial OIT subset: 1,235
+- course-count from initial OIT subset: 1,282
     - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b1__oit_data_01a_summary.json")
