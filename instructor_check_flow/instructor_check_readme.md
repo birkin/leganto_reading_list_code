@@ -12,14 +12,19 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b1__oit_data_01a_summary.json")
 
-- OLD -- course-count after filtering out courses with no email-address match: 1,117
+- course-count after filtering out courses with no email-address match: 1,125
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
-- OLD -- course-count for remaining OIT courses after Leganto check: 1,083
-    - 34 courses were removed because the course was already in Leganto with the same instructor.
+- course-count for remaining OIT courses after Leganto check: 1,038
+    - 87 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__oit_data_02.json")
     - (see file "d__already_in_leganto...tsv")
+
+
+
+---- old -----
+
 
 - OLD -- course-count for remaining OIT courses after OCRA class_id lookups: 430
     - 653 courses were removed because there were no OCRA class_ids found.
