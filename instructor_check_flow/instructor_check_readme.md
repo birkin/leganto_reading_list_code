@@ -2,7 +2,7 @@
 
 (Processing the Fall 2023 reading-lists -- in August 2023.)
 
-- OLD -- course-count from original OIT file (2023-May-24-Wednesday): 14,187
+- course-count from original OIT file (2023-Aug-18-Friday): 14,355
     - (see file "a__OIT_course_list...")
 
 - OLD -- course-count from initial OIT subset: 1,235
