@@ -69,7 +69,7 @@ def main():
         'number_of_already_in_leganto_courses_without_email': 0,
         'OIT_courses_removed_count': 0,
         'OIT_courses_removed_list': [],
-        'timestamp': str( datetime.datetime.now() )
+        'datetime_stamp': str( datetime.datetime.now() )
         }
 
     ## prepare already-in-leganto data for comparison ---------------

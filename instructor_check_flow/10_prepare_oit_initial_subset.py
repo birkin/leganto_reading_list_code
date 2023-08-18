@@ -178,7 +178,7 @@ def make_easyview_output(
         'course_count_subset': count_subset,
         'file_input': 'the all-OIT-courses file',
         'file_output': 'oit_subset_01.tsv',
-        'timestamp': datetime.datetime.now().isoformat(),
+        'datetime_stamp': datetime.datetime.now().isoformat(),
     }
 
     log.debug( f'output_dict, ``{pprint.pformat(output_dict)}``' )
