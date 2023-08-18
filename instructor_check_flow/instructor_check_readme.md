@@ -2,6 +2,8 @@
 
 (Processing the Fall 2023 reading-lists -- in August 2023.)
 
+The "see file 'name-of-file'" entries refer to google-doc file-names.
+
 - course-count from original OIT file (2023-Aug-18-Friday): 14,355
     - course-count subset: 1,282
     - (see file "a__OIT_course_list...")
