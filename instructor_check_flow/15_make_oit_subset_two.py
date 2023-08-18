@@ -4,6 +4,7 @@ This script...
 - It creates a data-holder-dict of relevant data from the oit_subset_01.tsv file.
 - It looks up the OIT bru-id in OCRA to get the instructor email-address (for the subsequent step to check if the instructor is in Leganto).
     - If no instructor email address is found, the course is eliminated.
+    - NOTE: the OCRA lookup implies the need to ssh-tunnel to access the db.
 - It saves the output to a json file to be used in the next step.
 """
 
