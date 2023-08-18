@@ -1,39 +1,39 @@
 # Summary...
 
-(Processing the Fall 2023 reading-lists.)
+(Processing the Fall 2023 reading-lists -- in August 2023.)
 
-- course-count from original OIT file (2023-May-24-Wednesday): 14,187
+- OLD -- course-count from original OIT file (2023-May-24-Wednesday): 14,187
     - (see file "a__OIT_course_list...")
 
-- course-count from initial OIT subset: 1,235
+- OLD -- course-count from initial OIT subset: 1,235
     - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b1__oit_data_01a_summary.json")
 
-- course-count after filtering out courses with no email-address match: 1,117
+- OLD -- course-count after filtering out courses with no email-address match: 1,117
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
-- course-count for remaining OIT courses after Leganto check: 1,083
+- OLD -- course-count for remaining OIT courses after Leganto check: 1,083
     - 34 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__oit_data_02.json")
     - (see file "d__already_in_leganto...tsv")
 
-- course-count for remaining OIT courses after OCRA class_id lookups: 430
+- OLD -- course-count for remaining OIT courses after OCRA class_id lookups: 430
     - 653 courses were removed because there were no OCRA class_ids found.
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json")
 
-- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 253
+- OLD -- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 253
     - 177 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
     - (see file "f__oit_data_03b.json")
 
-- course-count for remaining OIT courses after removing courses with no reading-list-data: 202
+- OLD -- course-count for remaining OIT courses after removing courses with no reading-list-data: 202
     - 51 courses were removed because there was no reading-list-data found.
     - (see file "g__oit_data_04.json")
 
-- actual reading-list: see file "h__list_2023-05...tsv"
+- OLD -- actual reading-list: see file "h__list_2023-05...tsv"
 
 ---
 
