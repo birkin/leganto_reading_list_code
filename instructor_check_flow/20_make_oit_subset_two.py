@@ -12,7 +12,7 @@ Another way of saying this...
 The new subset file will remove courses from the original subset file if the course is already in Leganto with the same instructor.
 """
 
-import json, logging, os, pprint, sys
+import datetime, json, logging, os, pprint, sys
 
 ## setup logging ----------------------------------------------------
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -69,6 +69,7 @@ def main():
         'number_of_already_in_leganto_courses_without_email': 0,
         'OIT_courses_removed_count': 0,
         'OIT_courses_removed_list': [],
+        'timestamp': str( datetime.datetime.now() )
         }
 
     ## prepare already-in-leganto data for comparison ---------------
