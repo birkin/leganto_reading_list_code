@@ -27,13 +27,14 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json")
 
+- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 187
+    - 173 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
+    - (see file "f__oit_data_03b.json")
+
 
 ---- old -----
 
 
-- OLD -- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 253
-    - 177 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
-    - (see file "f__oit_data_03b.json")
 
 - OLD -- course-count for remaining OIT courses after removing courses with no reading-list-data: 202
     - 51 courses were removed because there was no reading-list-data found.
