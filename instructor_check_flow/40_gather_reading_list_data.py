@@ -1,7 +1,9 @@
 """
 - This script iterates through "json_data/oit_data_03b.json" OIT-courses.
+- It produces the data-file "json_data/oit_data_04.json".
 - For each course's instructor-matching class-ids, it looks up the class_id in the ocra database.
 - It pulls out book, article, audio, ebook, excerpt, video, website, and tracks reading-list data.
+- Takes a little less than a minute to run.
 """
 
 import datetime, json, logging, os, pprint, sys
