@@ -221,7 +221,7 @@ def check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lin
             if oit_email in leganto_email_addresses:
                 course_code_and_instructor_match_found_result = True
                 break
-    log.debug( f'course_code_and_instructor_match_found_result, ``{course_code_and_instructor_match_found_result}``' )
+    log.debug( f'course_code_and_instructor_match_found_result for, ``{dept_part+num_part}``, ``{course_code_and_instructor_match_found_result}``' )
     return course_code_and_instructor_match_found_result
 
 
