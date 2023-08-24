@@ -196,16 +196,19 @@ def update_meta_with_already_in_leganto_data( already_in_leganto_dict_lines: lis
 def check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lines ):
     """ Returns True if match found, else False.
         Called by main(). """
+    # log.debug( f'param oit_course_code_key, ``{oit_course_code_key}``' )
+    # log.debug( f'param oit_email, ``{oit_email}``' )
+    # log.debug( f'param already_in_leganto_dict_lines, ``{pprint.pformat(already_in_leganto_dict_lines)}``' )
     dept_part = oit_course_code_key.split( '.' )[0]
-    log.debug( f'dept_part, ``{dept_part}``' )
+    # log.debug( f'dept_part, ``{dept_part}``' )
     num_part = oit_course_code_key.split( '.' )[1]
-    log.debug( f'num_part, ``{num_part}``' )
+    # log.debug( f'num_part, ``{num_part}``' )
     match_try_1 = f'%s.%s' % ( dept_part, num_part )
-    log.debug( f'match_try_1, ``{match_try_1}``' )
+    # log.debug( f'match_try_1, ``{match_try_1}``' )
     match_try_2 = f'%s %s' % ( dept_part, num_part )
-    log.debug( f'match_try_2, ``{match_try_2}``' )
+    # log.debug( f'match_try_2, ``{match_try_2}``' )
     match_try_3 = f'%s%s' % ( dept_part, num_part )
-    log.debug( f'match_try_3, ``{match_try_3}``' )
+    # log.debug( f'match_try_3, ``{match_try_3}``' )
     course_code_and_instructor_match_found_result = False
     for leganto_item in already_in_leganto_dict_lines:
         log.debug( f'leganto_item, ``{pprint.pformat(leganto_item)}``' )
@@ -216,12 +219,16 @@ def check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lin
             course_code_match_found = True
         elif match_try_3 in leganto_item['Reading List Code'] or match_try_3 in leganto_item['Reading List Name'] or match_try_3 in leganto_item['Course Code']:
             course_code_match_found = True
+        log.debug( f'course_code_match_found for, ``{dept_part}/{num_part}`` before email-check, ``{course_code_match_found}``')
         if course_code_match_found:
+            ## check for email match on lower-case emails ------------
             leganto_email_addresses = leganto_item['email_list']
-            if oit_email in leganto_email_addresses:
+            log.debug( f'leganto_email_addresses, ``{leganto_email_addresses}``' )
+            leganto_lowercase_email_addresses = [ email.lower() for email in leganto_email_addresses ]
+            if oit_email.lower() in leganto_lowercase_email_addresses:
                 course_code_and_instructor_match_found_result = True
                 break
-    log.debug( f'course_code_and_instructor_match_found_result for, ``{dept_part+num_part}``, ``{course_code_and_instructor_match_found_result}``' )
+    log.debug( f'course_code_and_instructor_match_found_result for, ``{dept_part}/{num_part}``, ``{course_code_and_instructor_match_found_result}``' )
     return course_code_and_instructor_match_found_result
 
 
