@@ -1,6 +1,7 @@
 """
 This script:
 - loads the "oit_data_01b.json" into a data-holder-dict.
+- loads the current "already_in_leganto.tsv".
 - produces a subset of the data-holder-dict -- "oit_subset_02.tsv" -- which will be used to create reading-lists.
 
 The logic...
@@ -195,12 +196,18 @@ def check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lin
     """ Returns True if match found, else False.
         Called by main(). """
     dept_part = oit_course_code_key.split( '.' )[0]
+    log.debug( f'dept_part, ``{dept_part}``' )
     num_part = oit_course_code_key.split( '.' )[1]
+    log.debug( f'num_part, ``{num_part}``' )
     match_try_1 = f'%s.%s' % ( dept_part, num_part )
+    log.debug( f'match_try_1, ``{match_try_1}``' )
     match_try_2 = f'%s %s' % ( dept_part, num_part )
+    log.debug( f'match_try_2, ``{match_try_2}``' )
     match_try_3 = f'%s%s' % ( dept_part, num_part )
+    log.debug( f'match_try_3, ``{match_try_3}``' )
     course_code_and_instructor_match_found_result = False
     for leganto_item in already_in_leganto_dict_lines:
+        log.debug( f'leganto_item, ``{pprint.pformat(leganto_item)}``' )
         course_code_match_found = False
         if match_try_1 in leganto_item['Reading List Code'] or match_try_1 in leganto_item['Reading List Name'] or match_try_1 in leganto_item['Course Code']:
             course_code_match_found = True
@@ -215,6 +222,32 @@ def check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lin
                 break
     log.debug( f'course_code_and_instructor_match_found_result, ``{course_code_and_instructor_match_found_result}``' )
     return course_code_and_instructor_match_found_result
+
+
+# def check_for_match( oit_course_code_key, oit_email, already_in_leganto_dict_lines ):
+#     """ Returns True if match found, else False.
+#         Called by main(). """
+#     dept_part = oit_course_code_key.split( '.' )[0]
+#     num_part = oit_course_code_key.split( '.' )[1]
+#     match_try_1 = f'%s.%s' % ( dept_part, num_part )
+#     match_try_2 = f'%s %s' % ( dept_part, num_part )
+#     match_try_3 = f'%s%s' % ( dept_part, num_part )
+#     course_code_and_instructor_match_found_result = False
+#     for leganto_item in already_in_leganto_dict_lines:
+#         course_code_match_found = False
+#         if match_try_1 in leganto_item['Reading List Code'] or match_try_1 in leganto_item['Reading List Name'] or match_try_1 in leganto_item['Course Code']:
+#             course_code_match_found = True
+#         elif match_try_2 in leganto_item['Reading List Code'] or match_try_2 in leganto_item['Reading List Name'] or match_try_2 in leganto_item['Course Code']:
+#             course_code_match_found = True
+#         elif match_try_3 in leganto_item['Reading List Code'] or match_try_3 in leganto_item['Reading List Name'] or match_try_3 in leganto_item['Course Code']:
+#             course_code_match_found = True
+#         if course_code_match_found:
+#             leganto_email_addresses = leganto_item['email_list']
+#             if oit_email in leganto_email_addresses:
+#                 course_code_and_instructor_match_found_result = True
+#                 break
+#     log.debug( f'course_code_and_instructor_match_found_result, ``{course_code_and_instructor_match_found_result}``' )
+#     return course_code_and_instructor_match_found_result
 
 ## entry point ------------------------------------------------------
 
