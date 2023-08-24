@@ -16,23 +16,23 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
-- course-count for remaining OIT courses after Leganto check: 1,038
-    - 87 courses were removed because the course was already in Leganto with the same instructor.
+- course-count for remaining OIT courses after already-in-Leganto check: 871
+    - 254 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__already_in_leganto...tsv")
     - (see file "d2__oit_data_02.json")
 
-- course-count for remaining OIT courses after OCRA class_id lookups: 360
-    - 678 courses were removed because there were no OCRA class_ids found.
+- course-count for remaining OIT courses after OCRA class_id lookups: 205
+    - 666 courses were removed because there were no OCRA class_ids found.
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json")
 
-- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 187
-    - 173 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
+- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 44
+    - 161 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
     - (see file "f__oit_data_03b.json")
 
-- course-count for remaining OIT courses after removing courses with no reading-list-data: 141
-    - 46 courses were removed because there was no reading-list-data found.
+- course-count for remaining OIT courses after removing courses with no reading-list-data: 5
+    - 39 courses were removed because there was no reading-list-data found.
     - (see file "g__oit_data_04.json")
 
 - actual reading-list: see file "h__list_2023-08...tsv"

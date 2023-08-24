@@ -3,7 +3,7 @@
 - It produces the json_file "json_data/oit_data_03b.json".
 - It adds OCRA instructor-emails to each OIT-course class_id entry.
 - It removes OIT-courses where none of the OIT-instructor-emails match any of the OCRA-instructor-emails.
-- Takes a little less than a minute to run.
+- Can take up to 5-minutes to run.
 """
 
 import datetime, json, logging, os, pprint, sys
