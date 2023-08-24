@@ -3,6 +3,7 @@ This script:
 - loads the "oit_data_01b.json" into a data-holder-dict.
 - loads the current "already_in_leganto.tsv".
 - produces a subset of the data-holder-dict -- "oit_subset_02.tsv" -- which will be used to create reading-lists.
+- takes about 1-minute, 30-seconds to run.
 
 The logic...
 - If there is an OIT course with OIT-instructor-X -- and that OIT course is not in Leganto -- I _WILL_ try to create an OCRA reading-list.
