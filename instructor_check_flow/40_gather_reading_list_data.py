@@ -82,6 +82,11 @@ def main():
         relevant_course_classids = inverted_ocra_classid_email_map.values()
         log.debug( f'relevant_course_classids, ``{pprint.pformat(relevant_course_classids)}``' )
 
+        ## hack to force target class-id ----------------------------
+        hard_coded_dict = { 'foo': '2344' }
+        relevant_course_classids = hard_coded_dict.values()
+        log.debug( f'hacked relevant_course_classids, ``{pprint.pformat(relevant_course_classids)}``' )
+
         ## process relevant class_ids ------------------------------------
         all_course_results = {}
         for class_id in relevant_course_classids:
