@@ -3,6 +3,7 @@
 - It produces the json_file "json_data/oit_data_03.json".
 - It adds one element to the data-holder-dict: a list of "ocra_class_ids" for the given course-code.
     - These ocra_class_ids will be used in the subsequent script to extract reading-list data.
+- Takes about 7-minutes to run.
 """
 
 import datetime, json, logging, os, pprint, sys

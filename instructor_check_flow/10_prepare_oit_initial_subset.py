@@ -6,6 +6,11 @@ This script creates a subset of the raw OIT course-list file, filtering out:
 
 It creates the subset, and, at the end of the logging, a summary of relevant data.
 
+Output files:
+- stuff/csv_output/oit_subset_01.tsv
+- stuff/json_data/oit_data_01a_summary.json
+
+
 Usage: % python ./instructor_check_flow/10_prepare_oit_initial_subset.py
 """
 
@@ -173,7 +178,7 @@ def make_easyview_output(
         'course_count_subset': count_subset,
         'file_input': 'the all-OIT-courses file',
         'file_output': 'oit_subset_01.tsv',
-        'timestamp': datetime.datetime.now().isoformat(),
+        'datetime_stamp': datetime.datetime.now().isoformat(),
     }
 
     log.debug( f'output_dict, ``{pprint.pformat(output_dict)}``' )

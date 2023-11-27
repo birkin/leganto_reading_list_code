@@ -4,10 +4,12 @@ This script...
 - It creates a data-holder-dict of relevant data from the oit_subset_01.tsv file.
 - It looks up the OIT bru-id in OCRA to get the instructor email-address (for the subsequent step to check if the instructor is in Leganto).
     - If no instructor email address is found, the course is eliminated.
+    - NOTE: the OCRA lookup implies the need to ssh-tunnel to access the db.
+    - NOTE: this takes 10 or 15 minutes to run.
 - It saves the output to a json file to be used in the next step.
 """
 
-import json, logging, os, pprint, sys
+import datetime, json, logging, os, pprint, sys
 
 ## setup logging ----------------------------------------------------
 LOG_PATH: str = os.environ['LGNT__LOG_PATH']
@@ -167,6 +169,7 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
         'number_of_courses_previously': len( data_holder_dict ),
         'number_of_courses_for_which_email_addresses_were_found': 0,
         'number_of_courses_with_multiple_instructors': 0,
+        'timestamp': str( datetime.datetime.now() )
     }
     for ( key, data_dict_value ) in data_holder_dict.items():
         if len( data_dict_value.get('oit_all_instructors', []) ) > 1:

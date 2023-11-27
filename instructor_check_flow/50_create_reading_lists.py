@@ -3,6 +3,7 @@
 - The necessary leganto categories are defined.
 - Data is prepared from the OCRA data, with some additional lookups.
     - TODO: Define the addtional lookups.
+- Takes a little less than 5 minutes to run.
 """
 
 import datetime, json, logging, os, pprint, sys
