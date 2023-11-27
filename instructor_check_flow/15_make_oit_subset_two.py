@@ -156,7 +156,8 @@ def add_emails_to_data_holder_dict( data_holder_dict: dict ) -> dict:
         email_addresses = []
         email_address_map = {}
         for bru_id in bru_ids:
-            email_address = query_ocra.get_email_from_bruid( bru_id )
+            # email_address = query_ocra.get_email_from_bruid( bru_id )
+            email_address = os.environ['LGNT__EMAIL_ADDRESS']
             log.debug( f'email_address result-set, ``{email_address}``')
             email_address_map[bru_id] = email_address
             if email_address:
