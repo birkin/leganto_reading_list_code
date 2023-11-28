@@ -7,19 +7,12 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
 - course-count from original OIT file (2023-Nov-27-Monday): 14,885
     - (see file "a__OIT_course_list...")
 
-- course-count from initial OIT subset: 1,390
+- course-count from initial OIT subset: 1,389
     - filtered out courses not matching season-year (2024-spring), and not having section "s01", and not having an instructor.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b2__oit_data_01a_summary.json")
 
-
-
----
-
-
-OLD data from last run...
-
-- course-count after filtering out courses with no email-address match: 1,125
+- course-count after filtering out courses with no email-address match: 1,253
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
@@ -27,11 +20,15 @@ OLD data from last run...
 ---
 
 
+OLD data from last run...
 
 - course-count for remaining OIT courses after already-in-Leganto check: 871
     - 254 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__already_in_leganto...tsv")
     - (see file "d2__oit_data_02.json")
+
+---
+
 
 - course-count for remaining OIT courses after OCRA class_id lookups: 205
     - 666 courses were removed because there were no OCRA class_ids found.
