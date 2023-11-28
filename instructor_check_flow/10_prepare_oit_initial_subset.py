@@ -141,6 +141,8 @@ def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
     """ Parses data-line.
         Called by main() """
     log.debug( 'starting parse_line()')
+    # log.debug( f'data_line, ``{data_line}``' )
+    # log.debug( f'heading_line, ``{heading_line}``' )
     assert type(data_line) == str
     assert type(heading_line) == str
     assert type(line_number) == int
@@ -150,7 +152,12 @@ def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
     heading_parts = [ part.strip() for part in heading_parts ]
     line_dict = {}
     for i, part in enumerate( parts ):
-        line_dict[heading_parts[i]] = part
+        log.debug( f'processing i, ``{i}``; part, ``{part}``' )
+        try:
+            line_dict[heading_parts[i]] = part
+        except:
+            log.exception( f'problem parsing part -- i, ``{i}``; part, ``{part}``' )
+            raise Exception( 'problem parsing line; processing halted' )
     if line_number < 5:
         log.debug( f'line_dict, ``{pprint.pformat(line_dict)}``' )
     return line_dict
