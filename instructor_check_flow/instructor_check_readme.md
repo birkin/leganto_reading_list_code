@@ -35,17 +35,7 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
     - 40 courses were removed because there was no reading-list-data found.
     - (see file "g__oit_data_04.json")
 
----
-
-
-OLD data from last run...
-
-
----
-
-
-
-- actual reading-list: see file "h__list_2023-08...tsv"
+- actual reading-list: see file "h__list_2023-11...tsv"
 
 ---
 
