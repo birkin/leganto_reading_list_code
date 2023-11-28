@@ -1,20 +1,32 @@
 # Summary...
 
-(Processing the Fall 2023 reading-lists -- in August 2023.)
+(Processing the Spring 2024 reading-lists -- in November 2023.)
 
 The "see file 'name-of-file'" entries refer to google-doc file-names.
 
-- course-count from original OIT file (2023-Aug-18-Friday): 14,355
+- course-count from original OIT file (2023-Nov-27-Monday): 14,885
     - (see file "a__OIT_course_list...")
 
-- course-count from initial OIT subset: 1,282
-    - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
+- course-count from initial OIT subset: 1,390
+    - filtered out courses not matching season-year (2024-spring), and not having section "s01", and not having an instructor.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b2__oit_data_01a_summary.json")
+
+
+
+---
+
+
+OLD data from last run...
 
 - course-count after filtering out courses with no email-address match: 1,125
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
+
+
+---
+
+
 
 - course-count for remaining OIT courses after already-in-Leganto check: 871
     - 254 courses were removed because the course was already in Leganto with the same instructor.
@@ -44,7 +56,7 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
 
 script: "instructor_check_flow/10_prepare_oit_initial_subset.py"
 
-source-file: N/A
+source-file: see "a__OIT_course_list..." in the ""2024_spring_reading_list_stuff__Nov2023" folder.
 
 output-files: 
 - "csv_output/oit_subset_01.tsv"
