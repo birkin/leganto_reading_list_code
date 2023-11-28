@@ -16,16 +16,16 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
+- course-count for remaining OIT courses after already-in-Leganto check: 1,052
+    - 201 courses were removed because the course was already in Leganto with the same instructor.
+    - (see file "d__already_in_leganto...tsv")
+    - (see file "d2__oit_data_02.json")
 
 ---
 
 
 OLD data from last run...
 
-- course-count for remaining OIT courses after already-in-Leganto check: 871
-    - 254 courses were removed because the course was already in Leganto with the same instructor.
-    - (see file "d__already_in_leganto...tsv")
-    - (see file "d2__oit_data_02.json")
 
 ---
 
@@ -91,7 +91,9 @@ description:
 
 script: "instructor_check_flow/20_make_oit_subset_two.py"
 
-source-file: "json_data/oit_data_01b.json"
+source-files: 
+- "json_data/oit_data_01b.json"
+- ../already_in_leganto_files/already_in_leganto_DATE_from_NAME.tsv
 
 output-file: "json_data/oit_data_02.json"
 
