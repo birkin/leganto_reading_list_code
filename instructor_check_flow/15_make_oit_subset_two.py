@@ -130,6 +130,7 @@ def build_data_holder_dict( data_lines ):
         all_instructors_string: str = parts[27]            # 'ALL_INSTRUCTORS'
         # log.debug( f'all_instructors_string, ``{all_instructors_string}``' )
         all_instructors: list = all_instructors_string.split( ',' )
+        all_instructors = [ instructor.strip() for instructor in all_instructors ]
         if len( all_instructors ) > 1:
             log.debug( f'found multiple instructors for course {course_id}' )
         course_parts_dict = {
