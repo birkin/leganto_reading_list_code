@@ -61,15 +61,15 @@ standard ------------------------------------------------------------
 
 script: "instructor_check_flow/10_prepare_oit_initial_subset.py"
 
-source-file: see "a__OIT_course_list..." in the ""2024_spring_reading_list_stuff__Nov2023" folder.
+source-file: see "a__OIT_course_list..." in the ""2024_spring_reading_list_stuff__Dec2023" folder.
 
 output-files: 
 - "csv_output/oit_subset_01.tsv"
 - "json_data/oit_data_01b.json"
 
 description:
-This takes the full OIT course list, and produces a subset of courses for Fall 2023, eliminating:
-- courses that are not offered in specified season-year (ie fall 2023).
+This takes the full OIT course list, and produces a subset of courses for Spring 2024, eliminating:
+- courses that are not offered in specified season-year (this specified season-year being spring-2024).
 - courses that either have no section, or have a section other than "s01".
 - courses that have no instructor.
 
