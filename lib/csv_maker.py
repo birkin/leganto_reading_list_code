@@ -40,7 +40,7 @@ def create_csv( data: list, headers: list ) -> None:
     output_filename: str = f'list_{datetimestamp}.tsv'  # produces, eg, `reading_list_2022-09-06T10-59-04.34.tsv`
     log.debug( f'output_filename, ``{output_filename}``' ) 
 
-    output_filepath: str = f'{CSV_OUTPUT_DIR_PATH}/2023_fall/{output_filename}'
+    output_filepath: str = f'{CSV_OUTPUT_DIR_PATH}/2024-spring/{output_filename}'
 
     ## open a new file for writing - if file exists, contents will be erased
     csvfile = open( output_filepath, 'w' )
