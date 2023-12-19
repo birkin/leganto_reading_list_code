@@ -20,6 +20,7 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
 - course-count for remaining OIT courses after already-in-Leganto check: 936
     - 340 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__already_in_leganto...tsv")
+        - Note there are two of these: Both Bart's original, and my copy are shown. The order of columns changed from the order the code was expecting, and there was one additional column. I restored the order of the columns to match the code, and I removed the additional column that's not used by the code.
     - (see file "d2__oit_data_02.json")
 
 - course-count for remaining OIT courses after OCRA class_id lookups: 177
@@ -27,6 +28,11 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json")
+
+- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 43
+    - 134 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
+    - (see file "f__oit_data_03b.json")
+
 
 ---------------------------------------------------------------------
 old output start ----------------------------------------------------
@@ -55,9 +61,9 @@ old output start ----------------------------------------------------
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json") -->
 
-- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 174
+<!-- - course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 174
     - 137 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
-    - (see file "f__oit_data_03b.json")
+    - (see file "f__oit_data_03b.json") -->
 
 - course-count for remaining OIT courses after removing courses with no reading-list-data: 134
     - 40 courses were removed because there was no reading-list-data found.
