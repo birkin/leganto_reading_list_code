@@ -1,8 +1,18 @@
 # Summary...
 
-(Processing the Spring 2024 reading-lists -- in November 2023.)
+(Processing the Spring 2024 reading-lists -- in December 2023.)
 
 The "see file 'name-of-file'" entries refer to google-doc file-names.
+
+- course-count from original OIT file (2023-Dec-19-Tuesday): 14,896
+    - (see file "a__OIT_course_list...")
+    - Note: had to manually make a slight manual correction to `brown.mcm.0800v.2024-spring` -- there was an errant backslash followed by an additional tab-character. Once they were removed, the file processed fine.
+
+
+
+---------------------------------------------------------------------
+old output start ----------------------------------------------------
+---------------------------------------------------------------------
 
 - course-count from original OIT file (2023-Nov-27-Monday): 14,885
     - (see file "a__OIT_course_list...")
@@ -37,7 +47,14 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
 
 - actual reading-list: see file "h__list_2023-11...tsv"
 
----
+---------------------------------------------------------------------
+old output end ------------------------------------------------------
+---------------------------------------------------------------------
+
+
+---------------------------------------------------------------------
+standard ------------------------------------------------------------
+---------------------------------------------------------------------
 
 
 # Step 1 -- Initial OIT subset
