@@ -1,41 +1,41 @@
 # Summary...
 
-(Processing the Fall 2023 reading-lists -- in August 2023.)
+(Processing the Spring 2024 reading-lists -- in November 2023.)
 
 The "see file 'name-of-file'" entries refer to google-doc file-names.
 
-- course-count from original OIT file (2023-Aug-18-Friday): 14,355
+- course-count from original OIT file (2023-Nov-27-Monday): 14,885
     - (see file "a__OIT_course_list...")
 
-- course-count from initial OIT subset: 1,282
-    - filtered out courses not matching season-year (2023-fall), and not having section "s01", and not having an instructor.
+- course-count from initial OIT subset: 1,389
+    - filtered out courses not matching season-year (2024-spring), and not having section "s01", and not having an instructor.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b2__oit_data_01a_summary.json")
 
-- course-count after filtering out courses with no email-address match: 1,125
+- course-count after filtering out courses with no email-address match: 1,260
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
-- course-count for remaining OIT courses after already-in-Leganto check: 871
-    - 254 courses were removed because the course was already in Leganto with the same instructor.
+- course-count for remaining OIT courses after already-in-Leganto check: 1,056
+    - 204 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__already_in_leganto...tsv")
     - (see file "d2__oit_data_02.json")
 
-- course-count for remaining OIT courses after OCRA class_id lookups: 205
-    - 666 courses were removed because there were no OCRA class_ids found.
+- course-count for remaining OIT courses after OCRA class_id lookups: 311
+    - 745 courses were removed because there were no OCRA class_ids found.
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json")
 
-- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 44
-    - 161 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
+- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 174
+    - 137 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
     - (see file "f__oit_data_03b.json")
 
-- course-count for remaining OIT courses after removing courses with no reading-list-data: 5
-    - 39 courses were removed because there was no reading-list-data found.
+- course-count for remaining OIT courses after removing courses with no reading-list-data: 134
+    - 40 courses were removed because there was no reading-list-data found.
     - (see file "g__oit_data_04.json")
 
-- actual reading-list: see file "h__list_2023-08...tsv"
+- actual reading-list: see file "h__list_2023-11...tsv"
 
 ---
 
@@ -44,7 +44,7 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
 
 script: "instructor_check_flow/10_prepare_oit_initial_subset.py"
 
-source-file: N/A
+source-file: see "a__OIT_course_list..." in the ""2024_spring_reading_list_stuff__Nov2023" folder.
 
 output-files: 
 - "csv_output/oit_subset_01.tsv"
@@ -82,7 +82,9 @@ description:
 
 script: "instructor_check_flow/20_make_oit_subset_two.py"
 
-source-file: "json_data/oit_data_01b.json"
+source-files: 
+- "json_data/oit_data_01b.json"
+- ../already_in_leganto_files/already_in_leganto_DATE_from_NAME.tsv
 
 output-file: "json_data/oit_data_02.json"
 
