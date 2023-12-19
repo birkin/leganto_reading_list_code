@@ -17,6 +17,10 @@ The "see file 'name-of-file'" entries refer to google-doc file-names.
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
+- course-count for remaining OIT courses after already-in-Leganto check: 936
+    - 340 courses were removed because the course was already in Leganto with the same instructor.
+    - (see file "d__already_in_leganto...tsv")
+    - (see file "d2__oit_data_02.json")
 
 ---------------------------------------------------------------------
 old output start ----------------------------------------------------
@@ -34,10 +38,10 @@ old output start ----------------------------------------------------
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json") -->
 
-- course-count for remaining OIT courses after already-in-Leganto check: 1,056
+<!-- - course-count for remaining OIT courses after already-in-Leganto check: 1,056
     - 204 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__already_in_leganto...tsv")
-    - (see file "d2__oit_data_02.json")
+    - (see file "d2__oit_data_02.json") -->
 
 - course-count for remaining OIT courses after OCRA class_id lookups: 311
     - 745 courses were removed because there were no OCRA class_ids found.
