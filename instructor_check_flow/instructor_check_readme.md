@@ -1,58 +1,59 @@
 # Summary...
 
-(Processing the Spring 2024 reading-lists -- in November 2023.)
+(Processing the Spring 2024 reading-lists -- in December 2023.)
 
 The _"see file 'name-of-file'"_ entries refer to google-doc file-names.
 
-- course-count from original OIT file (2023-Nov-27-Monday): 14,885
+- course-count from original OIT file (2023-Dec-19-Tuesday): 14,896
     - (see file "a__OIT_course_list...")
+    - Note: had to manually make a slight manual correction to `brown.mcm.0800v.2024-spring` -- there was an errant backslash followed by an additional tab-character. Once they were removed, the file processed fine.
 
-- course-count from initial OIT subset: 1,389
+- course-count from initial OIT subset: 1,399
     - filtered out courses not matching season-year (2024-spring), and not having section "s01", and not having an instructor.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b2__oit_data_01a_summary.json")
 
-- course-count after filtering out courses with no email-address match: 1,260
+- course-count after filtering out courses with no email-address match: 1,276
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
-- course-count for remaining OIT courses after already-in-Leganto check: 1,056
-    - 204 courses were removed because the course was already in Leganto with the same instructor.
+- course-count for remaining OIT courses after already-in-Leganto check: 936
+    - 340 courses were removed because the course was already in Leganto with the same instructor.
     - (see file "d__already_in_leganto...tsv")
+        - Note there are two of these: Both Bart's original, and my copy are shown. The order of columns changed from the order the code was expecting, and there was one additional column. I restored the order of the columns to match the code, and I removed the additional column that's not used by the code.
     - (see file "d2__oit_data_02.json")
 
-- course-count for remaining OIT courses after OCRA class_id lookups: 311
-    - 745 courses were removed because there were no OCRA class_ids found.
+- course-count for remaining OIT courses after OCRA class_id lookups: 177
+    - 759 courses were removed because there were no OCRA class_ids found.
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json")
 
-- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 174
-    - 137 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
+- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 43
+    - 134 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
     - (see file "f__oit_data_03b.json")
 
-- course-count for remaining OIT courses after removing courses with no reading-list-data: 134
+- course-count for remaining OIT courses after removing courses with no reading-list-data: 3
     - 40 courses were removed because there was no reading-list-data found.
     - (see file "g__oit_data_04.json")
 
-- actual reading-list: see file "h__list_2023-11...tsv"
+- actual reading-list: see file "h__list_2023-12...tsv"
 
 ---
-
 
 # Step 1 -- Initial OIT subset
 
 script: "instructor_check_flow/10_prepare_oit_initial_subset.py"
 
-source-file: see "a__OIT_course_list..." in the ""2024_spring_reading_list_stuff__Nov2023" folder.
+source-file: see "a__OIT_course_list..." in the ""2024_spring_reading_list_stuff__Dec2023" folder.
 
 output-files: 
 - "csv_output/oit_subset_01.tsv"
 - "json_data/oit_data_01b.json"
 
 description:
-This takes the full OIT course list, and produces a subset of courses for Fall 2023, eliminating:
-- courses that are not offered in specified season-year (ie fall 2023).
+This takes the full OIT course list, and produces a subset of courses for Spring 2024, eliminating:
+- courses that are not offered in specified season-year (this specified season-year being spring-2024).
 - courses that either have no section, or have a section other than "s01".
 - courses that have no instructor.
 
