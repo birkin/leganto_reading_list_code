@@ -2,7 +2,7 @@
 
 (Processing the Spring 2024 reading-lists -- in December 2023.)
 
-The "see file 'name-of-file'" entries refer to google-doc file-names.
+The _"see file 'name-of-file'"_ entries refer to google-doc file-names.
 
 - course-count from original OIT file (2023-Dec-19-Tuesday): 14,896
     - (see file "a__OIT_course_list...")
