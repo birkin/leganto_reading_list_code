@@ -36,25 +36,7 @@ The _"see file 'name-of-file'"_ entries refer to google-doc file-names.
     - 22 courses were removed because there was no reading-list-data found.
     - (see file "g__oit_data_04.json")
 
------------------
-Old info below...
------------------
-
-<!-- - course-count for remaining OIT courses after OCRA class_id lookups: 177
-    - 759 courses were removed because there were no OCRA class_ids found.
-    - a "class_id" is required to do OCRA reading-list lookups.
-    - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
-    - (see file "e__oit_data_03.json") -->
-
-<!-- - course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 43
-    - 134 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
-    - (see file "f__oit_data_03b.json") -->
-
-<!-- - course-count for remaining OIT courses after removing courses with no reading-list-data: 3
-    - 40 courses were removed because there was no reading-list-data found.
-    - (see file "g__oit_data_04.json") -->
-
-- actual reading-list: see file "h__list_2023-12...tsv"
+- actual reading-list: see file "h__list_2024-01...tsv"
 
 ---
 
