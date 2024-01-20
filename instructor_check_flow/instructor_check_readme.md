@@ -13,19 +13,18 @@ The _"see file 'name-of-file'"_ entries refer to google-doc file-names.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b2__oit_data_01a_summary.json")
 
------------------
-Old info below...
------------------
-
-- course-count after filtering out courses with no email-address match: 1,276
+- course-count after filtering out courses with no email-address match: 912
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
-- course-count for remaining OIT courses after already-in-Leganto check: 936
-    - 340 courses were removed because the course was already in Leganto with the same instructor.
-    - (see file "d__already_in_leganto...tsv")
-        - Note there are two of these: Both Bart's original, and my copy are shown. The order of columns changed from the order the code was expecting, and there was one additional column. I restored the order of the columns to match the code, and I removed the additional column that's not used by the code.
-    - (see file "d2__oit_data_02.json")
+- course-count for remaining OIT courses after already-in-Leganto check: 701
+    - 211 courses were removed because the course was already in Leganto with the same instructor.
+    - (see file "d__already_in_leganto...tsv" -- this was made from <https://docs.google.com/spreadsheets/d/1bRqzHn1fJ3sxN0d5NiVQc8X5QfCj_LbmQUIuIL2YRxM/edit?usp=drive_link>, which is a copy of Bart's spreadsheet. I used the second worksheet, and re-arranged the columns to fit my code.)
+    - (see file "d2__oit_data_02.json" -- for the output and summary metadata)
+
+-----------------
+Old info below...
+-----------------
 
 - course-count for remaining OIT courses after OCRA class_id lookups: 177
     - 759 courses were removed because there were no OCRA class_ids found.
