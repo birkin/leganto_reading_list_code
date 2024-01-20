@@ -91,12 +91,16 @@ def main():
                     data_ok = True
                 else:
                     skipped_sections.append( course_code_dict['course_code_section'] )
-                if data_ok == True and len( line_dict['ALL_INSTRUCTORS'].strip() ) > 0:
+                all_instructors = line_dict['ALL_INSTRUCTORS'].strip()
+                log.debug( f'all_instructors, ``{all_instructors}``' )
+                if data_ok == True and ',' in all_instructors and len( all_instructors ) < 5:
+                    log.debug( 'WHOA!' )
+                if data_ok == True and len( all_instructors ) > 0 and all_instructors != ',':
                     log.debug( 'passed instructor check' )
                     subset_lines.append( data_line )
                     log.debug( 'added to subset_lines' )
                 else:
-                    log.debug( 'skipped due to no instructor' )
+                    log.debug( f'skipped on instructor check; data_ok, ``{data_ok}``; all_instructors, ``{all_instructors}``' )
                     skipped_due_to_no_instructor.append( data_line )
     # log.debug( f'subset_lines, ``{pprint.pformat(subset_lines)}``' )
     # log.debug( f'len(subset_lines), ``{len(subset_lines)}``' )
