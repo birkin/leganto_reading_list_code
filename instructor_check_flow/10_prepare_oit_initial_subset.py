@@ -155,7 +155,7 @@ def tab_count_check( filepath: str ):
         else:
             line_tab_count = line.count( '\t' )
             if line_tab_count != tab_count:
-                err_line = { 'line': line, 'tab_count': line_tab_count }
+                err_line = { 'line': line, 'problem_tab_count': line_tab_count }
                 error_lines.append( err_line )
     if len( error_lines ) > 0:
         err_info = { 'expected_tab_count': tab_count, 'error_lines': error_lines }
