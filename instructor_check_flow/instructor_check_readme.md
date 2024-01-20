@@ -4,15 +4,16 @@
 
 The _"see file 'name-of-file'"_ entries refer to google-doc file-names.
 
-- course-count from original OIT file (2024-Jan-19-Friday):
+- course-count from original OIT file (2024-Jan-19-Friday): 5969
+    - (see file "a__OIT_course_list...")
+    - Note: had to manually make a slight manual correction to `"brown.mcm.0800v.2024-spring" -- "Art/Gender/Technology"` -- there was an errant backslash followed by an additional tab-character. Once they were removed, the file processed fine.
+
+- course-count from initial OIT subset: 1,043
 
 -----------------
 Old info below...
 -----------------
 
-- course-count from original OIT file (2023-Dec-19-Tuesday): 14,896
-    - (see file "a__OIT_course_list...")
-    - Note: had to manually make a slight manual correction to `brown.mcm.0800v.2024-spring` -- there was an errant backslash followed by an additional tab-character. Once they were removed, the file processed fine.
 
 - course-count from initial OIT subset: 1,399
     - filtered out courses not matching season-year (2024-spring), and not having section "s01", and not having an instructor.
