@@ -56,8 +56,9 @@ def main():
         Called by if __name__ == '__main__' """
 
     ## validate OIT file --------------------------------------------
-    assert is_utf8_encoded(OIT_COURSE_LIST_PATH) == True
+    assert is_utf8_encoded( OIT_COURSE_LIST_PATH ) == True
     # assert is_tab_separated(OIT_COURSE_LIST_PATH) == True  ## TODO
+    tab_count_check( OIT_COURSE_LIST_PATH )  # raises exception on failure
 
     ## load OIT file ------------------------------------------------
     lines = []
@@ -136,13 +137,40 @@ def main():
 
 
 ## helper functions -------------------------------------------------
+            
+
+def tab_count_check( filepath: str ):
+    """ Checks that all lines have the same number of tabs.
+        Logs problematic lines and raises exception on failure.
+        Called by main() """
+    assert type(filepath) == str
+    error_lines = []
+    lines = []
+    with open( filepath, 'r' ) as f:
+        lines = f.readlines()
+    tab_count = None
+    for i, line in enumerate( lines ):
+        if i == 0:
+            tab_count = line.count( '\t' )
+        else:
+            line_tab_count = line.count( '\t' )
+            if line_tab_count != tab_count:
+                err_line = { 'line': line, 'tab_count': line_tab_count }
+                error_lines.append( err_line )
+    if len( error_lines ) > 0:
+        err_info = { 'expected_tab_count': tab_count, 'error_lines': error_lines }
+        msg = f'problem with tab-count; error_lines, ``{pprint.pformat(err_info)}``'
+        log.error( msg )
+        raise Exception( f'problem with tab-count; {msg}' )
+    return
+
 
 def parse_line( data_line: str, heading_line: str, line_number: int ) -> dict:
     """ Parses data-line.
         Called by main() """
     log.debug( 'starting parse_line()')
-    # log.debug( f'data_line, ``{data_line}``' )
-    # log.debug( f'heading_line, ``{heading_line}``' )
+    log.debug( f'data_line, ``{data_line}``' )
+    log.debug( f'heading_line, ``{heading_line}``' )
     assert type(data_line) == str
     assert type(heading_line) == str
     assert type(line_number) == int
