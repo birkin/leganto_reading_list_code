@@ -22,15 +22,21 @@ The _"see file 'name-of-file'"_ entries refer to google-doc file-names.
     - (see file "d__already_in_leganto...tsv" -- this was made from <https://docs.google.com/spreadsheets/d/1bRqzHn1fJ3sxN0d5NiVQc8X5QfCj_LbmQUIuIL2YRxM/edit?usp=drive_link>, which is a copy of Bart's spreadsheet. I used the second worksheet, and re-arranged the columns to fit my code.)
     - (see file "d2__oit_data_02.json" -- for the output and summary metadata)
 
+- course-count for remaining OIT courses after OCRA class_id lookups: 122
+    - 579 courses were removed because there were no OCRA class_ids found.
+    - a "class_id" is required to do OCRA reading-list lookups.
+    - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
+    - (see file "e__oit_data_03.json")
+
 -----------------
 Old info below...
 -----------------
 
-- course-count for remaining OIT courses after OCRA class_id lookups: 177
+<!-- - course-count for remaining OIT courses after OCRA class_id lookups: 177
     - 759 courses were removed because there were no OCRA class_ids found.
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
-    - (see file "e__oit_data_03.json")
+    - (see file "e__oit_data_03.json") -->
 
 - course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 43
     - 134 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
