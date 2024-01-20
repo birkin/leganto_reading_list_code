@@ -1,43 +1,42 @@
 # Summary...
 
-(Processing the Spring 2024 reading-lists -- in December 2023.)
+(Processing the Spring 2024 reading-lists -- in January 2024.)
 
 The _"see file 'name-of-file'"_ entries refer to google-doc file-names.
 
-- course-count from original OIT file (2023-Dec-19-Tuesday): 14,896
+- course-count from original OIT file (2024-Jan-19-Friday): 5969
     - (see file "a__OIT_course_list...")
-    - Note: had to manually make a slight manual correction to `brown.mcm.0800v.2024-spring` -- there was an errant backslash followed by an additional tab-character. Once they were removed, the file processed fine.
+    - Note: had to manually make a slight manual correction to `"brown.mcm.0800v.2024-spring" -- "Art/Gender/Technology"` -- there was an errant backslash followed by an additional tab-character. Once they were removed, the file processed fine.
 
-- course-count from initial OIT subset: 1,399
+- course-count from initial OIT subset: 1,023
     - filtered out courses not matching season-year (2024-spring), and not having section "s01", and not having an instructor.
     - (see output-file "b__oit_subset_01.tsv")
     - (see summary-file "b2__oit_data_01a_summary.json")
 
-- course-count after filtering out courses with no email-address match: 1,276
+- course-count after filtering out courses with no email-address match: 912
     - I used OCRA to find email-addresses from the OIT Bru-ID.
     - (see output-file "c__oit_data_01b.json")
 
-- course-count for remaining OIT courses after already-in-Leganto check: 936
-    - 340 courses were removed because the course was already in Leganto with the same instructor.
-    - (see file "d__already_in_leganto...tsv")
-        - Note there are two of these: Both Bart's original, and my copy are shown. The order of columns changed from the order the code was expecting, and there was one additional column. I restored the order of the columns to match the code, and I removed the additional column that's not used by the code.
-    - (see file "d2__oit_data_02.json")
+- course-count for remaining OIT courses after already-in-Leganto check: 701
+    - 211 courses were removed because the course was already in Leganto with the same instructor.
+    - (see file "d__already_in_leganto...tsv" -- this was made from <https://docs.google.com/spreadsheets/d/1bRqzHn1fJ3sxN0d5NiVQc8X5QfCj_LbmQUIuIL2YRxM/edit?usp=drive_link>, which is a copy of Bart's spreadsheet. I used the second worksheet, and re-arranged the columns to fit my code.)
+    - (see file "d2__oit_data_02.json" -- for the output and summary metadata)
 
-- course-count for remaining OIT courses after OCRA class_id lookups: 177
-    - 759 courses were removed because there were no OCRA class_ids found.
+- course-count for remaining OIT courses after OCRA class_id lookups: 122
+    - 579 courses were removed because there were no OCRA class_ids found.
     - a "class_id" is required to do OCRA reading-list lookups.
     - I find class_ids by querying OCRA on the "department" and "number" part of the course-code (like "BIOL 1234")
     - (see file "e__oit_data_03.json")
 
-- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 43
-    - 134 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
+- course-count for remaining OIT courses after matching (for each course) all OIT-instructors against all OCRA-instructors: 26
+    - 96 courses were removed because there was no match between any of the OIT instructors and OCRA instructors.
     - (see file "f__oit_data_03b.json")
 
-- course-count for remaining OIT courses after removing courses with no reading-list-data: 3
-    - 40 courses were removed because there was no reading-list-data found.
+- course-count for remaining OIT courses after removing courses with no reading-list-data: 4
+    - 22 courses were removed because there was no reading-list-data found.
     - (see file "g__oit_data_04.json")
 
-- actual reading-list: see file "h__list_2023-12...tsv"
+- actual reading-list: see file "h__list_2024-01...tsv"
 
 ---
 
