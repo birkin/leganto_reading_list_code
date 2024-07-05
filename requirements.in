@@ -1,7 +1,7 @@
-cryptography==37.0.2
+cryptography==42.0.4
 fuzzywuzzy==0.18.0
 gspread==5.4.0
 pip-tools==6.6.2
-PyMySQL==1.0.2
+PyMySQL==1.1.1
 python-Levenshtein==0.12.2
-requests==2.28.1
+requests==2.32.2
